@@ -1,51 +1,24 @@
+import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Award, FileText, ExternalLink } from "lucide-react";
+import { Award, FileText, ExternalLink, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { type Patent } from "@shared/schema";
 
 export default function PatentPortfolio() {
-  const patents = [
-    {
-      number: "US10481758 B2",
-      title: "Location Based Augmented Reality System",
-      year: "2019",
-      company: "iOcculi",
-      status: "Awarded",
-      description:
-        "Location-based augmented reality systems for exchange of items based on location sensing and associated triggering icons.",
-      category: "AR/Mobile",
-    },
-    {
-      number: "US20200259974 A1",
-      title: "Cubiform Method",
-      year: "2020",
-      company: "Filmic Inc.",
-      status: "Awarded",
-      description:
-        "Method for generating color lookup tables for real-time image modification and color grading in mobile video applications.",
-      category: "Video/Imaging",
-    },
-    {
-      number: "US20150350041 A1",
-      title: "Protocols & Mechanisms of Communication",
-      year: "2015",
-      company: "Paladin Innovators",
-      status: "Contributor",
-      description:
-        "Communication protocols between live production servers and mobile/remote clients using WebSockets for real-time video production control.",
-      category: "Networking",
-    },
-    {
-      number: "US20150350289 A1",
-      title: "Methods & Systems for Transmission of High Resolution Data",
-      year: "2015",
-      company: "Paladin Innovators",
-      status: "Contributor",
-      description:
-        "Ultra low latency streaming methods for transmitting high-resolution video with minimal error and low latency over standard networks.",
-      category: "Streaming",
-    },
-  ];
+  const { data: patents = [], isLoading } = useQuery<Patent[]>({
+    queryKey: ["/api/patents"],
+  });
+
+  if (isLoading) {
+    return (
+      <section className="py-20 flex items-center justify-center bg-muted/30">
+        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+      </section>
+    );
+  }
+
+  const sortedPatents = [...patents].sort((a, b) => a.sortOrder - b.sortOrder);
 
   const statusColors: Record<string, string> = {
     Awarded: "bg-chart-2/10 text-chart-2 border-chart-2/20",
@@ -70,9 +43,9 @@ export default function PatentPortfolio() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          {patents.map((patent, idx) => (
+          {sortedPatents.map((patent, idx) => (
             <Card
-              key={idx}
+              key={patent.id}
               className="p-6 hover-elevate active-elevate-2 transition-all group"
               data-testid={`card-patent-${idx}`}
             >
@@ -92,7 +65,7 @@ export default function PatentPortfolio() {
                   size="icon"
                   variant="ghost"
                   className="opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={() => console.log(`View patent ${patent.number}`)}
+                  onClick={() => window.open(`https://patents.google.com/patent/${patent.number}`, '_blank')}
                   data-testid={`button-view-patent-${idx}`}
                 >
                   <ExternalLink className="w-4 h-4" />
@@ -102,23 +75,16 @@ export default function PatentPortfolio() {
               <p className="text-sm text-muted-foreground mb-4">{patent.description}</p>
 
               <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className={statusColors[patent.status]}>
+                <Badge variant="outline" className={statusColors[patent.status] || "bg-primary/10 text-primary border-primary/20"}>
                   {patent.status}
                 </Badge>
                 <Badge variant="secondary">{patent.category}</Badge>
-                <Badge variant="secondary" className="font-mono">
-                  {patent.year}
+                <Badge variant="outline" className="border-muted-foreground/20">
+                  {patent.company} • {patent.year}
                 </Badge>
-                <Badge variant="outline">{patent.company}</Badge>
               </div>
             </Card>
           ))}
-        </div>
-
-        <div className="mt-12 text-center">
-          <p className="text-sm text-muted-foreground">
-            Patents demonstrate expertise in mobile technologies, real-time streaming, and innovative user experiences
-          </p>
         </div>
       </div>
     </section>

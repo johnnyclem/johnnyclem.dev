@@ -1,62 +1,23 @@
+import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Building2 } from "lucide-react";
+import { Loader2, Building2 } from "lucide-react";
+import { type Experience } from "@shared/schema";
 
 export default function ExperienceTimeline() {
-  const experiences = [
-    {
-      company: "AI Layer Labs / Wire Network",
-      role: "Senior Blockchain Engineer (AI Agents)",
-      period: "Nov 2024 - Jun 2025",
-      location: "Remote, United States",
-      type: "AI & Blockchain",
-      achievements: [
-        "Architected and launched open-source agentic AI application for MacOS",
-        "Contributed to successful $2M pre-seed fundraise",
-        "Established TypeScript ecosystem for AI agents",
-        "Engineered LLM+RAG workflows",
-      ],
-    },
-    {
-      company: "Truepic",
-      role: "Senior iOS Engineer",
-      period: "Nov 2023 - Nov 2024",
-      location: "Remote, United States",
-      type: "iOS Development",
-      achievements: [
-        "Developed secure content-provenance iOS SDK adopted by 6 major social media platforms",
-        "Enhanced media capture and transmission pipelines for low latency",
-        "Reduced p95 operation time across diverse network conditions",
-        "Collaborated with Product and Design teams on usability improvements",
-      ],
-    },
-    {
-      company: "Belief Agency",
-      role: "Director of Digital",
-      period: "Nov 2019 - Aug 2022",
-      location: "Seattle, United States",
-      type: "Leadership",
-      achievements: [
-        "Guided multi-disciplinary mobile and web teams",
-        "Instituted best practices for code review and testing methodologies",
-        "Collaborated with creative and account teams on diverse solutions",
-        "Drove informed technical decisions across projects",
-      ],
-    },
-    {
-      company: "FiLMIC Inc.",
-      role: "Staff iOS Engineer, Chief Technology Officer",
-      period: "Feb 2015 - Jan 2019",
-      location: "Seattle, United States",
-      type: "CTO",
-      achievements: [
-        "Directed and mentored mobile engineering team from 1 to 8 engineers",
-        "Achieved #1 App Store ranking in Photo & Video category",
-        "Enhanced performance within AVFoundation, CoreMedia, and CoreAudio pipelines",
-        "Instituted release discipline and architectural guidelines",
-      ],
-    },
-  ];
+  const { data: experiences = [], isLoading } = useQuery<Experience[]>({
+    queryKey: ["/api/experiences"],
+  });
+
+  if (isLoading) {
+    return (
+      <section className="py-20 flex items-center justify-center">
+        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+      </section>
+    );
+  }
+
+  const sortedExperiences = [...experiences].sort((a, b) => a.sortOrder - b.sortOrder);
 
   const typeColors: Record<string, string> = {
     "AI & Blockchain": "bg-chart-5/10 text-chart-5 border-chart-5/20",
@@ -82,9 +43,9 @@ export default function ExperienceTimeline() {
           <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-px bg-border hidden md:block" />
 
           <div className="space-y-12">
-            {experiences.map((exp, idx) => (
+            {sortedExperiences.map((exp, idx) => (
               <div
-                key={idx}
+                key={exp.id}
                 className={`relative flex flex-col md:flex-row gap-8 ${
                   idx % 2 === 0 ? "md:flex-row-reverse" : ""
                 }`}
@@ -103,24 +64,21 @@ export default function ExperienceTimeline() {
                         <h3 className="text-xl font-bold" data-testid={`text-company-${idx}`}>
                           {exp.company}
                         </h3>
-                        <p className="text-lg font-semibold text-primary">{exp.role}</p>
+                        <p className="text-lg text-foreground font-medium mb-1">{exp.role}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {exp.period} • {exp.location}
+                        </p>
                       </div>
                     </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    <Badge variant="outline" className={typeColors[exp.type]}>
+                    <Badge variant="outline" className={typeColors[exp.type] || "bg-primary/10 text-primary border-primary/20"}>
                       {exp.type}
                     </Badge>
-                    <Badge variant="secondary" className="font-mono text-xs">
-                      {exp.period}
-                    </Badge>
                   </div>
 
-                  <ul className="space-y-2">
-                    {exp.achievements.map((achievement, achIdx) => (
-                      <li key={achIdx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <CheckCircle2 className="w-4 h-4 text-chart-2 mt-0.5 flex-shrink-0" />
+                  <ul className="space-y-2 text-sm" data-testid={`achievements-${idx}`}>
+                    {exp.achievements.map((achievement, achievementIdx) => (
+                      <li key={achievementIdx} className="flex items-start gap-2 text-muted-foreground">
+                        <span className="text-primary mt-1">•</span>
                         <span>{achievement}</span>
                       </li>
                     ))}

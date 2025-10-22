@@ -1,5 +1,7 @@
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Download, FileText, Award } from "lucide-react";
+import { Download, FileText, Award, Loader2 } from "lucide-react";
+import { type Profile, type Company } from "@shared/schema";
 import heroBackground from "@assets/generated_images/Professional_tech_hero_background_2aa09870.png";
 import ProjectCarousel from "./ProjectCarousel";
 
@@ -9,6 +11,26 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ onDownloadResume, onViewPatents }: HeroSectionProps) {
+  const { data: profile, isLoading: profileLoading } = useQuery<Profile>({
+    queryKey: ["/api/profile"],
+  });
+
+  const { data: companies = [], isLoading: companiesLoading } = useQuery<Company[]>({
+    queryKey: ["/api/companies"],
+  });
+
+  if (profileLoading || companiesLoading) {
+    return (
+      <section className="relative min-h-screen flex items-center justify-center">
+        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+      </section>
+    );
+  }
+
+  if (!profile) {
+    return null;
+  }
+
   return (
     <section
       id="hero"
@@ -31,33 +53,43 @@ export default function HeroSection({ onDownloadResume, onViewPatents }: HeroSec
               <div className="space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
                   <Award className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium text-primary">Senior iOS Engineer</span>
+                  <span className="text-sm font-medium text-primary">{profile.title.split(" & ")[0]}</span>
                 </div>
                 <h1 className="text-4xl md:text-6xl font-bold tracking-tight" data-testid="text-hero-title">
-                  Polymath Engineer &{" "}
-                  <span className="text-primary">Innovation Architect</span>
+                  {profile.title.includes(" & ") ? (
+                    <>
+                      {profile.title.split(" & ")[0]} &{" "}
+                      <span className="text-primary">{profile.title.split(" & ")[1]}</span>
+                    </>
+                  ) : (
+                    profile.title
+                  )}
                 </h1>
                 <p className="text-lg md:text-xl text-muted-foreground max-w-2xl" data-testid="text-hero-subtitle">
-                  Specializing in R&D and rapid prototyping with extensive jack-of-all-trades experience across{" "}
-                  <span className="text-foreground font-semibold">10+ programming languages</span> and{" "}
-                  <span className="text-foreground font-semibold">a dozen platforms</span>.
+                  {profile.subtitle}
                 </p>
               </div>
 
               <div className="space-y-4">
                 <div className="flex flex-wrap gap-4">
-                  <div className="flex items-center gap-2 text-sm">
-                    <div className="w-2 h-2 rounded-full bg-chart-2" />
-                    <span className="text-muted-foreground">10+ Years Experience</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <div className="w-2 h-2 rounded-full bg-chart-2" />
-                    <span className="text-muted-foreground">4 Patents</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <div className="w-2 h-2 rounded-full bg-chart-2" />
-                    <span className="text-muted-foreground">1B+ Devices Deployed</span>
-                  </div>
+                  {profile.yearsExperience && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-2 h-2 rounded-full bg-chart-2" />
+                      <span className="text-muted-foreground">{profile.yearsExperience}+ Years Experience</span>
+                    </div>
+                  )}
+                  {profile.patentCount && profile.patentCount > 0 && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-2 h-2 rounded-full bg-chart-2" />
+                      <span className="text-muted-foreground">{profile.patentCount} Patents</span>
+                    </div>
+                  )}
+                  {profile.devicesDeployed && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-2 h-2 rounded-full bg-chart-2" />
+                      <span className="text-muted-foreground">{profile.devicesDeployed} Devices Deployed</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex flex-wrap gap-3">
@@ -78,16 +110,18 @@ export default function HeroSection({ onDownloadResume, onViewPatents }: HeroSec
                 </div>
               </div>
 
-              <div className="pt-4 border-t">
-                <p className="text-sm text-muted-foreground mb-2">Trusted by leading companies</p>
-                <div className="flex flex-wrap gap-5 items-center text-muted-foreground">
-                  <span className="text-base font-semibold">Meta</span>
-                  <span className="text-base font-semibold">OpenAI</span>
-                  <span className="text-base font-semibold">Starbucks</span>
-                  <span className="text-base font-semibold">X</span>
-                  <span className="text-base font-semibold">Truepic</span>
+              {companies.length > 0 && (
+                <div className="pt-4 border-t">
+                  <p className="text-sm text-muted-foreground mb-2">Trusted by leading companies</p>
+                  <div className="flex flex-wrap gap-5 items-center text-muted-foreground">
+                    {companies.map((company) => (
+                      <span key={company.id} className="text-base font-semibold">
+                        {company.name}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <div className="hidden md:block">

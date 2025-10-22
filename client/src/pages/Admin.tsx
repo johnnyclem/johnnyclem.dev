@@ -14,14 +14,29 @@ export default function Admin() {
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    if (localStorage.getItem("admin_authenticated") !== "true") {
-      setLocation("/admin/login");
-    }
+    // Check session authentication on server
+    fetch("/api/admin/check")
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.isAuthenticated) {
+          localStorage.removeItem("admin_authenticated");
+          setLocation("/admin/login");
+        }
+      })
+      .catch(() => {
+        setLocation("/admin/login");
+      });
   }, [setLocation]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("admin_authenticated");
-    setLocation("/admin/login");
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/admin/logout", { method: "POST" });
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      localStorage.removeItem("admin_authenticated");
+      setLocation("/admin/login");
+    }
   };
 
   return (

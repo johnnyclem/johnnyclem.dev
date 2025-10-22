@@ -18,9 +18,13 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
-      // Simple password check - store in localStorage for this demo
-      // In production, you'd use proper authentication
-      if (password === "admin123") {
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+
+      if (response.ok) {
         localStorage.setItem("admin_authenticated", "true");
         setLocation("/admin");
       } else {

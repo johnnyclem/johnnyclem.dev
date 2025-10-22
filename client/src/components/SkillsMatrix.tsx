@@ -1,52 +1,24 @@
+import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Code2, Smartphone, Server, Database, Cpu, Wrench } from "lucide-react";
+import { Loader2, Award } from "lucide-react";
+import * as Icons from "lucide-react";
+import { type Skill } from "@shared/schema";
 
 export default function SkillsMatrix() {
-  const skillCategories = [
-    {
-      icon: Smartphone,
-      title: "Mobile Development",
-      color: "text-primary",
-      skills: ["Swift", "Objective-C", "UIKit", "SwiftUI", "AVFoundation", "CoreMedia", "CoreAudio"],
-      specialization: ["AVFoundation", "Swift"],
-    },
-    {
-      icon: Code2,
-      title: "Programming Languages",
-      color: "text-chart-2",
-      skills: ["TypeScript", "JavaScript", "C++", "Python", "Java", "Rust", "Go", "Kotlin", "C#", "Ruby"],
-      specialization: [],
-    },
-    {
-      icon: Server,
-      title: "Backend & APIs",
-      color: "text-chart-3",
-      skills: ["REST APIs", "GraphQL", "Node.js", "Express", "WebSockets", "Microservices"],
-      specialization: [],
-    },
-    {
-      icon: Database,
-      title: "Platforms & Deployment",
-      color: "text-chart-4",
-      skills: ["iOS", "macOS", "Android", "Web", "Desktop", "Cloud", "CI/CD", "Docker"],
-      specialization: [],
-    },
-    {
-      icon: Cpu,
-      title: "AI & Innovation",
-      color: "text-chart-5",
-      skills: ["Agentic AI", "LLM Integration", "RAG Workflows", "ML Optimization", "Blockchain"],
-      specialization: [],
-    },
-    {
-      icon: Wrench,
-      title: "Development Tools",
-      color: "text-primary",
-      skills: ["XCTest", "Instruments", "Git", "Jira", "Figma", "Performance Profiling"],
-      specialization: [],
-    },
-  ];
+  const { data: skills = [], isLoading } = useQuery<Skill[]>({
+    queryKey: ["/api/skills"],
+  });
+
+  if (isLoading) {
+    return (
+      <section className="py-20 flex items-center justify-center">
+        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+      </section>
+    );
+  }
+
+  const sortedSkills = [...skills].sort((a, b) => a.sortOrder - b.sortOrder);
 
   return (
     <section id="skills" className="py-20 bg-muted/30" data-testid="section-skills">
@@ -62,27 +34,27 @@ export default function SkillsMatrix() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {skillCategories.map((category, idx) => {
-            const Icon = category.icon;
+          {sortedSkills.map((category) => {
+            const IconComponent = (Icons as any)[category.icon] || Icons.Code2;
             return (
               <Card
-                key={idx}
+                key={category.id}
                 className="p-6 hover-elevate active-elevate-2 transition-all"
-                data-testid={`card-skill-${idx}`}
+                data-testid={`card-skill-${category.id}`}
               >
                 <div className="flex items-center gap-3 mb-4">
                   <div className={`p-2 rounded-lg bg-primary/10 ${category.color}`}>
-                    <Icon className="w-6 h-6" />
+                    <IconComponent className="w-6 h-6" />
                   </div>
                   <h3 className="text-lg font-semibold">{category.title}</h3>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {category.skills.map((skill, skillIdx) => (
+                  {category.items.map((skill, skillIdx) => (
                     <Badge
                       key={skillIdx}
-                      variant={category.specialization.includes(skill) ? "default" : "secondary"}
+                      variant={category.specializations.includes(skill) ? "default" : "secondary"}
                       className={
-                        category.specialization.includes(skill) ? "border-chart-2 bg-chart-2/10" : ""
+                        category.specializations.includes(skill) ? "border-chart-2 bg-chart-2/10" : ""
                       }
                       data-testid={`badge-skill-${skill.toLowerCase().replace(/\s+/g, "-")}`}
                     >
@@ -95,25 +67,23 @@ export default function SkillsMatrix() {
           })}
         </div>
 
-        <div className="mt-12 p-6 bg-card border rounded-lg">
-          <div className="flex items-start gap-4">
-            <div className="p-3 rounded-lg bg-chart-2/10">
-              <Award className="w-6 h-6 text-chart-2" />
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-2">Core Specialization</h4>
-              <p className="text-muted-foreground">
-                Deep expertise in <span className="text-foreground font-semibold">AVFoundation</span> and{" "}
-                <span className="text-foreground font-semibold">iPhone app development in Swift</span>, with proven
-                track record of optimizing video capture and streaming performance for #1 ranked App Store
-                applications.
-              </p>
+        {sortedSkills.some((s) => s.specializations.length > 0) && (
+          <div className="mt-12 p-6 bg-card border rounded-lg">
+            <div className="flex items-start gap-4">
+              <div className="p-3 rounded-lg bg-chart-2/10">
+                <Award className="w-6 h-6 text-chart-2" />
+              </div>
+              <div>
+                <h4 className="text-lg font-semibold mb-2">Core Specialization</h4>
+                <p className="text-muted-foreground">
+                  Primary expertise in AVFoundation for iOS, delivering high-performance media solutions that have
+                  reached over 1 billion devices worldwide.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </section>
   );
 }
-
-import { Award } from "lucide-react";

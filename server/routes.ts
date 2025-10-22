@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import {
@@ -10,14 +10,63 @@ import {
   insertCompanySchema,
 } from "@shared/schema";
 
+// Extend express-session
+declare module "express-session" {
+  interface SessionData {
+    isAdmin: boolean;
+  }
+}
+
+// Middleware to check if user is authenticated as admin
+function requireAdmin(req: Request, res: Response, next: NextFunction) {
+  if (req.session.isAdmin) {
+    next();
+  } else {
+    res.status(401).json({ error: "Unauthorized" });
+  }
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Admin authentication
+  app.post("/api/admin/login", async (req, res) => {
+    const { password } = req.body;
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
+    
+    if (password === ADMIN_PASSWORD) {
+      // Regenerate session to prevent fixation attacks
+      req.session.regenerate((err) => {
+        if (err) {
+          return res.status(500).json({ error: "Login failed" });
+        }
+        req.session.isAdmin = true;
+        res.json({ success: true });
+      });
+    } else {
+      res.status(401).json({ error: "Invalid password" });
+    }
+  });
+
+  app.post("/api/admin/logout", async (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        res.status(500).json({ error: "Logout failed" });
+      } else {
+        res.json({ success: true });
+      }
+    });
+  });
+
+  app.get("/api/admin/check", async (req, res) => {
+    res.json({ isAuthenticated: req.session.isAdmin === true });
+  });
+
   // Profile routes
   app.get("/api/profile", async (_req, res) => {
     const profile = await storage.getProfile();
     res.json(profile);
   });
 
-  app.post("/api/profile", async (req, res) => {
+  app.post("/api/profile", requireAdmin, async (req, res) => {
     try {
       const data = insertProfileSchema.parse(req.body);
       const profile = await storage.createProfile(data);
@@ -27,9 +76,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/profile/:id", async (req, res) => {
+  app.patch("/api/profile/:id", requireAdmin, async (req, res) => {
     try {
-      const profile = await storage.updateProfile(req.params.id, req.body);
+      const data = insertProfileSchema.partial().parse(req.body);
+      const profile = await storage.updateProfile(req.params.id, data);
       if (!profile) {
         return res.status(404).json({ error: "Profile not found" });
       }
@@ -45,7 +95,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(skills);
   });
 
-  app.post("/api/skills", async (req, res) => {
+  app.post("/api/skills", requireAdmin, async (req, res) => {
     try {
       const data = insertSkillSchema.parse(req.body);
       const skill = await storage.createSkill(data);
@@ -55,9 +105,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/skills/:id", async (req, res) => {
+  app.patch("/api/skills/:id", requireAdmin, async (req, res) => {
     try {
-      const skill = await storage.updateSkill(req.params.id, req.body);
+      const data = insertSkillSchema.partial().parse(req.body);
+      const skill = await storage.updateSkill(req.params.id, data);
       if (!skill) {
         return res.status(404).json({ error: "Skill not found" });
       }
@@ -67,7 +118,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/skills/:id", async (req, res) => {
+  app.delete("/api/skills/:id", requireAdmin, async (req, res) => {
     await storage.deleteSkill(req.params.id);
     res.status(204).send();
   });
@@ -78,7 +129,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(experiences);
   });
 
-  app.post("/api/experiences", async (req, res) => {
+  app.post("/api/experiences", requireAdmin, async (req, res) => {
     try {
       const data = insertExperienceSchema.parse(req.body);
       const experience = await storage.createExperience(data);
@@ -88,9 +139,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/experiences/:id", async (req, res) => {
+  app.patch("/api/experiences/:id", requireAdmin, async (req, res) => {
     try {
-      const experience = await storage.updateExperience(req.params.id, req.body);
+      const data = insertExperienceSchema.partial().parse(req.body);
+      const experience = await storage.updateExperience(req.params.id, data);
       if (!experience) {
         return res.status(404).json({ error: "Experience not found" });
       }
@@ -100,7 +152,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/experiences/:id", async (req, res) => {
+  app.delete("/api/experiences/:id", requireAdmin, async (req, res) => {
     await storage.deleteExperience(req.params.id);
     res.status(204).send();
   });
@@ -111,7 +163,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(patents);
   });
 
-  app.post("/api/patents", async (req, res) => {
+  app.post("/api/patents", requireAdmin, async (req, res) => {
     try {
       const data = insertPatentSchema.parse(req.body);
       const patent = await storage.createPatent(data);
@@ -121,9 +173,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/patents/:id", async (req, res) => {
+  app.patch("/api/patents/:id", requireAdmin, async (req, res) => {
     try {
-      const patent = await storage.updatePatent(req.params.id, req.body);
+      const data = insertPatentSchema.partial().parse(req.body);
+      const patent = await storage.updatePatent(req.params.id, data);
       if (!patent) {
         return res.status(404).json({ error: "Patent not found" });
       }
@@ -133,7 +186,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/patents/:id", async (req, res) => {
+  app.delete("/api/patents/:id", requireAdmin, async (req, res) => {
     await storage.deletePatent(req.params.id);
     res.status(204).send();
   });
@@ -144,7 +197,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(projects);
   });
 
-  app.post("/api/projects", async (req, res) => {
+  app.post("/api/projects", requireAdmin, async (req, res) => {
     try {
       const data = insertProjectSchema.parse(req.body);
       const project = await storage.createProject(data);
@@ -154,9 +207,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/projects/:id", async (req, res) => {
+  app.patch("/api/projects/:id", requireAdmin, async (req, res) => {
     try {
-      const project = await storage.updateProject(req.params.id, req.body);
+      const data = insertProjectSchema.partial().parse(req.body);
+      const project = await storage.updateProject(req.params.id, data);
       if (!project) {
         return res.status(404).json({ error: "Project not found" });
       }
@@ -166,7 +220,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/projects/:id", async (req, res) => {
+  app.delete("/api/projects/:id", requireAdmin, async (req, res) => {
     await storage.deleteProject(req.params.id);
     res.status(204).send();
   });
@@ -177,7 +231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(companies);
   });
 
-  app.post("/api/companies", async (req, res) => {
+  app.post("/api/companies", requireAdmin, async (req, res) => {
     try {
       const data = insertCompanySchema.parse(req.body);
       const company = await storage.createCompany(data);
@@ -187,9 +241,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/companies/:id", async (req, res) => {
+  app.patch("/api/companies/:id", requireAdmin, async (req, res) => {
     try {
-      const company = await storage.updateCompany(req.params.id, req.body);
+      const data = insertCompanySchema.partial().parse(req.body);
+      const company = await storage.updateCompany(req.params.id, data);
       if (!company) {
         return res.status(404).json({ error: "Company not found" });
       }
@@ -199,7 +254,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/companies/:id", async (req, res) => {
+  app.delete("/api/companies/:id", requireAdmin, async (req, res) => {
     await storage.deleteCompany(req.params.id);
     res.status(204).send();
   });
