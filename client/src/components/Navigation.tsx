@@ -84,7 +84,7 @@ export default function Navigation({ onDownloadResume }: NavigationProps) {
         </div>
 
         {isMobileMenuOpen && (
-          <div className="md:hidden mt-4 py-4 border-t flex flex-col gap-2" data-testid="mobile-menu">
+          <div className="md:hidden mt-4 py-4 border-t flex flex-col gap-2 bg-background rounded-lg" data-testid="mobile-menu">
             {navLinks.map((link) => (
               <button
                 key={link.id}
