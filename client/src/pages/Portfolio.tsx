@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
 import SkillsMatrix from "@/components/SkillsMatrix";
@@ -10,6 +10,8 @@ import ContactSection from "@/components/ContactSection";
 import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Portfolio() {
+  const [selectedSkillSlug, setSelectedSkillSlug] = useState<string | null>(null);
+
   useEffect(() => {
     document.documentElement.style.scrollBehavior = "smooth";
     return () => {
@@ -40,6 +42,19 @@ export default function Portfolio() {
     }
   };
 
+  const handleSkillClick = (skillSlug: string) => {
+    setSelectedSkillSlug(skillSlug);
+    // Scroll to projects section
+    const projectsSection = document.getElementById("projects");
+    if (projectsSection) {
+      projectsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const handleClearFilter = () => {
+    setSelectedSkillSlug(null);
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navigation onDownloadResume={handleDownloadResume} />
@@ -47,10 +62,17 @@ export default function Portfolio() {
 
       <main>
         <HeroSection onDownloadResume={handleDownloadResume} onViewPatents={handleViewPatents} />
-        <SkillsMatrix />
+        <SkillsMatrix 
+          onSkillClick={handleSkillClick} 
+          selectedSkillSlug={selectedSkillSlug}
+        />
         <ExperienceTimeline />
         <PatentPortfolio />
-        <ProjectHighlights />
+        <ProjectHighlights 
+          selectedSkillSlug={selectedSkillSlug}
+          onSkillClick={handleSkillClick}
+          onClearFilter={handleClearFilter}
+        />
         <SpecializationSection />
         <ContactSection
           onDownloadResume={handleDownloadResume}

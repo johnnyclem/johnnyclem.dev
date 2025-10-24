@@ -5,7 +5,12 @@ import { Loader2, Award } from "lucide-react";
 import * as Icons from "lucide-react";
 import { type Skill } from "@shared/schema";
 
-export default function SkillsMatrix() {
+interface SkillsMatrixProps {
+  onSkillClick: (skillSlug: string) => void;
+  selectedSkillSlug: string | null;
+}
+
+export default function SkillsMatrix({ onSkillClick, selectedSkillSlug }: SkillsMatrixProps) {
   const { data: skills = [], isLoading } = useQuery<Skill[]>({
     queryKey: ["/api/skills"],
   });
@@ -49,18 +54,23 @@ export default function SkillsMatrix() {
                   <h3 className="text-lg font-semibold">{category.title}</h3>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {category.items.map((skill, skillIdx) => (
-                    <Badge
-                      key={skillIdx}
-                      variant={category.specializations.includes(skill) ? "default" : "secondary"}
-                      className={
-                        category.specializations.includes(skill) ? "border-chart-2 bg-chart-2/10" : ""
-                      }
-                      data-testid={`badge-skill-${skill.toLowerCase().replace(/\s+/g, "-")}`}
-                    >
-                      {skill}
-                    </Badge>
-                  ))}
+                  {category.items.map((skill, skillIdx) => {
+                    const skillSlug = skill.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+                    const isSelected = selectedSkillSlug === skillSlug;
+                    return (
+                      <Badge
+                        key={skillIdx}
+                        variant={category.specializations.includes(skill) ? "default" : "secondary"}
+                        className={`cursor-pointer transition-all ${
+                          category.specializations.includes(skill) ? "border-chart-2 bg-chart-2/10" : ""
+                        } ${isSelected ? "ring-2 ring-primary" : ""}`}
+                        onClick={() => onSkillClick(skillSlug)}
+                        data-testid={`badge-skill-${skillSlug}`}
+                      >
+                        {skill}
+                      </Badge>
+                    );
+                  })}
                 </div>
               </Card>
             );

@@ -1,13 +1,29 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, X } from "lucide-react";
 import * as Icons from "lucide-react";
-import { type Project } from "@shared/schema";
+import { type Project, type SkillItem } from "@shared/schema";
 
-export default function ProjectHighlights() {
-  const { data: projects = [], isLoading } = useQuery<Project[]>({
-    queryKey: ["/api/projects"],
+interface EnrichedProject extends Project {
+  skillItems: SkillItem[];
+}
+
+interface ProjectHighlightsProps {
+  selectedSkillSlug: string | null;
+  onSkillClick: (skillSlug: string) => void;
+  onClearFilter: () => void;
+}
+
+export default function ProjectHighlights({ 
+  selectedSkillSlug, 
+  onSkillClick,
+  onClearFilter 
+}: ProjectHighlightsProps) {
+  // Fetch filtered projects if a skill is selected, otherwise fetch all projects
+  const { data: projects = [], isLoading } = useQuery<EnrichedProject[]>({
+    queryKey: selectedSkillSlug ? ["/api/skill-items", selectedSkillSlug, "projects"] : ["/api/projects"],
   });
 
   if (isLoading) {
@@ -20,6 +36,11 @@ export default function ProjectHighlights() {
 
   const sortedProjects = [...projects].sort((a, b) => a.sortOrder - b.sortOrder);
 
+  // Get the selected skill name for display
+  const selectedSkill = selectedSkillSlug 
+    ? projects[0]?.skillItems?.find(s => s.slug === selectedSkillSlug)
+    : null;
+
   return (
     <section id="projects" className="py-20" data-testid="section-projects">
       <div className="max-w-7xl mx-auto px-6">
@@ -30,6 +51,23 @@ export default function ProjectHighlights() {
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Proven track record of delivering high-impact solutions across mobile, AI, and video technologies
           </p>
+          
+          {selectedSkillSlug && (
+            <div className="mt-6 flex items-center justify-center gap-3">
+              <Badge variant="outline" className="text-base py-2 px-4">
+                Filtering by: <span className="font-semibold ml-2">{selectedSkill?.name || selectedSkillSlug}</span>
+              </Badge>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClearFilter}
+                data-testid="button-clear-filter"
+              >
+                <X className="w-4 h-4 mr-1" />
+                Clear Filter
+              </Button>
+            </div>
+          )}
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -71,11 +109,22 @@ export default function ProjectHighlights() {
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    {project.technologies.map((tech, techIdx) => (
-                      <Badge key={techIdx} variant="secondary" className="text-xs">
-                        {tech}
-                      </Badge>
-                    ))}
+                    {project.skillItems?.map((skillItem) => {
+                      const isSelected = selectedSkillSlug === skillItem.slug;
+                      return (
+                        <Badge 
+                          key={skillItem.id} 
+                          variant={skillItem.isSpecialization ? "default" : "secondary"}
+                          className={`text-xs cursor-pointer transition-all ${
+                            skillItem.isSpecialization ? "border-chart-2 bg-chart-2/10" : ""
+                          } ${isSelected ? "ring-2 ring-primary" : ""}`}
+                          onClick={() => onSkillClick(skillItem.slug)}
+                          data-testid={`badge-project-skill-${skillItem.slug}`}
+                        >
+                          {skillItem.name}
+                        </Badge>
+                      );
+                    })}
                   </div>
                 </div>
               </Card>
