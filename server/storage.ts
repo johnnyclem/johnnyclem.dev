@@ -5,6 +5,10 @@ import {
   type InsertProfile,
   type Skill,
   type InsertSkill,
+  type SkillItem,
+  type InsertSkillItem,
+  type ProjectSkillItem,
+  type InsertProjectSkillItem,
   type Experience,
   type InsertExperience,
   type Patent,
@@ -16,6 +20,8 @@ import {
   users,
   profile,
   skills,
+  skillItems,
+  projectSkillItems,
   experiences,
   patents,
   projects,
@@ -40,6 +46,20 @@ export interface IStorage {
   createSkill(data: InsertSkill): Promise<Skill>;
   updateSkill(id: string, data: Partial<InsertSkill>): Promise<Skill | undefined>;
   deleteSkill(id: string): Promise<void>;
+
+  // Skill Items methods
+  getAllSkillItems(): Promise<SkillItem[]>;
+  getSkillItemsBySkillId(skillId: string): Promise<SkillItem[]>;
+  getSkillItemBySlug(slug: string): Promise<SkillItem | undefined>;
+  createSkillItem(data: InsertSkillItem): Promise<SkillItem>;
+  updateSkillItem(id: string, data: Partial<InsertSkillItem>): Promise<SkillItem | undefined>;
+  deleteSkillItem(id: string): Promise<void>;
+
+  // Project-Skill Items junction methods
+  addSkillToProject(projectId: string, skillItemId: string): Promise<void>;
+  removeSkillFromProject(projectId: string, skillItemId: string): Promise<void>;
+  getSkillItemsForProject(projectId: string): Promise<SkillItem[]>;
+  getProjectsForSkillItem(skillItemId: string): Promise<Project[]>;
 
   // Experience methods
   getAllExperiences(): Promise<Experience[]>;
@@ -124,6 +144,69 @@ export class DatabaseStorage implements IStorage {
 
   async deleteSkill(id: string): Promise<void> {
     await db.delete(skills).where(eq(skills.id, id));
+  }
+
+  // Skill Items methods
+  async getAllSkillItems(): Promise<SkillItem[]> {
+    return await db.select().from(skillItems).orderBy(asc(skillItems.sortOrder));
+  }
+
+  async getSkillItemsBySkillId(skillId: string): Promise<SkillItem[]> {
+    return await db.select().from(skillItems).where(eq(skillItems.skillId, skillId)).orderBy(asc(skillItems.sortOrder));
+  }
+
+  async getSkillItemBySlug(slug: string): Promise<SkillItem | undefined> {
+    const [item] = await db.select().from(skillItems).where(eq(skillItems.slug, slug));
+    return item || undefined;
+  }
+
+  async createSkillItem(data: InsertSkillItem): Promise<SkillItem> {
+    const [skillItem] = await db.insert(skillItems).values(data).returning();
+    return skillItem;
+  }
+
+  async updateSkillItem(id: string, data: Partial<InsertSkillItem>): Promise<SkillItem | undefined> {
+    const [updated] = await db
+      .update(skillItems)
+      .set(data)
+      .where(eq(skillItems.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteSkillItem(id: string): Promise<void> {
+    await db.delete(skillItems).where(eq(skillItems.id, id));
+  }
+
+  // Project-Skill Items junction methods
+  async addSkillToProject(projectId: string, skillItemId: string): Promise<void> {
+    await db.insert(projectSkillItems).values({ projectId, skillItemId });
+  }
+
+  async removeSkillFromProject(projectId: string, skillItemId: string): Promise<void> {
+    await db.delete(projectSkillItems)
+      .where(eq(projectSkillItems.projectId, projectId))
+      .where(eq(projectSkillItems.skillItemId, skillItemId));
+  }
+
+  async getSkillItemsForProject(projectId: string): Promise<SkillItem[]> {
+    const result = await db
+      .select({ skillItem: skillItems })
+      .from(projectSkillItems)
+      .innerJoin(skillItems, eq(projectSkillItems.skillItemId, skillItems.id))
+      .where(eq(projectSkillItems.projectId, projectId))
+      .orderBy(asc(skillItems.sortOrder));
+    return result.map(r => r.skillItem);
+  }
+
+  async getProjectsForSkillItem(skillItemId: string): Promise<Project[]> {
+    const result = await db
+      .select({ project: projects })
+      .from(projectSkillItems)
+      .innerJoin(projects, eq(projectSkillItems.projectId, projects.id))
+      .where(eq(projectSkillItems.skillItemId, skillItemId))
+      .orderBy(asc(projects.sortOrder));
+    return result.map(r => r.project);
   }
 
   // Experience methods

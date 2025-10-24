@@ -140,3 +140,31 @@ export const insertCompanySchema = createInsertSchema(companies).omit({
 
 export type InsertCompany = z.infer<typeof insertCompanySchema>;
 export type Company = typeof companies.$inferSelect;
+
+// Skill Items (individual skills like "Swift", "Objective-C", etc.)
+export const skillItems = pgTable("skill_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  skillId: varchar("skill_id").notNull().references(() => skills.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  isSpecialization: boolean("is_specialization").notNull().default(false),
+  sortOrder: integer("sort_order").notNull().default(0),
+});
+
+export const insertSkillItemSchema = createInsertSchema(skillItems).omit({
+  id: true,
+});
+
+export type InsertSkillItem = z.infer<typeof insertSkillItemSchema>;
+export type SkillItem = typeof skillItems.$inferSelect;
+
+// Junction table for many-to-many relationship between projects and skill items
+export const projectSkillItems = pgTable("project_skill_items", {
+  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  skillItemId: varchar("skill_item_id").notNull().references(() => skillItems.id, { onDelete: "cascade" }),
+});
+
+export const insertProjectSkillItemSchema = createInsertSchema(projectSkillItems);
+
+export type InsertProjectSkillItem = z.infer<typeof insertProjectSkillItemSchema>;
+export type ProjectSkillItem = typeof projectSkillItems.$inferSelect;
