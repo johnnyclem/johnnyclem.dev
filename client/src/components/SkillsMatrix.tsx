@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Award } from "lucide-react";
 import * as Icons from "lucide-react";
 import { type Skill } from "@shared/schema";
+import { skillToSlug } from "@/lib/skillSlugify";
 
 interface SkillsMatrixProps {
   onSkillClick: (skillSlug: string) => void;
@@ -55,7 +56,7 @@ export default function SkillsMatrix({ onSkillClick, selectedSkillSlug }: Skills
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {category.items.map((skill, skillIdx) => {
-                    const skillSlug = skill.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+                    const skillSlug = skillToSlug(skill);
                     const isSelected = selectedSkillSlug === skillSlug;
                     return (
                       <Badge

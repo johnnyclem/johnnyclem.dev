@@ -1,4 +1,5 @@
 import { storage } from "./storage";
+import { skillToSlug } from "./utils/slugify";
 
 export async function seedDatabase() {
   console.log("🌱 Seeding database...");
@@ -91,7 +92,7 @@ export async function seedDatabase() {
 
   for (const skill of [mobileDev, programmingLangs, backendAPIs, platforms, aiInnovation, devTools]) {
     for (const itemName of skill.items) {
-      const slug = itemName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      const slug = skillToSlug(itemName);
       const isSpecialization = skill.specializations.includes(itemName);
       
       const skillItem = await storage.createSkillItem({
@@ -257,7 +258,7 @@ export async function seedDatabase() {
     impact: "#1 App Store",
     icon: "Video",
     color: "text-chart-3",
-    technologies: ["Swift", "Objective-C", "AVFoundation", "CoreMedia", "CoreAudio", "UIKit", "iOS"],
+    technologies: ["Swift", "Objective-C", "AVFoundation", "CoreMedia", "CoreAudio", "UIKit", "iOS", "SwiftUI"],
     imageUrl: "/attached_assets/generated_images/FiLMiC_Pro_app_icon_9165a6a3.png",
     featured: true,
     sortOrder: 0,
@@ -271,7 +272,7 @@ export async function seedDatabase() {
     impact: "1B+ devices",
     icon: "Shield",
     color: "text-primary",
-    technologies: ["Swift", "iOS", "UIKit", "Security"],
+    technologies: ["Swift", "iOS", "UIKit"],
     imageUrl: "/attached_assets/truepic-logo-color_1761321859430.png",
     featured: false,
     sortOrder: 1,
@@ -285,7 +286,7 @@ export async function seedDatabase() {
     impact: "$2M raised",
     icon: "Bot",
     color: "text-chart-5",
-    technologies: ["TypeScript", "JavaScript", "Agentic AI", "LLM Integration", "RAG Workflows", "macOS", "Node.js"],
+    technologies: ["TypeScript", "JavaScript", "Agentic AI", "LLM Integration", "RAG Workflows", "macOS", "Node.js", "Blockchain"],
     imageUrl: "/attached_assets/App-1_1761321900465.png",
     featured: true,
     sortOrder: 2,
@@ -299,7 +300,7 @@ export async function seedDatabase() {
     impact: "<100ms latency",
     icon: "Zap",
     color: "text-chart-2",
-    technologies: ["WebSockets", "C++", "iOS", "Objective-C", "CoreMedia"],
+    technologies: ["WebSockets", "C++", "iOS", "Objective-C", "CoreMedia", "CoreAudio"],
     imageUrl: "/attached_assets/generated_images/Paladin_Innovators_corporate_logo_0d89c73f.png",
     featured: false,
     sortOrder: 3,

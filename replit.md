@@ -9,6 +9,12 @@ The application is built as a modern web stack with React frontend, Express back
 **Status**: ✅ Production-ready (pending environment variable configuration)
 
 **Recent Updates** (October 24, 2025):
+- ✅ Implemented clickable skills with bidirectional many-to-many navigation
+  - Created skillItems and projectSkillItems junction tables for proper relationships
+  - Skills in SkillsMatrix are clickable and filter projects by selected skill
+  - Projects display skills from database with clickable badges for bidirectional navigation
+  - Implemented consistent slug generation handling special cases (C++ → cpp, C# → csharp, Objective-C → objective-c)
+  - Filter UI with Clear Filter button and selected skill indicator
 - ✅ Added real company logos and app screenshots throughout portfolio
   - FiLMiC Pro and FiLMiC Remote app icons in projects
   - Souls agentic AI platform macOS app screenshot (featured project)
