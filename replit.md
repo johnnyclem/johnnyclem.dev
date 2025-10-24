@@ -8,7 +8,11 @@ The application is built as a modern web stack with React frontend, Express back
 
 **Status**: ✅ Production-ready (pending environment variable configuration)
 
-**Recent Updates** (October 22, 2025):
+**Recent Updates** (October 24, 2025):
+- ✅ Added real company logos and app icons throughout portfolio
+  - FiLMiC Pro and FiLMiC Remote app icons in projects
+  - Company logos for Truepic, AI Layer Labs, Wire Network, Belief Agency, FiLMiC Inc, Paladin Innovators
+  - Fixed static file serving to prevent content-type issues (images now served as image/png)
 - Implemented secure session-based authentication with CSRF protection
 - Added schema validation to all CRUD API routes
 - Enhanced color vibrancy (85% saturation) for a more alive, professional feel
@@ -113,6 +117,7 @@ Preferred communication style: Simple, everyday language.
 - Vite dev server with middleware mode integrated into Express
 - HMR for rapid frontend development
 - Replit-specific plugins for error overlay and development banners
+- Static file serving for attached_assets mounted before Vite middleware (critical: prevents content-type issues)
 
 **Production Build**
 - Frontend: Vite builds static assets to `dist/public`
