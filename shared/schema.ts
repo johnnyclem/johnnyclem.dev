@@ -168,3 +168,70 @@ export const insertProjectSkillItemSchema = createInsertSchema(projectSkillItems
 
 export type InsertProjectSkillItem = z.infer<typeof insertProjectSkillItemSchema>;
 export type ProjectSkillItem = typeof projectSkillItems.$inferSelect;
+
+// Blog Posts
+export const blogPosts = pgTable("blog_posts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
+  content: text("content").notNull(),
+  excerpt: text("excerpt"),
+  status: text("status").notNull().default("draft"),
+  publishedAt: timestamp("published_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const updateBlogPostSchema = insertBlogPostSchema.partial();
+
+export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
+export type UpdateBlogPost = z.infer<typeof updateBlogPostSchema>;
+export type BlogPost = typeof blogPosts.$inferSelect;
+
+// Theme Settings (singleton table)
+export const themeSettings = pgTable("theme_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  primaryColor: text("primary_color").notNull().default("220 85% 58%"),
+  accentColor: text("accent_color").notNull().default("142 85% 50%"),
+  backgroundColor: text("background_color").notNull().default("222 47% 11%"),
+  foregroundColor: text("foreground_color").notNull().default("213 31% 91%"),
+  fontFamily: text("font_family").notNull().default("Inter"),
+  headingFontFamily: text("heading_font_family").notNull().default("Inter"),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertThemeSettingsSchema = createInsertSchema(themeSettings).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export const updateThemeSettingsSchema = insertThemeSettingsSchema.partial();
+
+export type InsertThemeSettings = z.infer<typeof insertThemeSettingsSchema>;
+export type UpdateThemeSettings = z.infer<typeof updateThemeSettingsSchema>;
+export type ThemeSettings = typeof themeSettings.$inferSelect;
+
+// Content Blocks (for drag-and-drop reordering)
+export const contentBlocks = pgTable("content_blocks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  blockType: text("block_type").notNull(),
+  title: text("title").notNull(),
+  visible: boolean("visible").notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0),
+});
+
+export const insertContentBlockSchema = createInsertSchema(contentBlocks).omit({
+  id: true,
+});
+
+export const updateContentBlockSchema = insertContentBlockSchema.partial();
+
+export type InsertContentBlock = z.infer<typeof insertContentBlockSchema>;
+export type UpdateContentBlock = z.infer<typeof updateContentBlockSchema>;
+export type ContentBlock = typeof contentBlocks.$inferSelect;

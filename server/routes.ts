@@ -1,6 +1,9 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import multer from "multer";
+import path from "path";
+import { promises as fs } from "fs";
 import {
   insertProfileSchema,
   insertSkillSchema,
@@ -9,6 +12,12 @@ import {
   insertPatentSchema,
   insertProjectSchema,
   insertCompanySchema,
+  insertBlogPostSchema,
+  updateBlogPostSchema,
+  insertThemeSettingsSchema,
+  updateThemeSettingsSchema,
+  insertContentBlockSchema,
+  updateContentBlockSchema,
 } from "@shared/schema";
 
 // Extend express-session
@@ -342,6 +351,168 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/companies/:id", requireAdmin, async (req, res) => {
     await storage.deleteCompany(req.params.id);
     res.status(204).send();
+  });
+
+  // Blog Post routes
+  app.get("/api/blog-posts", async (_req, res) => {
+    const posts = await storage.getPublishedBlogPosts();
+    res.json(posts);
+  });
+
+  app.get("/api/blog-posts/all", requireAdmin, async (_req, res) => {
+    const posts = await storage.getAllBlogPosts();
+    res.json(posts);
+  });
+
+  app.get("/api/blog-posts/:id", async (req, res) => {
+    const post = await storage.getBlogPost(req.params.id);
+    if (!post) {
+      return res.status(404).json({ error: "Blog post not found" });
+    }
+    res.json(post);
+  });
+
+  app.get("/api/blog-posts/slug/:slug", async (req, res) => {
+    const post = await storage.getBlogPostBySlug(req.params.slug);
+    if (!post) {
+      return res.status(404).json({ error: "Blog post not found" });
+    }
+    res.json(post);
+  });
+
+  app.post("/api/blog-posts", requireAdmin, async (req, res) => {
+    try {
+      const data = insertBlogPostSchema.parse(req.body);
+      const post = await storage.createBlogPost(data);
+      res.json(post);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/blog-posts/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = updateBlogPostSchema.parse(req.body);
+      const post = await storage.updateBlogPost(req.params.id, data);
+      if (!post) {
+        return res.status(404).json({ error: "Blog post not found" });
+      }
+      res.json(post);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/blog-posts/:id", requireAdmin, async (req, res) => {
+    await storage.deleteBlogPost(req.params.id);
+    res.status(204).send();
+  });
+
+  // Theme Settings routes
+  app.get("/api/theme-settings", async (_req, res) => {
+    const settings = await storage.getThemeSettings();
+    res.json(settings);
+  });
+
+  app.post("/api/theme-settings", requireAdmin, async (req, res) => {
+    try {
+      const data = insertThemeSettingsSchema.parse(req.body);
+      const settings = await storage.createThemeSettings(data);
+      res.json(settings);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/theme-settings/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = updateThemeSettingsSchema.parse(req.body);
+      const settings = await storage.updateThemeSettings(req.params.id, data);
+      if (!settings) {
+        return res.status(404).json({ error: "Theme settings not found" });
+      }
+      res.json(settings);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  // Content Block routes
+  app.get("/api/content-blocks", async (_req, res) => {
+    const blocks = await storage.getAllContentBlocks();
+    res.json(blocks);
+  });
+
+  app.post("/api/content-blocks", requireAdmin, async (req, res) => {
+    try {
+      const data = insertContentBlockSchema.parse(req.body);
+      const block = await storage.createContentBlock(data);
+      res.json(block);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/content-blocks/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = updateContentBlockSchema.parse(req.body);
+      const block = await storage.updateContentBlock(req.params.id, data);
+      if (!block) {
+        return res.status(404).json({ error: "Content block not found" });
+      }
+      res.json(block);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/content-blocks/reorder", requireAdmin, async (req, res) => {
+    try {
+      const { blocks } = req.body;
+      await storage.updateContentBlockOrder(blocks);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/content-blocks/:id", requireAdmin, async (req, res) => {
+    await storage.deleteContentBlock(req.params.id);
+    res.status(204).send();
+  });
+
+  // File upload configuration
+  const upload = multer({
+    storage: multer.diskStorage({
+      destination: async (_req: any, _file: any, cb: any) => {
+        const uploadDir = path.join(process.cwd(), "attached_assets/uploads");
+        await fs.mkdir(uploadDir, { recursive: true });
+        cb(null, uploadDir);
+      },
+      filename: (_req: any, file: any, cb: any) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+      }
+    }),
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+    fileFilter: (_req: any, file: any, cb: any) => {
+      const allowedTypes = /jpeg|jpg|png|gif|webp|svg/;
+      const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+      const mimetype = allowedTypes.test(file.mimetype);
+      if (extname && mimetype) {
+        return cb(null, true);
+      }
+      cb(new Error('Only image files are allowed'));
+    }
+  });
+
+  // File upload route
+  app.post("/api/upload", requireAdmin, upload.single('file'), async (req: any, res) => {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+    const fileUrl = `/attached_assets/uploads/${req.file.filename}`;
+    res.json({ url: fileUrl, filename: req.file.filename });
   });
 
   const httpServer = createServer(app);

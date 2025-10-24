@@ -17,6 +17,15 @@ import {
   type InsertProject,
   type Company,
   type InsertCompany,
+  type BlogPost,
+  type InsertBlogPost,
+  type UpdateBlogPost,
+  type ThemeSettings,
+  type InsertThemeSettings,
+  type UpdateThemeSettings,
+  type ContentBlock,
+  type InsertContentBlock,
+  type UpdateContentBlock,
   users,
   profile,
   skills,
@@ -26,6 +35,9 @@ import {
   patents,
   projects,
   companies,
+  blogPosts,
+  themeSettings,
+  contentBlocks,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, asc, and } from "drizzle-orm";
@@ -84,6 +96,27 @@ export interface IStorage {
   createCompany(data: InsertCompany): Promise<Company>;
   updateCompany(id: string, data: Partial<InsertCompany>): Promise<Company | undefined>;
   deleteCompany(id: string): Promise<void>;
+
+  // Blog Post methods
+  getAllBlogPosts(): Promise<BlogPost[]>;
+  getPublishedBlogPosts(): Promise<BlogPost[]>;
+  getBlogPost(id: string): Promise<BlogPost | undefined>;
+  getBlogPostBySlug(slug: string): Promise<BlogPost | undefined>;
+  createBlogPost(data: InsertBlogPost): Promise<BlogPost>;
+  updateBlogPost(id: string, data: UpdateBlogPost): Promise<BlogPost | undefined>;
+  deleteBlogPost(id: string): Promise<void>;
+
+  // Theme Settings methods
+  getThemeSettings(): Promise<ThemeSettings | undefined>;
+  createThemeSettings(data: InsertThemeSettings): Promise<ThemeSettings>;
+  updateThemeSettings(id: string, data: UpdateThemeSettings): Promise<ThemeSettings | undefined>;
+
+  // Content Block methods
+  getAllContentBlocks(): Promise<ContentBlock[]>;
+  createContentBlock(data: InsertContentBlock): Promise<ContentBlock>;
+  updateContentBlock(id: string, data: UpdateContentBlock): Promise<ContentBlock | undefined>;
+  updateContentBlockOrder(blocks: Array<{ id: string; sortOrder: number }>): Promise<void>;
+  deleteContentBlock(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -304,6 +337,100 @@ export class DatabaseStorage implements IStorage {
 
   async deleteCompany(id: string): Promise<void> {
     await db.delete(companies).where(eq(companies.id, id));
+  }
+
+  // Blog Post methods
+  async getAllBlogPosts(): Promise<BlogPost[]> {
+    return await db.select().from(blogPosts).orderBy(asc(blogPosts.createdAt));
+  }
+
+  async getPublishedBlogPosts(): Promise<BlogPost[]> {
+    return await db
+      .select()
+      .from(blogPosts)
+      .where(eq(blogPosts.status, "published"))
+      .orderBy(asc(blogPosts.publishedAt));
+  }
+
+  async getBlogPost(id: string): Promise<BlogPost | undefined> {
+    const [post] = await db.select().from(blogPosts).where(eq(blogPosts.id, id));
+    return post || undefined;
+  }
+
+  async getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
+    const [post] = await db.select().from(blogPosts).where(eq(blogPosts.slug, slug));
+    return post || undefined;
+  }
+
+  async createBlogPost(data: InsertBlogPost): Promise<BlogPost> {
+    const [post] = await db.insert(blogPosts).values(data).returning();
+    return post;
+  }
+
+  async updateBlogPost(id: string, data: UpdateBlogPost): Promise<BlogPost | undefined> {
+    const [updated] = await db
+      .update(blogPosts)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(blogPosts.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteBlogPost(id: string): Promise<void> {
+    await db.delete(blogPosts).where(eq(blogPosts.id, id));
+  }
+
+  // Theme Settings methods
+  async getThemeSettings(): Promise<ThemeSettings | undefined> {
+    const [settings] = await db.select().from(themeSettings).limit(1);
+    return settings || undefined;
+  }
+
+  async createThemeSettings(data: InsertThemeSettings): Promise<ThemeSettings> {
+    const [settings] = await db.insert(themeSettings).values(data).returning();
+    return settings;
+  }
+
+  async updateThemeSettings(id: string, data: UpdateThemeSettings): Promise<ThemeSettings | undefined> {
+    const [updated] = await db
+      .update(themeSettings)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(themeSettings.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  // Content Block methods
+  async getAllContentBlocks(): Promise<ContentBlock[]> {
+    return await db.select().from(contentBlocks).orderBy(asc(contentBlocks.sortOrder));
+  }
+
+  async createContentBlock(data: InsertContentBlock): Promise<ContentBlock> {
+    const [block] = await db.insert(contentBlocks).values(data).returning();
+    return block;
+  }
+
+  async updateContentBlock(id: string, data: UpdateContentBlock): Promise<ContentBlock | undefined> {
+    const [updated] = await db
+      .update(contentBlocks)
+      .set(data)
+      .where(eq(contentBlocks.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async updateContentBlockOrder(blocks: Array<{ id: string; sortOrder: number }>): Promise<void> {
+    await Promise.all(
+      blocks.map((block) =>
+        db.update(contentBlocks)
+          .set({ sortOrder: block.sortOrder })
+          .where(eq(contentBlocks.id, block.id))
+      )
+    );
+  }
+
+  async deleteContentBlock(id: string): Promise<void> {
+    await db.delete(contentBlocks).where(eq(contentBlocks.id, id));
   }
 }
 
