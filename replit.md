@@ -9,9 +9,11 @@ The application is built as a modern web stack with React frontend, Express back
 **Status**: ✅ Production-ready (pending environment variable configuration)
 
 **Recent Updates** (October 24, 2025):
-- ✅ Added real company logos and app icons throughout portfolio
+- ✅ Added real company logos and app screenshots throughout portfolio
   - FiLMiC Pro and FiLMiC Remote app icons in projects
-  - Company logos for Truepic, AI Layer Labs, Wire Network, Belief Agency, FiLMiC Inc, Paladin Innovators
+  - Souls agentic AI platform macOS app screenshot (featured project)
+  - Official Truepic company logo (wordmark)
+  - Company logos for AI Layer Labs, Wire Network, Belief Agency, FiLMiC Inc, Paladin Innovators
   - Fixed static file serving to prevent content-type issues (images now served as image/png)
 - Implemented secure session-based authentication with CSRF protection
 - Added schema validation to all CRUD API routes

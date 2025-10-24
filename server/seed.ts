@@ -225,16 +225,16 @@ export async function seedDatabase() {
   });
 
   await storage.createProject({
-    title: "Agentic AI Platform",
-    company: "AI Layer Labs",
+    title: "Souls - Agentic AI Platform",
+    company: "AI Layer Labs / Wire Network",
     role: "Senior Blockchain Engineer",
-    description: "Architected open-source agentic AI application for MacOS. Established TypeScript ecosystem for AI agents and LLM+RAG workflows.",
+    description: "Architected and launched Souls, an open-source agentic AI application for MacOS. No code, no complexity—just intelligent software that works for you. Established TypeScript ecosystem for AI agents and LLM+RAG workflows.",
     impact: "$2M raised",
     icon: "Bot",
     color: "text-chart-5",
-    technologies: ["TypeScript", "AI/ML", "RAG"],
-    imageUrl: "/attached_assets/generated_images/AI_Layer_Labs_logo_b1b77a03.png",
-    featured: false,
+    technologies: ["TypeScript", "AI/ML", "RAG", "MacOS"],
+    imageUrl: "/attached_assets/App-1_1761321900465.png",
+    featured: true,
     sortOrder: 2,
   });
 
