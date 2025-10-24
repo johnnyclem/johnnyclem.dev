@@ -18,10 +18,8 @@ export default function Portfolio() {
   }, []);
 
   const handleDownloadResume = () => {
-    // TODO: Implement actual resume download
-    console.log("Downloading resume...");
     const link = document.createElement("a");
-    link.href = "/attached_assets/Resume - Staff iOS Engineer_1761050342129.pdf";
+    link.href = "/attached_assets/Resume - Staff iOS Engineer_1761322308766.pdf";
     link.download = "Jonathan_Clem_Resume.pdf";
     link.click();
   };

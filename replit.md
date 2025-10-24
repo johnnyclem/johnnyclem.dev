@@ -13,8 +13,11 @@ The application is built as a modern web stack with React frontend, Express back
   - FiLMiC Pro and FiLMiC Remote app icons in projects
   - Souls agentic AI platform macOS app screenshot (featured project)
   - Official Truepic company logo (wordmark)
-  - Company logos for AI Layer Labs, Wire Network, Belief Agency, FiLMiC Inc, Paladin Innovators
-  - Fixed static file serving to prevent content-type issues (images now served as image/png)
+  - Official Belief Agency stacked logo (hand icon + text)
+  - Company logos for AI Layer Labs, Wire Network, FiLMiC Inc, Paladin Innovators, General Assembly, Analytics Pros
+  - Fixed static file serving to prevent content-type issues (images now served as image/png, image/webp, image/jpeg)
+- ✅ Added complete work experience timeline (6 companies spanning 2013-2025)
+- ✅ Fixed resume download - now serves actual PDF (167KB) instead of blank file
 - Implemented secure session-based authentication with CSRF protection
 - Added schema validation to all CRUD API routes
 - Enhanced color vibrancy (85% saturation) for a more alive, professional feel
