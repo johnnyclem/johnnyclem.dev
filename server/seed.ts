@@ -120,7 +120,7 @@ export async function seedDatabase() {
 
   await storage.createExperience({
     company: "Belief Agency",
-    companyLogoUrl: "/attached_assets/generated_images/Belief_Agency_wordmark_logo_29c2ec98.png",
+    companyLogoUrl: "/attached_assets/Belief_Lockup_Stacked_1.png_1761322028607.webp",
     role: "Director of Digital",
     period: "Nov 2019 - Aug 2022",
     location: "Seattle, United States",
