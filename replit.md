@@ -9,6 +9,14 @@ The application is built as a modern web stack with React frontend, Express back
 **Status**: ✅ Production-ready (pending environment variable configuration)
 
 **Recent Updates** (October 24, 2025):
+- ✅ **NEW: Blog Management & Theme Editor**
+  - Complete blog post management with markdown support
+  - Draft/Published status with automatic publishedAt timestamps
+  - Public blog page at `/blog` displaying published posts only
+  - Theme customization with HSL color inputs (primary, accent, background, foreground)
+  - Font family selection for body and heading text
+  - Admin tabs for Blog and Theme in the admin panel
+  - End-to-end tested blog lifecycle (create, publish, unpublish, delete)
 - ✅ Implemented clickable skills with bidirectional many-to-many navigation
   - Created skillItems and projectSkillItems junction tables for proper relationships
   - Skills in SkillsMatrix are clickable and filter projects by selected skill
