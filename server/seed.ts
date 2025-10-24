@@ -104,7 +104,7 @@ export async function seedDatabase() {
 
   await storage.createExperience({
     company: "Truepic",
-    companyLogoUrl: "/attached_assets/generated_images/Truepic_company_logo_clean_d437eee2.png",
+    companyLogoUrl: "/attached_assets/truepic-logo-color_1761321859430.png",
     role: "Senior iOS Engineer",
     period: "Nov 2023 - Nov 2024",
     location: "Remote, United States",
@@ -219,7 +219,7 @@ export async function seedDatabase() {
     icon: "Shield",
     color: "text-primary",
     technologies: ["Swift", "Security", "SDK"],
-    imageUrl: "/attached_assets/generated_images/Truepic_company_logo_clean_d437eee2.png",
+    imageUrl: "/attached_assets/truepic-logo-color_1761321859430.png",
     featured: false,
     sortOrder: 1,
   });
