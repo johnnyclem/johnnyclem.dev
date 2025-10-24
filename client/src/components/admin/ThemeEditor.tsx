@@ -101,41 +101,25 @@ export function ThemeEditor() {
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="primaryColor">Primary Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="primaryColor"
-                  type="color"
-                  value={formData.primaryColor}
-                  onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })}
-                  className="w-20 h-10"
-                  data-testid="input-primary-color"
-                />
-                <Input
-                  value={formData.primaryColor}
-                  onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })}
-                  placeholder="#3b82f6"
-                />
-              </div>
+              <Label htmlFor="primaryColor">Primary Color (HSL)</Label>
+              <Input
+                id="primaryColor"
+                value={formData.primaryColor}
+                onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })}
+                placeholder="220 85% 58%"
+                data-testid="input-primary-color"
+              />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="accentColor">Accent Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="accentColor"
-                  type="color"
-                  value={formData.accentColor}
-                  onChange={(e) => setFormData({ ...formData, accentColor: e.target.value })}
-                  className="w-20 h-10"
-                  data-testid="input-accent-color"
-                />
-                <Input
-                  value={formData.accentColor}
-                  onChange={(e) => setFormData({ ...formData, accentColor: e.target.value })}
-                  placeholder="#10b981"
-                />
-              </div>
+              <Label htmlFor="accentColor">Accent Color (HSL)</Label>
+              <Input
+                id="accentColor"
+                value={formData.accentColor}
+                onChange={(e) => setFormData({ ...formData, accentColor: e.target.value })}
+                placeholder="142 85% 50%"
+                data-testid="input-accent-color"
+              />
             </div>
 
             <div className="space-y-2">

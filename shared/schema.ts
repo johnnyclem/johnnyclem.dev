@@ -186,6 +186,8 @@ export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  publishedAt: z.coerce.date().optional().nullable(),
 });
 
 export const updateBlogPostSchema = insertBlogPostSchema.partial();
