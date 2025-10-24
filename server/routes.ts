@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import {
   insertProfileSchema,
   insertSkillSchema,
+  insertSkillItemSchema,
   insertExperienceSchema,
   insertPatentSchema,
   insertProjectSchema,
@@ -123,6 +124,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(204).send();
   });
 
+  // Skill Items routes
+  app.get("/api/skill-items", async (_req, res) => {
+    const skillItems = await storage.getAllSkillItems();
+    res.json(skillItems);
+  });
+
+  app.get("/api/skill-items/:slug", async (req, res) => {
+    const skillItem = await storage.getSkillItemBySlug(req.params.slug);
+    if (!skillItem) {
+      return res.status(404).json({ error: "Skill item not found" });
+    }
+    res.json(skillItem);
+  });
+
+  app.get("/api/skill-items/:slug/projects", async (req, res) => {
+    const skillItem = await storage.getSkillItemBySlug(req.params.slug);
+    if (!skillItem) {
+      return res.status(404).json({ error: "Skill item not found" });
+    }
+    const projects = await storage.getProjectsForSkillItem(skillItem.id);
+    
+    // Enrich projects with their skill items
+    const enrichedProjects = await Promise.all(
+      projects.map(async (project) => ({
+        ...project,
+        skillItems: await storage.getSkillItemsForProject(project.id),
+      }))
+    );
+    
+    res.json(enrichedProjects);
+  });
+
+  app.post("/api/skill-items", requireAdmin, async (req, res) => {
+    try {
+      const data = insertSkillItemSchema.parse(req.body);
+      const skillItem = await storage.createSkillItem(data);
+      res.json(skillItem);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/skill-items/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = insertSkillItemSchema.partial().parse(req.body);
+      const skillItem = await storage.updateSkillItem(req.params.id, data);
+      if (!skillItem) {
+        return res.status(404).json({ error: "Skill item not found" });
+      }
+      res.json(skillItem);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/skill-items/:id", requireAdmin, async (req, res) => {
+    await storage.deleteSkillItem(req.params.id);
+    res.status(204).send();
+  });
+
   // Experience routes
   app.get("/api/experiences", async (_req, res) => {
     const experiences = await storage.getAllExperiences();
@@ -192,9 +253,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Project routes
-  app.get("/api/projects", async (_req, res) => {
+  app.get("/api/projects", async (req, res) => {
     const projects = await storage.getAllProjects();
-    res.json(projects);
+    
+    // Enrich projects with their skill items
+    const enrichedProjects = await Promise.all(
+      projects.map(async (project) => ({
+        ...project,
+        skillItems: await storage.getSkillItemsForProject(project.id),
+      }))
+    );
+    
+    res.json(enrichedProjects);
   });
 
   app.post("/api/projects", requireAdmin, async (req, res) => {
@@ -222,6 +292,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/projects/:id", requireAdmin, async (req, res) => {
     await storage.deleteProject(req.params.id);
+    res.status(204).send();
+  });
+
+  // Project-Skill junction routes
+  app.post("/api/projects/:projectId/skills/:skillItemId", requireAdmin, async (req, res) => {
+    try {
+      await storage.addSkillToProject(req.params.projectId, req.params.skillItemId);
+      res.status(201).json({ success: true });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/projects/:projectId/skills/:skillItemId", requireAdmin, async (req, res) => {
+    await storage.removeSkillFromProject(req.params.projectId, req.params.skillItemId);
     res.status(204).send();
   });
 

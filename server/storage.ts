@@ -28,7 +28,7 @@ import {
   companies,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, asc } from "drizzle-orm";
+import { eq, asc, and } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
@@ -185,8 +185,10 @@ export class DatabaseStorage implements IStorage {
 
   async removeSkillFromProject(projectId: string, skillItemId: string): Promise<void> {
     await db.delete(projectSkillItems)
-      .where(eq(projectSkillItems.projectId, projectId))
-      .where(eq(projectSkillItems.skillItemId, skillItemId));
+      .where(and(
+        eq(projectSkillItems.projectId, projectId),
+        eq(projectSkillItems.skillItemId, skillItemId)
+      ));
   }
 
   async getSkillItemsForProject(projectId: string): Promise<SkillItem[]> {
