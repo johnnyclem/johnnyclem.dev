@@ -150,6 +150,38 @@ export async function seedDatabase() {
     sortOrder: 3,
   });
 
+  await storage.createExperience({
+    company: "General Assembly",
+    companyLogoUrl: "/attached_assets/general-1523860193.jpg_1761322141229.avif",
+    role: "Instructor, Web Development Immersive",
+    period: "2014 - 2015",
+    location: "Seattle, United States",
+    type: "Education",
+    achievements: [
+      "Taught full-stack web development to career-changing students",
+      "Covered HTML, CSS, JavaScript, Ruby on Rails, and modern frameworks",
+      "Mentored students through project development and portfolio building",
+      "Guided graduates into successful software engineering careers",
+    ],
+    sortOrder: 4,
+  });
+
+  await storage.createExperience({
+    company: "Analytics Pros",
+    companyLogoUrl: "/attached_assets/1_1761322057415.jpeg",
+    role: "Senior Software Engineer",
+    period: "2013 - 2014",
+    location: "Seattle, United States",
+    type: "Development",
+    achievements: [
+      "Built analytics and data visualization solutions for enterprise clients",
+      "Developed custom integrations with Google Analytics and marketing platforms",
+      "Created automated reporting dashboards and data pipelines",
+      "Collaborated with marketing teams to deliver actionable insights",
+    ],
+    sortOrder: 5,
+  });
+
   // Seed patents
   await storage.createPatent({
     number: "US10481758 B2",
