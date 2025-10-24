@@ -58,7 +58,15 @@ export default function ExperienceTimeline() {
                   <div className="flex items-start justify-between gap-4 mb-4">
                     <div className="flex items-start gap-3">
                       <div className="p-2 rounded-lg bg-primary/10 mt-1">
-                        <Building2 className="w-5 h-5 text-primary" />
+                        {exp.companyLogoUrl ? (
+                          <img 
+                            src={exp.companyLogoUrl} 
+                            alt={`${exp.company} logo`} 
+                            className="w-12 h-12 object-contain"
+                          />
+                        ) : (
+                          <Building2 className="w-5 h-5 text-primary" />
+                        )}
                       </div>
                       <div>
                         <h3 className="text-xl font-bold" data-testid={`text-company-${idx}`}>

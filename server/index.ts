@@ -1,5 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
+import path from "path";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { seedDatabase } from "./seed";
@@ -7,6 +8,9 @@ import { seedDatabase } from "./seed";
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Serve attached_assets folder for images/files
+app.use('/attached_assets', express.static(path.resolve(process.cwd(), 'attached_assets')));
 
 // Session configuration for admin authentication
 app.use(session({

@@ -42,9 +42,19 @@ export default function ProjectHighlights() {
                 data-testid={`card-project-${idx}`}
               >
                 <div className="flex items-start gap-3 mb-4">
-                  <div className={`p-2 rounded-lg bg-primary/10 ${project.color}`}>
-                    <IconComponent className="w-6 h-6" />
-                  </div>
+                  {project.imageUrl ? (
+                    <div className="rounded-lg overflow-hidden">
+                      <img 
+                        src={project.imageUrl} 
+                        alt={`${project.title} icon`} 
+                        className="w-12 h-12 object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className={`p-2 rounded-lg bg-primary/10 ${project.color}`}>
+                      <IconComponent className="w-6 h-6" />
+                    </div>
+                  )}
                   <div className="flex-1">
                     <h3 className="text-lg font-bold mb-1">{project.title}</h3>
                     <p className="text-sm text-muted-foreground">{project.company}</p>

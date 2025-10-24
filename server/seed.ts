@@ -88,6 +88,7 @@ export async function seedDatabase() {
   // Seed experiences
   await storage.createExperience({
     company: "AI Layer Labs / Wire Network",
+    companyLogoUrl: "/attached_assets/generated_images/AI_Layer_Labs_logo_b1b77a03.png",
     role: "Senior Blockchain Engineer (AI Agents)",
     period: "Nov 2024 - Jun 2025",
     location: "Remote, United States",
@@ -103,6 +104,7 @@ export async function seedDatabase() {
 
   await storage.createExperience({
     company: "Truepic",
+    companyLogoUrl: "/attached_assets/generated_images/Truepic_company_logo_clean_d437eee2.png",
     role: "Senior iOS Engineer",
     period: "Nov 2023 - Nov 2024",
     location: "Remote, United States",
@@ -118,6 +120,7 @@ export async function seedDatabase() {
 
   await storage.createExperience({
     company: "Belief Agency",
+    companyLogoUrl: "/attached_assets/generated_images/Belief_Agency_wordmark_logo_29c2ec98.png",
     role: "Director of Digital",
     period: "Nov 2019 - Aug 2022",
     location: "Seattle, United States",
@@ -133,6 +136,7 @@ export async function seedDatabase() {
 
   await storage.createExperience({
     company: "FiLMIC Inc.",
+    companyLogoUrl: "/attached_assets/generated_images/FiLMiC_Inc_company_logo_9b82d21a.png",
     role: "Staff iOS Engineer, Chief Technology Officer",
     period: "Feb 2015 - Jan 2019",
     location: "Seattle, United States",
@@ -201,6 +205,7 @@ export async function seedDatabase() {
     icon: "Video",
     color: "text-chart-3",
     technologies: ["Swift", "AVFoundation", "CoreMedia"],
+    imageUrl: "/attached_assets/generated_images/FiLMiC_Pro_app_icon_9165a6a3.png",
     featured: true,
     sortOrder: 0,
   });
@@ -214,6 +219,7 @@ export async function seedDatabase() {
     icon: "Shield",
     color: "text-primary",
     technologies: ["Swift", "Security", "SDK"],
+    imageUrl: "/attached_assets/generated_images/Truepic_company_logo_clean_d437eee2.png",
     featured: false,
     sortOrder: 1,
   });
@@ -227,6 +233,7 @@ export async function seedDatabase() {
     icon: "Bot",
     color: "text-chart-5",
     technologies: ["TypeScript", "AI/ML", "RAG"],
+    imageUrl: "/attached_assets/generated_images/AI_Layer_Labs_logo_b1b77a03.png",
     featured: false,
     sortOrder: 2,
   });
@@ -240,6 +247,7 @@ export async function seedDatabase() {
     icon: "Zap",
     color: "text-chart-2",
     technologies: ["WebSockets", "Video", "Real-time"],
+    imageUrl: "/attached_assets/generated_images/Paladin_Innovators_corporate_logo_0d89c73f.png",
     featured: false,
     sortOrder: 3,
   });
