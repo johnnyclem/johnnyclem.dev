@@ -25,7 +25,7 @@ export async function seedDatabase() {
   });
 
   // Seed skills
-  await storage.createSkill({
+  const mobileDev = await storage.createSkill({
     category: "Mobile Development",
     title: "Mobile Development",
     icon: "Smartphone",
@@ -35,7 +35,7 @@ export async function seedDatabase() {
     sortOrder: 0,
   });
 
-  await storage.createSkill({
+  const programmingLangs = await storage.createSkill({
     category: "Programming Languages",
     title: "Programming Languages",
     icon: "Code2",
@@ -45,7 +45,7 @@ export async function seedDatabase() {
     sortOrder: 1,
   });
 
-  await storage.createSkill({
+  const backendAPIs = await storage.createSkill({
     category: "Backend & APIs",
     title: "Backend & APIs",
     icon: "Server",
@@ -55,7 +55,7 @@ export async function seedDatabase() {
     sortOrder: 2,
   });
 
-  await storage.createSkill({
+  const platforms = await storage.createSkill({
     category: "Platforms & Deployment",
     title: "Platforms & Deployment",
     icon: "Database",
@@ -65,7 +65,7 @@ export async function seedDatabase() {
     sortOrder: 3,
   });
 
-  await storage.createSkill({
+  const aiInnovation = await storage.createSkill({
     category: "AI & Innovation",
     title: "AI & Innovation",
     icon: "Cpu",
@@ -75,7 +75,7 @@ export async function seedDatabase() {
     sortOrder: 4,
   });
 
-  await storage.createSkill({
+  const devTools = await storage.createSkill({
     category: "Development Tools",
     title: "Development Tools",
     icon: "Wrench",
@@ -84,6 +84,27 @@ export async function seedDatabase() {
     specializations: [],
     sortOrder: 5,
   });
+
+  // Create skill items from the skills categories
+  const skillItemsMap: Record<string, string> = {};
+  let sortIdx = 0;
+
+  for (const skill of [mobileDev, programmingLangs, backendAPIs, platforms, aiInnovation, devTools]) {
+    for (const itemName of skill.items) {
+      const slug = itemName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      const isSpecialization = skill.specializations.includes(itemName);
+      
+      const skillItem = await storage.createSkillItem({
+        skillId: skill.id,
+        name: itemName,
+        slug,
+        isSpecialization,
+        sortOrder: sortIdx++,
+      });
+      
+      skillItemsMap[itemName] = skillItem.id;
+    }
+  }
 
   // Seed experiences
   await storage.createExperience({
@@ -227,22 +248,22 @@ export async function seedDatabase() {
     sortOrder: 3,
   });
 
-  // Seed projects
-  await storage.createProject({
-    title: "FiLMIC Pro",
-    company: "FiLMIC Inc.",
+  // Seed projects with their skill relationships
+  const filmicPro = await storage.createProject({
+    title: "FiLMiC Pro",
+    company: "FiLMiC Inc.",
     role: "Staff iOS Engineer & CTO",
     description: "Achieved #1 App Store ranking in Photo & Video. Featured in Apple's iPhone 11 keynote. Optimized AVFoundation pipelines for millions of users.",
     impact: "#1 App Store",
     icon: "Video",
     color: "text-chart-3",
-    technologies: ["Swift", "AVFoundation", "CoreMedia"],
+    technologies: ["Swift", "Objective-C", "AVFoundation", "CoreMedia", "CoreAudio", "UIKit", "iOS"],
     imageUrl: "/attached_assets/generated_images/FiLMiC_Pro_app_icon_9165a6a3.png",
     featured: true,
     sortOrder: 0,
   });
 
-  await storage.createProject({
+  const truepicSDK = await storage.createProject({
     title: "Content-Provenance SDK",
     company: "Truepic",
     role: "Senior iOS Engineer",
@@ -250,13 +271,13 @@ export async function seedDatabase() {
     impact: "1B+ devices",
     icon: "Shield",
     color: "text-primary",
-    technologies: ["Swift", "Security", "SDK"],
+    technologies: ["Swift", "iOS", "UIKit", "Security"],
     imageUrl: "/attached_assets/truepic-logo-color_1761321859430.png",
     featured: false,
     sortOrder: 1,
   });
 
-  await storage.createProject({
+  const soulsAI = await storage.createProject({
     title: "Souls - Agentic AI Platform",
     company: "AI Layer Labs / Wire Network",
     role: "Senior Blockchain Engineer",
@@ -264,13 +285,13 @@ export async function seedDatabase() {
     impact: "$2M raised",
     icon: "Bot",
     color: "text-chart-5",
-    technologies: ["TypeScript", "AI/ML", "RAG", "MacOS"],
+    technologies: ["TypeScript", "JavaScript", "Agentic AI", "LLM Integration", "RAG Workflows", "macOS", "Node.js"],
     imageUrl: "/attached_assets/App-1_1761321900465.png",
     featured: true,
     sortOrder: 2,
   });
 
-  await storage.createProject({
+  const ultraLowLatency = await storage.createProject({
     title: "Ultra Low-Latency Streaming",
     company: "Paladin Innovators",
     role: "Senior Engineer",
@@ -278,11 +299,23 @@ export async function seedDatabase() {
     impact: "<100ms latency",
     icon: "Zap",
     color: "text-chart-2",
-    technologies: ["WebSockets", "Video", "Real-time"],
+    technologies: ["WebSockets", "C++", "iOS", "Objective-C", "CoreMedia"],
     imageUrl: "/attached_assets/generated_images/Paladin_Innovators_corporate_logo_0d89c73f.png",
     featured: false,
     sortOrder: 3,
   });
+
+  // Link projects to skill items via junction table
+  const projects = [filmicPro, truepicSDK, soulsAI, ultraLowLatency];
+  
+  for (const project of projects) {
+    for (const techName of project.technologies) {
+      const skillItemId = skillItemsMap[techName];
+      if (skillItemId) {
+        await storage.addSkillToProject(project.id, skillItemId);
+      }
+    }
+  }
 
   // Seed companies
   const companyData = [
