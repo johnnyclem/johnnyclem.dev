@@ -31,6 +31,7 @@ import {
   updateMediaAppearanceSchema,
 } from "@shared/schema";
 import { sendMessage } from "./chat-service";
+import { textToSpeech } from "./elevenlabs-service";
 
 // Extend express-session
 declare module "express-session" {
@@ -641,6 +642,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/chat/conversations/:id/messages", async (req, res) => {
     const messages = await storage.getChatMessagesByConversationId(req.params.id);
     res.json(messages);
+  });
+
+  // Voice generation for chat messages
+  app.post("/api/chat/messages/:messageId/voice", async (req, res) => {
+    try {
+      const messageId = req.params.messageId;
+      const message = await storage.getChatMessage(messageId);
+      
+      if (!message) {
+        return res.status(404).json({ error: "Message not found" });
+      }
+
+      if (message.role !== "assistant") {
+        return res.status(400).json({ error: "Voice generation only available for assistant messages" });
+      }
+
+      const audioBuffer = await textToSpeech(message.content);
+      
+      res.setHeader("Content-Type", "audio/mpeg");
+      res.setHeader("Content-Length", audioBuffer.length.toString());
+      res.send(audioBuffer);
+    } catch (error: any) {
+      console.error("Voice generation error:", error);
+      res.status(500).json({ error: error.message || "Failed to generate voice" });
+    }
+  });
+
+  // Direct text-to-speech endpoint
+  app.post("/api/chat/text-to-speech", async (req, res) => {
+    try {
+      const { text } = req.body;
+      
+      if (!text || typeof text !== "string") {
+        return res.status(400).json({ error: "Text is required" });
+      }
+
+      const audioBuffer = await textToSpeech(text);
+      
+      res.setHeader("Content-Type", "audio/mpeg");
+      res.setHeader("Content-Length", audioBuffer.length.toString());
+      res.send(audioBuffer);
+    } catch (error: any) {
+      console.error("Voice generation error:", error);
+      res.status(500).json({ error: error.message || "Failed to generate voice" });
+    }
   });
 
   // Chat Context Document routes (admin only)

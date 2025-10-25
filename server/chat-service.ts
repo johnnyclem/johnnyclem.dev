@@ -11,7 +11,7 @@ export interface ChatServiceConfig {
 const defaultConfig: ChatServiceConfig = {
   model: CHAT_MODEL,
   temperature: 0.7,
-  maxTokens: 2000,
+  maxTokens: 400, // ~100-150 words
 };
 
 export async function buildContextForChat(): Promise<string> {
@@ -120,7 +120,18 @@ export async function createChatCompletion(
 
 ${context}
 
-Your role is to answer questions about Jonathan's background, skills, projects, and patents. Be conversational, friendly, and informative. If asked about technical challenges or how Jonathan might approach a problem, use the context above to provide informed answers. If you're asked something that isn't covered in the context, politely let the user know.`,
+CRITICAL RESPONSE RULES:
+1. Keep responses between 100-150 words maximum - be concise and direct
+2. ALWAYS cite sources with clickable links when referencing specific information:
+   - For patents: include patent number and link if available
+   - For projects: reference by name with internal links (e.g., "Learn more in the Projects section")
+   - For experiences: cite company name with internal links (e.g., "See full experience timeline")
+   - For external resources: include full URLs (e.g., https://example.com)
+3. Use this format for citations: "According to [Patent #12345678](link) ..." or "As seen in the [Projects](#projects) section..."
+4. Be conversational, friendly, and informative
+5. If asked something not covered in the context, briefly acknowledge the limitation
+
+Your responses will be converted to speech, so write naturally for voice delivery.`,
   };
 
   const openaiMessages = [

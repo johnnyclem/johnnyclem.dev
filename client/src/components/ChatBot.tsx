@@ -3,15 +3,21 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageCircle, Send, Sparkles, Loader2 } from "lucide-react";
+import { MessageCircle, Send, Sparkles, Loader2, Volume2, VolumeX } from "lucide-react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { ChatPrompt, ChatConversation, ChatMessage } from "@shared/schema";
+import ReactMarkdown from "react-markdown";
 
 export function ChatBot() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
+  const [playingMessageId, setPlayingMessageId] = useState<string | null>(null);
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [loadingVoice, setLoadingVoice] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const lastProcessedMessageRef = useRef<string | null>(null);
 
   const { data: prompts } = useQuery<ChatPrompt[]>({
     queryKey: ["/api/chat/prompts"],
@@ -66,11 +72,89 @@ export function ChatBot() {
     });
   };
 
+  const playVoice = async (messageId: string, text: string) => {
+    try {
+      setLoadingVoice(messageId);
+      
+      // Stop any currently playing audio
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+
+      // Generate voice from text
+      const response = await apiRequest("POST", "/api/chat/text-to-speech", { text });
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      // Create and play audio
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+      
+      audio.onplay = () => {
+        setPlayingMessageId(messageId);
+        setLoadingVoice(null);
+      };
+      
+      audio.onended = () => {
+        setPlayingMessageId(null);
+        URL.revokeObjectURL(audioUrl);
+        audioRef.current = null;
+      };
+      
+      audio.onerror = () => {
+        setPlayingMessageId(null);
+        setLoadingVoice(null);
+        URL.revokeObjectURL(audioUrl);
+        audioRef.current = null;
+      };
+
+      await audio.play();
+    } catch (error) {
+      console.error("Voice playback error:", error);
+      setLoadingVoice(null);
+      setPlayingMessageId(null);
+    }
+  };
+
+  const stopVoice = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+      setPlayingMessageId(null);
+    }
+  };
+
+  const toggleVoice = (messageId: string, text: string) => {
+    if (playingMessageId === messageId) {
+      stopVoice();
+    } else {
+      playVoice(messageId, text);
+    }
+  };
+
   useEffect(() => {
     if (messages.length > 0) {
       scrollToBottom();
     }
   }, [messages.length, messages]);
+
+  // Auto-play voice for new assistant messages
+  useEffect(() => {
+    const isPending = sendMessageMutation.isPending || createConversationMutation.isPending;
+    if (!voiceEnabled || messages.length === 0 || isPending) return;
+
+    const lastMessage = messages[messages.length - 1];
+    
+    // Only auto-play assistant messages that haven't been processed yet
+    if (
+      lastMessage.role === "assistant" && 
+      lastMessage.id !== lastProcessedMessageRef.current
+    ) {
+      lastProcessedMessageRef.current = lastMessage.id;
+      playVoice(lastMessage.id, lastMessage.content);
+    }
+  }, [messages, voiceEnabled, sendMessageMutation.isPending, createConversationMutation.isPending]);
 
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) return;
@@ -109,9 +193,24 @@ export function ChatBot() {
   return (
     <Card className="w-full max-w-2xl mx-auto" data-testid="card-chatbot">
       <CardHeader>
-        <div className="flex items-center gap-2">
-          <MessageCircle className="w-5 h-5 text-primary" />
-          <CardTitle data-testid="text-chatbot-title">Ask Me Anything</CardTitle>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <MessageCircle className="w-5 h-5 text-primary" />
+            <CardTitle data-testid="text-chatbot-title">Ask Me Anything</CardTitle>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setVoiceEnabled(!voiceEnabled)}
+            data-testid="button-toggle-voice"
+            title={voiceEnabled ? "Disable voice" : "Enable voice"}
+          >
+            {voiceEnabled ? (
+              <Volume2 className="w-4 h-4" />
+            ) : (
+              <VolumeX className="w-4 h-4" />
+            )}
+          </Button>
         </div>
         <CardDescription data-testid="text-chatbot-description">
           Chat with an AI assistant trained on Jonathan's resume, patents, and portfolio
@@ -160,7 +259,50 @@ export function ChatBot() {
                       : "bg-muted"
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                  {msg.role === "assistant" ? (
+                    <div className="space-y-2">
+                      <div className="text-sm prose prose-sm max-w-none">
+                        <ReactMarkdown
+                          components={{
+                            a: ({ node, ...props }) => (
+                              <a
+                                {...props}
+                                className="text-primary underline hover:text-primary/80"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              />
+                            ),
+                            p: ({ node, ...props }) => <p {...props} className="mb-2 last:mb-0" />,
+                          }}
+                        >
+                          {msg.content}
+                        </ReactMarkdown>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2 text-xs"
+                          onClick={() => toggleVoice(msg.id, msg.content)}
+                          disabled={loadingVoice === msg.id}
+                          data-testid={`button-voice-${idx}`}
+                        >
+                          {loadingVoice === msg.id ? (
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                          ) : playingMessageId === msg.id ? (
+                            <VolumeX className="w-3 h-3" />
+                          ) : (
+                            <Volume2 className="w-3 h-3" />
+                          )}
+                          <span className="ml-1">
+                            {playingMessageId === msg.id ? "Stop" : "Play"}
+                          </span>
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                  )}
                 </div>
               </div>
             ))}
