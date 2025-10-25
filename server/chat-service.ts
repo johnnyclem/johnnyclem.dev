@@ -1,11 +1,6 @@
-import OpenAI from "openai";
 import { storage } from "./storage";
 import type { ChatMessage, InsertChatMessage } from "@shared/schema";
-
-const openai = new OpenAI({
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-});
+import { openai, CHAT_MODEL } from "./openai";
 
 export interface ChatServiceConfig {
   model?: string;
@@ -14,7 +9,7 @@ export interface ChatServiceConfig {
 }
 
 const defaultConfig: ChatServiceConfig = {
-  model: "gpt-4",
+  model: CHAT_MODEL,
   temperature: 0.7,
   maxTokens: 2000,
 };

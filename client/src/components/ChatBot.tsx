@@ -11,6 +11,7 @@ export function ChatBot() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const { data: prompts } = useQuery<ChatPrompt[]>({
     queryKey: ["/api/chat/prompts"],
@@ -55,12 +56,21 @@ export function ChatBot() {
   });
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Use requestAnimationFrame for better timing with browser render cycle
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (messagesContainerRef.current) {
+          messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+        }
+      });
+    });
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (messages.length > 0) {
+      scrollToBottom();
+    }
+  }, [messages.length, messages]);
 
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) return;
@@ -132,7 +142,11 @@ export function ChatBot() {
         )}
 
         {(messages.length > 0 || messagesLoading) && (
-          <div className="space-y-4 max-h-96 overflow-y-auto pr-2" data-testid="container-messages">
+          <div 
+            ref={messagesContainerRef}
+            className="space-y-4 max-h-96 overflow-y-auto pr-2" 
+            data-testid="container-messages"
+          >
             {messages.map((msg, idx) => (
               <div
                 key={msg.id}
