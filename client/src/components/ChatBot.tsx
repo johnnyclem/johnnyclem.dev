@@ -66,10 +66,20 @@ export function ChatBot() {
     if (!content.trim()) return;
 
     if (!conversationId) {
-      await createConversationMutation.mutateAsync();
-      setTimeout(() => {
-        sendMessageMutation.mutate(content);
-      }, 100);
+      // Create conversation first, then send message with the new conversation ID
+      const newConversation = await createConversationMutation.mutateAsync();
+      // Send message using the newly created conversation ID directly
+      const response = await apiRequest(
+        "POST",
+        `/api/chat/conversations/${newConversation.id}/messages`,
+        { content }
+      );
+      await response.json();
+      // Invalidate to refresh messages
+      queryClient.invalidateQueries({ 
+        queryKey: ["/api/chat/conversations", newConversation.id, "messages"] 
+      });
+      setMessage("");
     } else {
       sendMessageMutation.mutate(content);
     }
