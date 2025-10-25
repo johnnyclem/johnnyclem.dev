@@ -328,12 +328,11 @@ export type ChatContextDoc = typeof chatContextDocs.$inferSelect;
 // Media Assets (for iPhone carousel)
 export const mediaAssets = pgTable("media_assets", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description"),
+  mediaType: text("media_type").notNull(),
   url: text("url").notNull(),
-  type: text("type").notNull(),
-  mimeType: text("mime_type").notNull(),
-  altText: text("alt_text"),
-  caption: text("caption"),
-  durationMs: integer("duration_ms"),
+  thumbnailUrl: text("thumbnail_url"),
   sortOrder: integer("sort_order").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

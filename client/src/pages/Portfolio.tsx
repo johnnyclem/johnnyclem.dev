@@ -9,6 +9,8 @@ import ProjectHighlights from "@/components/ProjectHighlights";
 import SpecializationSection from "@/components/SpecializationSection";
 import ContactSection from "@/components/ContactSection";
 import ThemeToggle from "@/components/ThemeToggle";
+import { ChatBot } from "@/components/ChatBot";
+import { IPhoneCarousel } from "@/components/IPhoneCarousel";
 
 export default function Portfolio() {
   const [selectedSkillSlug, setSelectedSkillSlug] = useState<string | null>(null);
@@ -63,6 +65,18 @@ export default function Portfolio() {
 
       <main>
         <HeroSection onDownloadResume={handleDownloadResume} onViewPatents={handleViewPatents} />
+        
+        {/* AI Chatbot Section */}
+        <section className="container mx-auto px-6 py-16 md:py-24">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Ask Me Anything</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Chat with an AI assistant trained on my resume, patents, and professional experience.
+            </p>
+          </div>
+          <ChatBot />
+        </section>
+
         <SkillsMatrix 
           onSkillClick={handleSkillClick} 
           selectedSkillSlug={selectedSkillSlug}
@@ -75,6 +89,18 @@ export default function Portfolio() {
           onSkillClick={handleSkillClick}
           onClearFilter={handleClearFilter}
         />
+        
+        {/* iPhone Carousel Section */}
+        <section className="container mx-auto px-6 py-16 md:py-24" id="carousel">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Apps in Action</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              See my iOS applications and projects in action
+            </p>
+          </div>
+          <IPhoneCarousel />
+        </section>
+
         <SpecializationSection />
         <ContactSection
           onDownloadResume={handleDownloadResume}
