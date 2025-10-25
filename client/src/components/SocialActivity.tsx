@@ -7,6 +7,16 @@ import { SiStackoverflow } from "react-icons/si";
 import type { Profile } from "@shared/schema";
 import { useEffect, useRef } from "react";
 
+declare global {
+  interface Window {
+    twttr?: {
+      widgets: {
+        load: () => void;
+      };
+    };
+  }
+}
+
 interface GitHubCommit {
   sha: string;
   commit: {
@@ -350,11 +360,4 @@ export default function SocialActivity() {
       </div>
     </section>
   );
-}
-
-// Add TypeScript declaration for Twitter widget
-declare global {
-  interface Window {
-    twttr?: any;
-  }
 }
