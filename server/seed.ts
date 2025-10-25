@@ -331,5 +331,28 @@ export async function seedDatabase() {
     await storage.createCompany(company);
   }
 
+  // Seed chat prompts
+  const chatPromptsData = [
+    { 
+      prompt: "Tell me about a project you've worked on that you're really proud of.",
+      sortOrder: 0,
+      isActive: true,
+    },
+    { 
+      prompt: "Tell me about a time you overcame a conflict with a coworker.",
+      sortOrder: 1,
+      isActive: true,
+    },
+    { 
+      prompt: 'Given the following input string, write a parcel in swift to convert raw text into markdown syntax: "Input string goes here"',
+      sortOrder: 2,
+      isActive: true,
+    },
+  ];
+
+  for (const promptData of chatPromptsData) {
+    await storage.createChatPrompt(promptData);
+  }
+
   console.log("✅ Database seeded successfully!");
 }

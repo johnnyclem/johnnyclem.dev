@@ -26,6 +26,20 @@ import {
   type ContentBlock,
   type InsertContentBlock,
   type UpdateContentBlock,
+  type ChatPrompt,
+  type InsertChatPrompt,
+  type UpdateChatPrompt,
+  type ChatConversation,
+  type InsertChatConversation,
+  type UpdateChatConversation,
+  type ChatMessage,
+  type InsertChatMessage,
+  type ChatContextDoc,
+  type InsertChatContextDoc,
+  type UpdateChatContextDoc,
+  type MediaAsset,
+  type InsertMediaAsset,
+  type UpdateMediaAsset,
   users,
   profile,
   skills,
@@ -38,6 +52,11 @@ import {
   blogPosts,
   themeSettings,
   contentBlocks,
+  chatPrompts,
+  chatConversations,
+  chatMessages,
+  chatContextDocs,
+  mediaAssets,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, asc, and } from "drizzle-orm";
@@ -117,6 +136,40 @@ export interface IStorage {
   updateContentBlock(id: string, data: UpdateContentBlock): Promise<ContentBlock | undefined>;
   updateContentBlockOrder(blocks: Array<{ id: string; sortOrder: number }>): Promise<void>;
   deleteContentBlock(id: string): Promise<void>;
+
+  // Chat Prompt methods
+  getAllChatPrompts(): Promise<ChatPrompt[]>;
+  getActiveChatPrompts(): Promise<ChatPrompt[]>;
+  getChatPrompt(id: string): Promise<ChatPrompt | undefined>;
+  createChatPrompt(data: InsertChatPrompt): Promise<ChatPrompt>;
+  updateChatPrompt(id: string, data: UpdateChatPrompt): Promise<ChatPrompt | undefined>;
+  updateChatPromptOrder(prompts: Array<{ id: string; sortOrder: number }>): Promise<void>;
+  deleteChatPrompt(id: string): Promise<void>;
+
+  // Chat Conversation methods
+  getChatConversation(id: string): Promise<ChatConversation | undefined>;
+  getChatConversationBySessionId(sessionId: string): Promise<ChatConversation | undefined>;
+  createChatConversation(data: InsertChatConversation): Promise<ChatConversation>;
+  updateChatConversation(id: string, data: UpdateChatConversation): Promise<ChatConversation | undefined>;
+  deleteChatConversation(id: string): Promise<void>;
+
+  // Chat Message methods
+  getChatMessagesByConversationId(conversationId: string): Promise<ChatMessage[]>;
+  createChatMessage(data: InsertChatMessage): Promise<ChatMessage>;
+
+  // Chat Context Doc methods
+  getAllChatContextDocs(): Promise<ChatContextDoc[]>;
+  createChatContextDoc(data: InsertChatContextDoc): Promise<ChatContextDoc>;
+  updateChatContextDoc(id: string, data: UpdateChatContextDoc): Promise<ChatContextDoc | undefined>;
+  deleteChatContextDoc(id: string): Promise<void>;
+
+  // Media Asset methods (for carousel)
+  getAllMediaAssets(): Promise<MediaAsset[]>;
+  getMediaAsset(id: string): Promise<MediaAsset | undefined>;
+  createMediaAsset(data: InsertMediaAsset): Promise<MediaAsset>;
+  updateMediaAsset(id: string, data: UpdateMediaAsset): Promise<MediaAsset | undefined>;
+  updateMediaAssetOrder(assets: Array<{ id: string; sortOrder: number }>): Promise<void>;
+  deleteMediaAsset(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -431,6 +484,146 @@ export class DatabaseStorage implements IStorage {
 
   async deleteContentBlock(id: string): Promise<void> {
     await db.delete(contentBlocks).where(eq(contentBlocks.id, id));
+  }
+
+  // Chat Prompt methods
+  async getAllChatPrompts(): Promise<ChatPrompt[]> {
+    return await db.select().from(chatPrompts).orderBy(asc(chatPrompts.sortOrder));
+  }
+
+  async getActiveChatPrompts(): Promise<ChatPrompt[]> {
+    return await db.select().from(chatPrompts).where(eq(chatPrompts.isActive, true)).orderBy(asc(chatPrompts.sortOrder));
+  }
+
+  async getChatPrompt(id: string): Promise<ChatPrompt | undefined> {
+    const [prompt] = await db.select().from(chatPrompts).where(eq(chatPrompts.id, id));
+    return prompt || undefined;
+  }
+
+  async createChatPrompt(data: InsertChatPrompt): Promise<ChatPrompt> {
+    const [prompt] = await db.insert(chatPrompts).values(data).returning();
+    return prompt;
+  }
+
+  async updateChatPrompt(id: string, data: UpdateChatPrompt): Promise<ChatPrompt | undefined> {
+    const [updated] = await db
+      .update(chatPrompts)
+      .set(data)
+      .where(eq(chatPrompts.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async updateChatPromptOrder(prompts: Array<{ id: string; sortOrder: number }>): Promise<void> {
+    await Promise.all(
+      prompts.map(({ id, sortOrder }) =>
+        db.update(chatPrompts).set({ sortOrder }).where(eq(chatPrompts.id, id))
+      )
+    );
+  }
+
+  async deleteChatPrompt(id: string): Promise<void> {
+    await db.delete(chatPrompts).where(eq(chatPrompts.id, id));
+  }
+
+  // Chat Conversation methods
+  async getChatConversation(id: string): Promise<ChatConversation | undefined> {
+    const [conversation] = await db.select().from(chatConversations).where(eq(chatConversations.id, id));
+    return conversation || undefined;
+  }
+
+  async getChatConversationBySessionId(sessionId: string): Promise<ChatConversation | undefined> {
+    const [conversation] = await db.select().from(chatConversations).where(eq(chatConversations.sessionId, sessionId));
+    return conversation || undefined;
+  }
+
+  async createChatConversation(data: InsertChatConversation): Promise<ChatConversation> {
+    const [conversation] = await db.insert(chatConversations).values(data).returning();
+    return conversation;
+  }
+
+  async updateChatConversation(id: string, data: UpdateChatConversation): Promise<ChatConversation | undefined> {
+    const [updated] = await db
+      .update(chatConversations)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(chatConversations.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteChatConversation(id: string): Promise<void> {
+    await db.delete(chatConversations).where(eq(chatConversations.id, id));
+  }
+
+  // Chat Message methods
+  async getChatMessagesByConversationId(conversationId: string): Promise<ChatMessage[]> {
+    return await db.select().from(chatMessages)
+      .where(eq(chatMessages.conversationId, conversationId))
+      .orderBy(asc(chatMessages.createdAt));
+  }
+
+  async createChatMessage(data: InsertChatMessage): Promise<ChatMessage> {
+    const [message] = await db.insert(chatMessages).values(data).returning();
+    return message;
+  }
+
+  // Chat Context Doc methods
+  async getAllChatContextDocs(): Promise<ChatContextDoc[]> {
+    return await db.select().from(chatContextDocs).orderBy(asc(chatContextDocs.priority));
+  }
+
+  async createChatContextDoc(data: InsertChatContextDoc): Promise<ChatContextDoc> {
+    const [doc] = await db.insert(chatContextDocs).values(data).returning();
+    return doc;
+  }
+
+  async updateChatContextDoc(id: string, data: UpdateChatContextDoc): Promise<ChatContextDoc | undefined> {
+    const [updated] = await db
+      .update(chatContextDocs)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(chatContextDocs.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteChatContextDoc(id: string): Promise<void> {
+    await db.delete(chatContextDocs).where(eq(chatContextDocs.id, id));
+  }
+
+  // Media Asset methods (for carousel)
+  async getAllMediaAssets(): Promise<MediaAsset[]> {
+    return await db.select().from(mediaAssets).orderBy(asc(mediaAssets.sortOrder));
+  }
+
+  async getMediaAsset(id: string): Promise<MediaAsset | undefined> {
+    const [asset] = await db.select().from(mediaAssets).where(eq(mediaAssets.id, id));
+    return asset || undefined;
+  }
+
+  async createMediaAsset(data: InsertMediaAsset): Promise<MediaAsset> {
+    const [asset] = await db.insert(mediaAssets).values(data).returning();
+    return asset;
+  }
+
+  async updateMediaAsset(id: string, data: UpdateMediaAsset): Promise<MediaAsset | undefined> {
+    const [updated] = await db
+      .update(mediaAssets)
+      .set(data)
+      .where(eq(mediaAssets.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async updateMediaAssetOrder(assets: Array<{ id: string; sortOrder: number }>): Promise<void> {
+    await Promise.all(
+      assets.map(({ id, sortOrder }) =>
+        db.update(mediaAssets).set({ sortOrder }).where(eq(mediaAssets.id, id))
+      )
+    );
+  }
+
+  async deleteMediaAsset(id: string): Promise<void> {
+    await db.delete(mediaAssets).where(eq(mediaAssets.id, id));
   }
 }
 

@@ -240,3 +240,111 @@ export const updateContentBlockSchema = insertContentBlockSchema.partial();
 export type InsertContentBlock = z.infer<typeof insertContentBlockSchema>;
 export type UpdateContentBlock = z.infer<typeof updateContentBlockSchema>;
 export type ContentBlock = typeof contentBlocks.$inferSelect;
+
+// Chat Prompts (suggested conversation starters)
+export const chatPrompts = pgTable("chat_prompts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  prompt: text("prompt").notNull(),
+  sortOrder: integer("sort_order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertChatPromptSchema = createInsertSchema(chatPrompts).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const updateChatPromptSchema = insertChatPromptSchema.partial();
+
+export type InsertChatPrompt = z.infer<typeof insertChatPromptSchema>;
+export type UpdateChatPrompt = z.infer<typeof updateChatPromptSchema>;
+export type ChatPrompt = typeof chatPrompts.$inferSelect;
+
+// Chat Conversations
+export const chatConversations = pgTable("chat_conversations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: text("session_id").notNull(),
+  title: text("title"),
+  lastSummary: text("last_summary"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertChatConversationSchema = createInsertSchema(chatConversations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const updateChatConversationSchema = insertChatConversationSchema.partial();
+
+export type InsertChatConversation = z.infer<typeof insertChatConversationSchema>;
+export type UpdateChatConversation = z.infer<typeof updateChatConversationSchema>;
+export type ChatConversation = typeof chatConversations.$inferSelect;
+
+// Chat Messages
+export const chatMessages = pgTable("chat_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  conversationId: varchar("conversation_id").notNull().references(() => chatConversations.id, { onDelete: 'cascade' }),
+  role: text("role").notNull(),
+  content: text("content").notNull(),
+  contextChunks: text("context_chunks").array().default(sql`ARRAY[]::text[]`),
+  parentMessageId: varchar("parent_message_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+export type ChatMessage = typeof chatMessages.$inferSelect;
+
+// Chat Context Documents (resume, patents, etc.)
+export const chatContextDocs = pgTable("chat_context_docs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  label: text("label").notNull(),
+  body: text("body").notNull(),
+  source: text("source").notNull(),
+  priority: integer("priority").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertChatContextDocSchema = createInsertSchema(chatContextDocs).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const updateChatContextDocSchema = insertChatContextDocSchema.partial();
+
+export type InsertChatContextDoc = z.infer<typeof insertChatContextDocSchema>;
+export type UpdateChatContextDoc = z.infer<typeof updateChatContextDocSchema>;
+export type ChatContextDoc = typeof chatContextDocs.$inferSelect;
+
+// Media Assets (for iPhone carousel)
+export const mediaAssets = pgTable("media_assets", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  url: text("url").notNull(),
+  type: text("type").notNull(),
+  mimeType: text("mime_type").notNull(),
+  altText: text("alt_text"),
+  caption: text("caption"),
+  durationMs: integer("duration_ms"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertMediaAssetSchema = createInsertSchema(mediaAssets).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const updateMediaAssetSchema = insertMediaAssetSchema.partial();
+
+export type InsertMediaAsset = z.infer<typeof insertMediaAssetSchema>;
+export type UpdateMediaAsset = z.infer<typeof updateMediaAssetSchema>;
+export type MediaAsset = typeof mediaAssets.$inferSelect;
