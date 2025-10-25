@@ -9,6 +9,16 @@ The application is built as a modern web stack with React frontend, Express back
 **Status**: ✅ Production-ready (pending environment variable configuration)
 
 **Recent Updates** (October 25, 2025):
+- ✅ **NEW: Featured In - Media Appearances Section**
+  - Added "Featured In" section showcasing podcast appearances and speaking engagements
+  - Embedded YouTube video players for each media appearance
+  - Database schema with mediaAppearances table (title, description, videoUrl, type, publishedAt, sortOrder)
+  - Full CRUD admin management in Media tab of admin panel
+  - Seeded with 4 podcast/conversation appearances from provided YouTube URLs
+  - Positioned after iPhone Carousel section on portfolio page
+  - YouTube URL parsing supports both youtu.be and youtube.com formats
+  - Drag-and-drop reordering support in admin interface
+  - End-to-end tested with public display verification
 - ✅ **NEW: AI Chatbot & iPhone Carousel Features**
   - Added AI chatbot with RAG (Retrieval Augmented Generation) using OpenAI gpt-4o
   - ChatBot displays suggested prompts and generates contextual responses based on resume, patents, and experience
