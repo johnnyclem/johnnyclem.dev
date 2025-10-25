@@ -36,6 +36,51 @@ export async function seedDatabase() {
       }
       console.log("✅ Chat prompts seeded successfully!");
     }
+
+    // Also seed media appearances if they don't exist
+    const existingAppearances = await storage.getAllMediaAppearances();
+    if (existingAppearances.length === 0) {
+      console.log("🌱 Seeding media appearances...");
+      const mediaAppearancesData = [
+        {
+          title: "Podcast Interview",
+          description: "Discussion about software engineering and innovation",
+          videoUrl: "https://youtu.be/uWr4o92bLCI?si=kRpaKEFTGIwwi3RA",
+          type: "podcast",
+          publishedAt: new Date("2024-01-15"),
+          sortOrder: 0,
+        },
+        {
+          title: "Tech Talk",
+          description: "Insights on mobile development and iOS engineering",
+          videoUrl: "https://youtu.be/b44N3xF8y7A?si=irNeujfsetrh5flh",
+          type: "conversation",
+          publishedAt: new Date("2024-03-20"),
+          sortOrder: 1,
+        },
+        {
+          title: "Engineering Discussion",
+          description: "Deep dive into software architecture and best practices",
+          videoUrl: "https://youtu.be/9yFVb3OEyzg?si=v_bBjkggGPnwRc_Y",
+          type: "podcast",
+          publishedAt: new Date("2024-06-10"),
+          sortOrder: 2,
+        },
+        {
+          title: "Industry Conversation",
+          description: "Exploring the future of technology and innovation",
+          videoUrl: "https://youtu.be/uUOB1-mQny8?si=lrFjIgdkqux_K318",
+          type: "conversation",
+          publishedAt: new Date("2024-09-05"),
+          sortOrder: 3,
+        },
+      ];
+
+      for (const appearanceData of mediaAppearancesData) {
+        await storage.createMediaAppearance(appearanceData);
+      }
+      console.log("✅ Media appearances seeded successfully!");
+    }
     
     return;
   }
@@ -381,6 +426,46 @@ export async function seedDatabase() {
 
   for (const promptData of chatPromptsData) {
     await storage.createChatPrompt(promptData);
+  }
+
+  // Seed media appearances (podcasts, speaking engagements)
+  const mediaAppearancesData = [
+    {
+      title: "Podcast Interview",
+      description: "Discussion about software engineering and innovation",
+      videoUrl: "https://youtu.be/uWr4o92bLCI?si=kRpaKEFTGIwwi3RA",
+      type: "podcast",
+      publishedAt: new Date("2024-01-15"),
+      sortOrder: 0,
+    },
+    {
+      title: "Tech Talk",
+      description: "Insights on mobile development and iOS engineering",
+      videoUrl: "https://youtu.be/b44N3xF8y7A?si=irNeujfsetrh5flh",
+      type: "conversation",
+      publishedAt: new Date("2024-03-20"),
+      sortOrder: 1,
+    },
+    {
+      title: "Engineering Discussion",
+      description: "Deep dive into software architecture and best practices",
+      videoUrl: "https://youtu.be/9yFVb3OEyzg?si=v_bBjkggGPnwRc_Y",
+      type: "podcast",
+      publishedAt: new Date("2024-06-10"),
+      sortOrder: 2,
+    },
+    {
+      title: "Industry Conversation",
+      description: "Exploring the future of technology and innovation",
+      videoUrl: "https://youtu.be/uUOB1-mQny8?si=lrFjIgdkqux_K318",
+      type: "conversation",
+      publishedAt: new Date("2024-09-05"),
+      sortOrder: 3,
+    },
+  ];
+
+  for (const appearanceData of mediaAppearancesData) {
+    await storage.createMediaAppearance(appearanceData);
   }
 
   console.log("✅ Database seeded successfully!");

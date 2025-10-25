@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { LogOut, User, Code, Briefcase, Award, FolderKanban, Building, BookOpen, Palette, MessageCircle, Image } from "lucide-react";
+import { LogOut, User, Code, Briefcase, Award, FolderKanban, Building, BookOpen, Palette, MessageCircle, Image, Mic } from "lucide-react";
 import { ProfileEditor } from "@/components/admin/ProfileEditor";
 import { SkillsEditor } from "@/components/admin/SkillsEditor";
 import { ExperienceEditor } from "@/components/admin/ExperienceEditor";
@@ -13,6 +13,7 @@ import { BlogEditor } from "@/components/admin/BlogEditor";
 import { ThemeEditor } from "@/components/admin/ThemeEditor";
 import { ChatPromptsEditor } from "@/components/admin/ChatPromptsEditor";
 import { CarouselManager } from "@/components/admin/CarouselManager";
+import AppearancesManager from "@/components/admin/AppearancesManager";
 
 export default function Admin() {
   const [, setLocation] = useLocation();
@@ -73,7 +74,7 @@ export default function Admin() {
 
       <div className="container mx-auto px-6 py-8">
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-10 mb-8">
+          <TabsList className="grid w-full grid-cols-11 mb-8">
             <TabsTrigger value="profile" data-testid="tab-profile">
               <User className="w-4 h-4 mr-2" />
               Profile
@@ -109,6 +110,10 @@ export default function Admin() {
             <TabsTrigger value="carousel" data-testid="tab-carousel">
               <Image className="w-4 h-4 mr-2" />
               Carousel
+            </TabsTrigger>
+            <TabsTrigger value="appearances" data-testid="tab-appearances">
+              <Mic className="w-4 h-4 mr-2" />
+              Media
             </TabsTrigger>
             <TabsTrigger value="theme" data-testid="tab-theme">
               <Palette className="w-4 h-4 mr-2" />
@@ -150,6 +155,10 @@ export default function Admin() {
 
           <TabsContent value="carousel">
             <CarouselManager />
+          </TabsContent>
+
+          <TabsContent value="appearances">
+            <AppearancesManager />
           </TabsContent>
 
           <TabsContent value="theme">

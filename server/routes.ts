@@ -27,6 +27,8 @@ import {
   updateChatContextDocSchema,
   insertMediaAssetSchema,
   updateMediaAssetSchema,
+  insertMediaAppearanceSchema,
+  updateMediaAppearanceSchema,
 } from "@shared/schema";
 import { sendMessage } from "./chat-service";
 
@@ -744,6 +746,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { assets } = req.body;
       await storage.updateMediaAssetOrder(assets);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Media Appearance routes (podcasts, speaking, interviews)
+  app.get("/api/media-appearances", async (_req, res) => {
+    const appearances = await storage.getAllMediaAppearances();
+    res.json(appearances);
+  });
+
+  app.post("/api/admin/media-appearances", requireAdmin, async (req, res) => {
+    try {
+      const data = insertMediaAppearanceSchema.parse(req.body);
+      const appearance = await storage.createMediaAppearance(data);
+      res.json(appearance);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/admin/media-appearances/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = updateMediaAppearanceSchema.parse(req.body);
+      const appearance = await storage.updateMediaAppearance(req.params.id, data);
+      if (!appearance) {
+        return res.status(404).json({ error: "Appearance not found" });
+      }
+      res.json(appearance);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/admin/media-appearances/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteMediaAppearance(req.params.id);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/admin/media-appearances/reorder", requireAdmin, async (req, res) => {
+    try {
+      const { appearances } = req.body;
+      await storage.updateMediaAppearanceOrder(appearances);
       res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });

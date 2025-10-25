@@ -347,3 +347,26 @@ export const updateMediaAssetSchema = insertMediaAssetSchema.partial();
 export type InsertMediaAsset = z.infer<typeof insertMediaAssetSchema>;
 export type UpdateMediaAsset = z.infer<typeof updateMediaAssetSchema>;
 export type MediaAsset = typeof mediaAssets.$inferSelect;
+
+// Media Appearances (podcasts, speaking engagements, interviews)
+export const mediaAppearances = pgTable("media_appearances", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description"),
+  videoUrl: text("video_url").notNull(),
+  type: text("type").notNull(), // 'podcast', 'speaking', 'interview', 'conversation'
+  publishedAt: timestamp("published_at"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertMediaAppearanceSchema = createInsertSchema(mediaAppearances).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const updateMediaAppearanceSchema = insertMediaAppearanceSchema.partial();
+
+export type InsertMediaAppearance = z.infer<typeof insertMediaAppearanceSchema>;
+export type UpdateMediaAppearance = z.infer<typeof updateMediaAppearanceSchema>;
+export type MediaAppearance = typeof mediaAppearances.$inferSelect;

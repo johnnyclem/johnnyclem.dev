@@ -40,6 +40,9 @@ import {
   type MediaAsset,
   type InsertMediaAsset,
   type UpdateMediaAsset,
+  type MediaAppearance,
+  type InsertMediaAppearance,
+  type UpdateMediaAppearance,
   users,
   profile,
   skills,
@@ -57,6 +60,7 @@ import {
   chatMessages,
   chatContextDocs,
   mediaAssets,
+  mediaAppearances,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, asc, and } from "drizzle-orm";
@@ -170,6 +174,14 @@ export interface IStorage {
   updateMediaAsset(id: string, data: UpdateMediaAsset): Promise<MediaAsset | undefined>;
   updateMediaAssetOrder(assets: Array<{ id: string; sortOrder: number }>): Promise<void>;
   deleteMediaAsset(id: string): Promise<void>;
+
+  // Media Appearance methods (podcasts, speaking engagements, interviews)
+  getAllMediaAppearances(): Promise<MediaAppearance[]>;
+  getMediaAppearance(id: string): Promise<MediaAppearance | undefined>;
+  createMediaAppearance(data: InsertMediaAppearance): Promise<MediaAppearance>;
+  updateMediaAppearance(id: string, data: UpdateMediaAppearance): Promise<MediaAppearance | undefined>;
+  updateMediaAppearanceOrder(appearances: Array<{ id: string; sortOrder: number }>): Promise<void>;
+  deleteMediaAppearance(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -624,6 +636,42 @@ export class DatabaseStorage implements IStorage {
 
   async deleteMediaAsset(id: string): Promise<void> {
     await db.delete(mediaAssets).where(eq(mediaAssets.id, id));
+  }
+
+  // Media Appearance methods (podcasts, speaking engagements, interviews)
+  async getAllMediaAppearances(): Promise<MediaAppearance[]> {
+    return await db.select().from(mediaAppearances).orderBy(asc(mediaAppearances.sortOrder));
+  }
+
+  async getMediaAppearance(id: string): Promise<MediaAppearance | undefined> {
+    const [appearance] = await db.select().from(mediaAppearances).where(eq(mediaAppearances.id, id));
+    return appearance || undefined;
+  }
+
+  async createMediaAppearance(data: InsertMediaAppearance): Promise<MediaAppearance> {
+    const [appearance] = await db.insert(mediaAppearances).values(data).returning();
+    return appearance;
+  }
+
+  async updateMediaAppearance(id: string, data: UpdateMediaAppearance): Promise<MediaAppearance | undefined> {
+    const [updated] = await db
+      .update(mediaAppearances)
+      .set(data)
+      .where(eq(mediaAppearances.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async updateMediaAppearanceOrder(appearances: Array<{ id: string; sortOrder: number }>): Promise<void> {
+    await Promise.all(
+      appearances.map(({ id, sortOrder }) =>
+        db.update(mediaAppearances).set({ sortOrder }).where(eq(mediaAppearances.id, id))
+      )
+    );
+  }
+
+  async deleteMediaAppearance(id: string): Promise<void> {
+    await db.delete(mediaAppearances).where(eq(mediaAppearances.id, id));
   }
 }
 

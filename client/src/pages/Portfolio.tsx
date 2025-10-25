@@ -10,6 +10,7 @@ import SpecializationSection from "@/components/SpecializationSection";
 import ContactSection from "@/components/ContactSection";
 import { ChatBot } from "@/components/ChatBot";
 import { IPhoneCarousel } from "@/components/IPhoneCarousel";
+import FeaturedIn from "@/components/FeaturedIn";
 
 export default function Portfolio() {
   const [selectedSkillSlug, setSelectedSkillSlug] = useState<string | null>(null);
@@ -98,6 +99,8 @@ export default function Portfolio() {
           </div>
           <IPhoneCarousel />
         </section>
+
+        <FeaturedIn />
 
         <SpecializationSection />
         <ContactSection
