@@ -2,7 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-/* LIGHT MODE */
+/*
+ * BACKUP THEME (Original - Dark & Professional)
+ * To revert, uncomment this section and comment out the new theme below
+ *
+ * Light Mode Colors:
+ * --primary: 217 85% 55%; (Blue)
+ * --accent: 217 15% 92%; (Neutral Gray)
+ * --background: 0 0% 98%; (Light Gray)
+ * --foreground: 217 15% 12%; (Dark Blue-Gray)
+ * 
+ * Dark Mode Colors:
+ * --primary: 217 85% 65%; (Lighter Blue)
+ * --accent: 217 12% 20%; (Dark Gray)
+ * --background: 217 8% 6%; (Very Dark Blue)
+ * --foreground: 0 0% 98%; (Off White)
+ */
+
+/* NEW VIBRANT THEME - Bright, Fun & Expressive! 🎨 */
 :root {
   --button-outline: rgba(0,0,0, .10);
   --badge-outline: rgba(0,0,0, .05);
@@ -14,80 +31,95 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
-  --background: 0 0% 98%;
+  /* Warm, inviting background - soft cream instead of harsh white */
+  --background: 40 30% 98%;
 
-  --foreground: 217 15% 12%;
+  /* Deep purple-gray text - easier on eyes than black */
+  --foreground: 270 20% 18%;
 
-  --border: 0 0% 88%;
+  /* Soft purple-tinted borders */
+  --border: 270 15% 88%;
 
+  /* Pure white cards for crisp contrast */
   --card: 0 0% 100%;
 
-  --card-foreground: 217 15% 12%;
+  --card-foreground: 270 20% 18%;
 
-  --card-border: 0 0% 94%;
+  /* Slightly darker card borders for definition */
+  --card-border: 270 12% 92%;
 
-  --sidebar: 0 0% 96%;
+  /* Light lavender sidebar */
+  --sidebar: 270 25% 96%;
 
-  --sidebar-foreground: 217 15% 15%;
+  --sidebar-foreground: 270 30% 20%;
 
-  --sidebar-border: 0 0% 90%;
+  --sidebar-border: 270 20% 88%;
 
-  --sidebar-primary: 217 91% 45%;
+  /* Vibrant purple primary - fun and energetic! */
+  --sidebar-primary: 270 90% 58%;
 
-  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-primary-foreground: 0 0% 100%;
 
-  --sidebar-accent: 0 0% 92%;
+  /* Soft lavender accent */
+  --sidebar-accent: 280 30% 92%;
 
-  --sidebar-accent-foreground: 217 15% 18%;
+  --sidebar-accent-foreground: 270 30% 22%;
 
-  --sidebar-ring: 217 91% 45%;
+  --sidebar-ring: 270 90% 58%;
 
   --popover: 0 0% 100%;
 
-  --popover-foreground: 217 15% 12%;
+  --popover-foreground: 270 20% 18%;
 
-  --popover-border: 0 0% 92%;
+  --popover-border: 270 15% 90%;
 
-  --primary: 217 85% 55%;
+  /* Main vibrant purple - this is our signature color! */
+  --primary: 270 90% 58%;
 
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 0 0% 94%;
+  /* Light lavender secondary */
+  --secondary: 280 40% 94%;
 
-  --secondary-foreground: 217 15% 15%;
+  --secondary-foreground: 270 30% 22%;
 
-  --muted: 0 0% 96%;
+  /* Very light purple-tinted muted backgrounds */
+  --muted: 270 20% 94%;
 
-  --muted-foreground: 0 0% 40%;
+  --muted-foreground: 270 15% 40%;
 
-  --accent: 217 15% 92%;
+  /* Warm coral accent - pops of excitement! */
+  --accent: 15 95% 88%;
 
-  --accent-foreground: 217 20% 10%;
+  --accent-foreground: 15 80% 25%;
 
-  --destructive: 0 80% 52%;
+  /* Bright red for destructive actions */
+  --destructive: 0 85% 58%;
 
   --destructive-foreground: 0 0% 100%;
 
-  --input: 0 0% 75%;
-  --ring: 217 85% 55%;
-  --chart-1: 217 85% 50%;
-  --chart-2: 142 75% 48%;
-  --chart-3: 25 95% 55%;
-  --chart-4: 280 75% 55%;
-  --chart-5: 340 85% 58%;
+  --input: 270 12% 80%;
+  --ring: 270 90% 58%;
+  
+  /* Vibrant rainbow chart colors! */
+  --chart-1: 210 95% 60%; /* Electric Blue */
+  --chart-2: 140 85% 55%; /* Bright Green */
+  --chart-3: 30 100% 60%; /* Sunny Orange */
+  --chart-4: 330 90% 60%; /* Hot Pink */
+  --chart-5: 270 90% 65%; /* Vivid Purple */
 
   --font-sans: Inter, sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: JetBrains Mono, Menlo, monospace;
   --radius: .5rem; /* 8px */
-  --shadow-2xs: 0px 1px 2px 0px hsl(217 10% 10% / 0.05);
-  --shadow-xs: 0px 1px 2px 0px hsl(217 10% 10% / 0.06);
-  --shadow-sm: 0px 1px 3px 0px hsl(217 10% 10% / 0.08), 0px 1px 2px -1px hsl(217 10% 10% / 0.08);
-  --shadow: 0px 1px 3px 0px hsl(217 10% 10% / 0.09), 0px 1px 2px -1px hsl(217 10% 10% / 0.09);
-  --shadow-md: 0px 4px 6px -1px hsl(217 10% 10% / 0.08), 0px 2px 4px -2px hsl(217 10% 10% / 0.08);
-  --shadow-lg: 0px 10px 15px -3px hsl(217 10% 10% / 0.08), 0px 4px 6px -4px hsl(217 10% 10% / 0.08);
-  --shadow-xl: 0px 20px 25px -5px hsl(217 10% 10% / 0.08), 0px 8px 10px -6px hsl(217 10% 10% / 0.08);
-  --shadow-2xl: 0px 25px 50px -12px hsl(217 10% 10% / 0.15);
+  --shadow-2xs: 0px 1px 2px 0px hsl(270 20% 20% / 0.06);
+  --shadow-xs: 0px 1px 2px 0px hsl(270 20% 20% / 0.08);
+  --shadow-sm: 0px 1px 3px 0px hsl(270 20% 20% / 0.10), 0px 1px 2px -1px hsl(270 20% 20% / 0.10);
+  --shadow: 0px 1px 3px 0px hsl(270 20% 20% / 0.11), 0px 1px 2px -1px hsl(270 20% 20% / 0.11);
+  --shadow-md: 0px 4px 6px -1px hsl(270 20% 20% / 0.10), 0px 2px 4px -2px hsl(270 20% 20% / 0.10);
+  --shadow-lg: 0px 10px 15px -3px hsl(270 20% 20% / 0.10), 0px 4px 6px -4px hsl(270 20% 20% / 0.10);
+  --shadow-xl: 0px 20px 25px -5px hsl(270 20% 20% / 0.10), 0px 8px 10px -6px hsl(270 20% 20% / 0.10);
+  --shadow-2xl: 0px 25px 50px -12px hsl(270 20% 20% / 0.18);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 
@@ -132,67 +164,74 @@
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
 
-  --background: 217 8% 6%;
+  /* Deep purple-ish dark background instead of pure black */
+  --background: 270 15% 8%;
 
   --foreground: 0 0% 98%;
 
-  --border: 217 6% 16%;
+  /* Purple-tinted borders */
+  --border: 270 10% 18%;
 
-  --card: 217 6% 10%;
+  --card: 270 12% 12%;
 
   --card-foreground: 0 0% 98%;
 
-  --card-border: 217 6% 14%;
+  --card-border: 270 10% 16%;
 
-  --sidebar: 217 6% 8%;
+  --sidebar: 270 12% 10%;
 
   --sidebar-foreground: 0 0% 96%;
 
-  --sidebar-border: 217 6% 12%;
+  --sidebar-border: 270 10% 14%;
 
-  --sidebar-primary: 217 91% 60%;
+  /* Brighter purple for dark mode */
+  --sidebar-primary: 270 85% 65%;
 
   --sidebar-primary-foreground: 0 0% 98%;
 
-  --sidebar-accent: 217 6% 12%;
+  --sidebar-accent: 270 12% 16%;
 
   --sidebar-accent-foreground: 0 0% 96%;
 
-  --sidebar-ring: 217 91% 60%;
+  --sidebar-ring: 270 85% 65%;
 
-  --popover: 217 6% 12%;
+  --popover: 270 12% 14%;
 
   --popover-foreground: 0 0% 98%;
 
-  --popover-border: 217 6% 16%;
+  --popover-border: 270 10% 18%;
 
-  --primary: 217 85% 65%;
+  /* Vibrant purple for dark mode */
+  --primary: 270 85% 65%;
 
-  --primary-foreground: 217 15% 5%;
+  --primary-foreground: 270 15% 8%;
 
-  --secondary: 217 10% 18%;
+  --secondary: 270 15% 20%;
 
   --secondary-foreground: 0 0% 98%;
 
-  --muted: 217 8% 16%;
+  --muted: 270 12% 18%;
 
   --muted-foreground: 0 0% 70%;
 
-  --accent: 217 12% 20%;
+  /* Brighter coral for dark mode */
+  --accent: 15 90% 28%;
 
   --accent-foreground: 0 0% 98%;
 
-  --destructive: 0 80% 58%;
+  --destructive: 0 85% 62%;
 
   --destructive-foreground: 0 0% 100%;
 
-  --input: 217 8% 30%;
-  --ring: 217 85% 65%;
-  --chart-1: 217 85% 68%;
-  --chart-2: 142 75% 65%;
-  --chart-3: 25 95% 68%;
-  --chart-4: 280 75% 68%;
-  --chart-5: 340 85% 68%;
+  --input: 270 12% 28%;
+  --ring: 270 85% 65%;
+  
+  /* Vibrant chart colors for dark mode */
+  --chart-1: 210 90% 68%;
+  --chart-2: 140 80% 65%;
+  --chart-3: 30 95% 68%;
+  --chart-4: 330 85% 68%;
+  --chart-5: 270 85% 70%;
 
   --shadow-2xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.20);
   --shadow-xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.24);
