@@ -23,6 +23,9 @@ export function ProfileEditor() {
       ...profile,
       bio: profile.bio || "",
       linkedin: profile.linkedin || "",
+      githubUsername: profile.githubUsername || "",
+      twitterHandle: profile.twitterHandle || "",
+      stackOverflowUrl: profile.stackOverflowUrl || "",
       location: profile.location || "",
       yearsExperience: profile.yearsExperience || 0,
       patentCount: profile.patentCount || 0,
@@ -36,6 +39,9 @@ export function ProfileEditor() {
       bio: "",
       email: "",
       linkedin: "",
+      githubUsername: "",
+      twitterHandle: "",
+      stackOverflowUrl: "",
       location: "",
       yearsExperience: 0,
       patentCount: 0,
@@ -203,6 +209,53 @@ export function ProfileEditor() {
                   </FormItem>
                 )}
               />
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium">Social Media</h3>
+              <div className="grid grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="githubUsername"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>GitHub Username</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="username" data-testid="input-github-username" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="twitterHandle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Twitter/X Handle</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="@username" data-testid="input-twitter-handle" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="stackOverflowUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Stack Overflow URL</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="https://stackoverflow.com/users/..." data-testid="input-stackoverflow-url" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

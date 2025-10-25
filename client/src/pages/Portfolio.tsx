@@ -3,6 +3,7 @@ import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
 import SkillsMatrix from "@/components/SkillsMatrix";
 import ExperienceTimeline from "@/components/ExperienceTimeline";
+import SocialActivity from "@/components/SocialActivity";
 import PatentPortfolio from "@/components/PatentPortfolio";
 import ProjectHighlights from "@/components/ProjectHighlights";
 import SpecializationSection from "@/components/SpecializationSection";
@@ -67,6 +68,7 @@ export default function Portfolio() {
           selectedSkillSlug={selectedSkillSlug}
         />
         <ExperienceTimeline />
+        <SocialActivity />
         <PatentPortfolio />
         <ProjectHighlights 
           selectedSkillSlug={selectedSkillSlug}
