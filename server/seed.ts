@@ -8,6 +8,35 @@ export async function seedDatabase() {
   const existingProfile = await storage.getProfile();
   if (existingProfile) {
     console.log("✅ Database already seeded");
+    
+    // But still seed chat prompts if they don't exist
+    const existingPrompts = await storage.getAllChatPrompts();
+    if (existingPrompts.length === 0) {
+      console.log("🌱 Seeding chat prompts...");
+      const chatPromptsData = [
+        { 
+          prompt: "Tell me about a project you've worked on that you're really proud of.",
+          sortOrder: 0,
+          isActive: true,
+        },
+        { 
+          prompt: "Tell me about a time you overcame a conflict with a coworker.",
+          sortOrder: 1,
+          isActive: true,
+        },
+        { 
+          prompt: 'Given the following input string, write a parcel in swift to convert raw text into markdown syntax: "Input string goes here"',
+          sortOrder: 2,
+          isActive: true,
+        },
+      ];
+
+      for (const promptData of chatPromptsData) {
+        await storage.createChatPrompt(promptData);
+      }
+      console.log("✅ Chat prompts seeded successfully!");
+    }
+    
     return;
   }
 

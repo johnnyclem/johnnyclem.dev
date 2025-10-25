@@ -18,7 +18,17 @@ import {
   updateThemeSettingsSchema,
   insertContentBlockSchema,
   updateContentBlockSchema,
+  insertChatPromptSchema,
+  updateChatPromptSchema,
+  insertChatConversationSchema,
+  updateChatConversationSchema,
+  insertChatMessageSchema,
+  insertChatContextDocSchema,
+  updateChatContextDocSchema,
+  insertMediaAssetSchema,
+  updateMediaAssetSchema,
 } from "@shared/schema";
+import { sendMessage } from "./chat-service";
 
 // Extend express-session
 declare module "express-session" {
@@ -513,6 +523,226 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     const fileUrl = `/attached_assets/uploads/${req.file.filename}`;
     res.json({ url: fileUrl, filename: req.file.filename });
+  });
+
+  // Chat Prompt routes
+  app.get("/api/chat/prompts", async (_req, res) => {
+    const prompts = await storage.getActiveChatPrompts();
+    res.json(prompts);
+  });
+
+  app.get("/api/admin/chat/prompts", requireAdmin, async (_req, res) => {
+    const prompts = await storage.getAllChatPrompts();
+    res.json(prompts);
+  });
+
+  app.post("/api/admin/chat/prompts", requireAdmin, async (req, res) => {
+    try {
+      const data = insertChatPromptSchema.parse(req.body);
+      const prompt = await storage.createChatPrompt(data);
+      res.json(prompt);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/admin/chat/prompts/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = updateChatPromptSchema.parse(req.body);
+      const prompt = await storage.updateChatPrompt(req.params.id, data);
+      if (!prompt) {
+        return res.status(404).json({ error: "Prompt not found" });
+      }
+      res.json(prompt);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/admin/chat/prompts/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteChatPrompt(req.params.id);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/admin/chat/prompts/reorder", requireAdmin, async (req, res) => {
+    try {
+      const { prompts } = req.body;
+      await storage.updateChatPromptOrder(prompts);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Chat Conversation routes
+  app.post("/api/chat/conversations", async (req, res) => {
+    try {
+      const sessionId = req.sessionID;
+      
+      let conversation = await storage.getChatConversationBySessionId(sessionId);
+      
+      if (!conversation) {
+        const data = insertChatConversationSchema.parse({
+          sessionId,
+          title: "New Conversation",
+        });
+        conversation = await storage.createChatConversation(data);
+      }
+      
+      res.json(conversation);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/chat/conversations/:id", async (req, res) => {
+    const conversation = await storage.getChatConversation(req.params.id);
+    if (!conversation) {
+      return res.status(404).json({ error: "Conversation not found" });
+    }
+    res.json(conversation);
+  });
+
+  // Chat Message routes
+  app.post("/api/chat/conversations/:id/messages", async (req, res) => {
+    try {
+      const { content } = req.body;
+      const conversationId = req.params.id;
+      
+      if (!content || typeof content !== 'string') {
+        return res.status(400).json({ error: "Message content is required" });
+      }
+      
+      const result = await sendMessage(conversationId, content);
+      
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to send message" });
+    }
+  });
+
+  app.get("/api/chat/conversations/:id/messages", async (req, res) => {
+    const messages = await storage.getChatMessagesByConversationId(req.params.id);
+    res.json(messages);
+  });
+
+  // Chat Context Document routes (admin only)
+  app.get("/api/admin/chat/context-docs", requireAdmin, async (_req, res) => {
+    const docs = await storage.getAllChatContextDocs();
+    res.json(docs);
+  });
+
+  app.post("/api/admin/chat/context-docs", requireAdmin, async (req, res) => {
+    try {
+      const data = insertChatContextDocSchema.parse(req.body);
+      const doc = await storage.createChatContextDoc(data);
+      res.json(doc);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/admin/chat/context-docs/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = updateChatContextDocSchema.parse(req.body);
+      const doc = await storage.updateChatContextDoc(req.params.id, data);
+      if (!doc) {
+        return res.status(404).json({ error: "Document not found" });
+      }
+      res.json(doc);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/admin/chat/context-docs/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteChatContextDoc(req.params.id);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Media Asset routes (for carousel)
+  app.get("/api/media-assets", async (_req, res) => {
+    const assets = await storage.getAllMediaAssets();
+    res.json(assets);
+  });
+
+  app.post("/api/admin/media-assets", requireAdmin, upload.single('file'), async (req: any, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      const fileUrl = `/attached_assets/uploads/${req.file.filename}`;
+      
+      const data = insertMediaAssetSchema.parse({
+        title: req.body.title || req.file.originalname,
+        description: req.body.description || null,
+        mediaType: req.body.mediaType || 'image',
+        url: fileUrl,
+        thumbnailUrl: fileUrl,
+        sortOrder: parseInt(req.body.sortOrder || '0'),
+      });
+
+      const asset = await storage.createMediaAsset(data);
+      res.json(asset);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/admin/media-assets/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = updateMediaAssetSchema.parse(req.body);
+      const asset = await storage.updateMediaAsset(req.params.id, data);
+      if (!asset) {
+        return res.status(404).json({ error: "Asset not found" });
+      }
+      res.json(asset);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/admin/media-assets/:id", requireAdmin, async (req, res) => {
+    try {
+      const asset = await storage.getMediaAsset(req.params.id);
+      if (!asset) {
+        return res.status(404).json({ error: "Asset not found" });
+      }
+
+      if (asset.url.startsWith('/attached_assets/uploads/')) {
+        const filename = path.basename(asset.url);
+        const filepath = path.join(process.cwd(), 'attached_assets', 'uploads', filename);
+        try {
+          await fs.unlink(filepath);
+        } catch (err) {
+          console.error('Failed to delete file:', err);
+        }
+      }
+
+      await storage.deleteMediaAsset(req.params.id);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/admin/media-assets/reorder", requireAdmin, async (req, res) => {
+    try {
+      const { assets } = req.body;
+      await storage.updateMediaAssetOrder(assets);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
   });
 
   const httpServer = createServer(app);
