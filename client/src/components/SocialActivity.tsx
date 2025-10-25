@@ -53,9 +53,9 @@ export default function SocialActivity() {
         
         // Filter for push events and extract commits
         const commitEvents = events
-          .filter((event: any) => event.type === 'PushEvent')
+          .filter((event: any) => event.type === 'PushEvent' && event.payload.commits)
           .flatMap((event: any) => 
-            event.payload.commits.map((commit: any) => ({
+            (event.payload.commits || []).map((commit: any) => ({
               sha: commit.sha,
               commit: {
                 message: commit.message,

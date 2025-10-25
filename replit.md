@@ -8,8 +8,16 @@ The application is built as a modern web stack with React frontend, Express back
 
 **Status**: ✅ Production-ready (pending environment variable configuration)
 
-**Recent Updates** (October 24, 2025):
-- ✅ **NEW: Blog Management & Theme Editor**
+**Recent Updates** (October 25, 2025):
+- ✅ **NEW: Social Activity Integration**
+  - Added social media fields to profile (GitHub username, Twitter handle, Stack Overflow URL)
+  - Created SocialActivity component displaying recent GitHub commits via public API
+  - Integrated Twitter/X embedded timeline for recent posts
+  - Professional links section with LinkedIn, GitHub, Twitter, and Stack Overflow
+  - Positioned between Experience and Patents sections on portfolio page
+  - GitHub API integration fetches up to 5 most recent commits from public events
+  - End-to-end tested with admin profile updates and public display verification
+- ✅ **Blog Management & Theme Editor** (October 24, 2025)
   - Complete blog post management with markdown support
   - Draft/Published status with automatic publishedAt timestamps
   - Public blog page at `/blog` displaying published posts only
