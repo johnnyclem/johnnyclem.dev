@@ -50,7 +50,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin authentication
   app.post("/api/admin/login", async (req, res) => {
     const { password } = req.body;
-    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+    
+    if (!ADMIN_PASSWORD) {
+      console.error("ADMIN_PASSWORD environment variable is not set");
+      return res.status(500).json({ error: "Server configuration error" });
+    }
     
     if (password === ADMIN_PASSWORD) {
       // Regenerate session to prevent fixation attacks

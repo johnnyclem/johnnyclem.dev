@@ -56,6 +56,14 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Validate required environment variables
+  if (!process.env.ADMIN_PASSWORD) {
+    console.error("\n❌ ERROR: ADMIN_PASSWORD environment variable is required but not set.");
+    console.error("Please set ADMIN_PASSWORD in your Replit Secrets to secure the admin panel.");
+    console.error("Example: ADMIN_PASSWORD=your-secure-password-here\n");
+    process.exit(1);
+  }
+
   await seedDatabase();
   const server = await registerRoutes(app);
 
