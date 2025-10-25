@@ -9,6 +9,18 @@ The application is built as a modern web stack with React frontend, Express back
 **Status**: ✅ Production-ready (pending environment variable configuration)
 
 **Recent Updates** (October 25, 2025):
+- ✅ **NEW: Voice Chat with ElevenLabs Integration**
+  - Integrated ElevenLabs text-to-speech API for natural voice responses
+  - Voice-first chat interface with auto-play for assistant responses
+  - Voice toggle button for enabling/disabling audio playback
+  - Manual replay controls for each assistant message
+  - Chat responses limited to 100-150 words for concise, voice-friendly content
+  - All responses include citations with clickable markdown links (external URLs and internal page links)
+  - React-markdown rendering for rich text formatting in chat
+  - Storage method `getChatMessage(id)` for retrieving individual messages
+  - API endpoints: POST `/api/chat/messages/:messageId/voice` and `/api/chat/text-to-speech`
+  - Requires ELEVENLABS_API_KEY environment variable for voice playback
+  - End-to-end tested with UI/UX verification (voice playback pending API key)
 - ✅ **NEW: Featured In - Media Appearances Section**
   - Added "Featured In" section showcasing podcast appearances and speaking engagements
   - Embedded YouTube video players for each media appearance
