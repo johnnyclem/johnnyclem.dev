@@ -9,6 +9,20 @@ The application is built as a modern web stack with React frontend, Express back
 **Status**: ✅ Production-ready (pending environment variable configuration)
 
 **Recent Updates** (October 25, 2025):
+- ✅ **NEW: AI Chatbot & iPhone Carousel Features**
+  - Added AI chatbot with RAG (Retrieval Augmented Generation) using OpenAI gpt-4o
+  - ChatBot displays suggested prompts and generates contextual responses based on resume, patents, and experience
+  - iPhone carousel for displaying app screenshots/videos with swipe functionality
+  - Admin panel features for managing chat prompts and carousel media
+  - Fixed race condition in conversation creation flow
+  - Implemented auto-scroll for chat messages using double requestAnimationFrame
+  - Updated database schema with chat_conversations, chat_messages, chat_prompts, and media_assets tables
+- ✅ **Theme Update: Light Mode Only**
+  - Removed dark mode entirely - application now uses only light mode
+  - Deleted .dark CSS class definitions from index.css
+  - ThemeProvider locked to "light" mode permanently
+  - Removed ThemeToggle button from UI
+  - Bright, vibrant color scheme: purple primary (270° 90% 58%), coral accent (15° 95% 88%)
 - ✅ **NEW: Social Activity Integration**
   - Added social media fields to profile (GitHub username, Twitter handle, Stack Overflow URL)
   - Created SocialActivity component displaying recent GitHub commits via public API
@@ -67,7 +81,8 @@ Preferred communication style: Simple, everyday language.
 - Class Variance Authority (CVA) for component variant management
 
 **Styling System**
-- Dark mode as the primary theme with light mode support
+- Light mode only - dark mode removed entirely
+- Bright, vibrant color scheme with purple primary (270° 90% 58%) and coral accent (15° 95% 88%)
 - Custom color palette based on HSL values with CSS custom properties
 - Design system inspired by Linear's typography and Apple's minimalism
 - Consistent spacing units (4, 6, 8, 12, 16, 20, 24) for visual rhythm

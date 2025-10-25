@@ -8,7 +8,6 @@ import PatentPortfolio from "@/components/PatentPortfolio";
 import ProjectHighlights from "@/components/ProjectHighlights";
 import SpecializationSection from "@/components/SpecializationSection";
 import ContactSection from "@/components/ContactSection";
-import ThemeToggle from "@/components/ThemeToggle";
 import { ChatBot } from "@/components/ChatBot";
 import { IPhoneCarousel } from "@/components/IPhoneCarousel";
 
@@ -61,7 +60,6 @@ export default function Portfolio() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navigation onDownloadResume={handleDownloadResume} />
-      <ThemeToggle />
 
       <main>
         <HeroSection onDownloadResume={handleDownloadResume} onViewPatents={handleViewPatents} />
