@@ -60,22 +60,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({ error: "Server configuration error" });
     }
     
+    console.log(`[Auth] Login attempt received (password length: ${password?.length || 0})`);
+    
     if (password === ADMIN_PASSWORD) {
+      console.log("[Auth] Password correct, creating admin session");
       // Regenerate session to prevent fixation attacks
       req.session.regenerate((err) => {
         if (err) {
+          console.error("[Auth] Session regeneration error:", err);
           return res.status(500).json({ error: "Login failed" });
         }
         req.session.isAdmin = true;
         // Explicitly save the session before sending response
         req.session.save((saveErr) => {
           if (saveErr) {
+            console.error("[Auth] Session save error:", saveErr);
             return res.status(500).json({ error: "Failed to save session" });
           }
+          console.log("[Auth] Login successful, session created");
           res.json({ success: true });
         });
       });
     } else {
+      console.log("[Auth] Invalid password provided");
       res.status(401).json({ error: "Invalid password" });
     }
   });
