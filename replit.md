@@ -1,251 +1,90 @@
 # Jonathan Clem Portfolio Application
 
 ## Overview
-
-This is a full-stack portfolio website for Jonathan Clem, a Senior iOS Engineer and Innovation Architect. The application showcases professional experience, technical skills, patents, and project highlights through an interactive web interface with both public-facing portfolio views and an authenticated admin panel for content management.
-
-The application is built as a modern web stack with React frontend, Express backend, PostgreSQL database via Neon, and uses Drizzle ORM for type-safe database operations.
-
-**Status**: ✅ Production-ready (pending environment variable configuration)
-
-**Recent Updates** (October 27, 2025):
-- ✅ **CRITICAL FIX: PostgreSQL Session Store for Production**
-  - Fixed admin login loop bug on public deployment domains
-  - Replaced default in-memory session store with PostgreSQL-backed session store (connect-pg-simple)
-  - Sessions now persist across server restarts, deployments, and scaling
-  - Auto-creates `session` table in PostgreSQL database
-  - Resolves issue where logins worked locally but failed in production
-  - **Action Required**: Re-publish to production for this fix to take effect
-
-**Previous Updates** (October 25, 2025):
-- ✅ **NEW: Voice Chat with ElevenLabs Integration**
-  - Integrated ElevenLabs text-to-speech API for natural voice responses
-  - Voice-first chat interface with auto-play for assistant responses
-  - Voice toggle button for enabling/disabling audio playback
-  - Manual replay controls for each assistant message
-  - Chat responses limited to 100-150 words for concise, voice-friendly content
-  - All responses include citations with clickable markdown links (external URLs and internal page links)
-  - React-markdown rendering for rich text formatting in chat
-  - Storage method `getChatMessage(id)` for retrieving individual messages
-  - API endpoints: POST `/api/chat/messages/:messageId/voice` and `/api/chat/text-to-speech`
-  - Requires ELEVENLABS_API_KEY environment variable for voice playback
-  - End-to-end tested with UI/UX verification (voice playback pending API key)
-- ✅ **NEW: Featured In - Media Appearances Section**
-  - Added "Featured In" section showcasing podcast appearances and speaking engagements
-  - Embedded YouTube video players for each media appearance
-  - Database schema with mediaAppearances table (title, description, videoUrl, type, publishedAt, sortOrder)
-  - Full CRUD admin management in Media tab of admin panel
-  - Seeded with 4 podcast/conversation appearances from provided YouTube URLs
-  - Positioned after iPhone Carousel section on portfolio page
-  - YouTube URL parsing supports both youtu.be and youtube.com formats
-  - Drag-and-drop reordering support in admin interface
-  - End-to-end tested with public display verification
-- ✅ **NEW: AI Chatbot & iPhone Carousel Features**
-  - Added AI chatbot with RAG (Retrieval Augmented Generation) using OpenAI gpt-4o
-  - ChatBot displays suggested prompts and generates contextual responses based on resume, patents, and experience
-  - iPhone carousel for displaying app screenshots/videos with swipe functionality
-  - Admin panel features for managing chat prompts and carousel media
-  - Fixed race condition in conversation creation flow
-  - Implemented auto-scroll for chat messages using double requestAnimationFrame
-  - Updated database schema with chat_conversations, chat_messages, chat_prompts, and media_assets tables
-- ✅ **Theme Update: Light Mode Only**
-  - Removed dark mode entirely - application now uses only light mode
-  - Deleted .dark CSS class definitions from index.css
-  - ThemeProvider locked to "light" mode permanently
-  - Removed ThemeToggle button from UI
-  - Bright, vibrant color scheme: purple primary (270° 90% 58%), coral accent (15° 95% 88%)
-- ✅ **NEW: Social Activity Integration**
-  - Added social media fields to profile (GitHub username, Twitter handle, Stack Overflow URL)
-  - Created SocialActivity component displaying recent GitHub commits via public API
-  - Integrated Twitter/X embedded timeline for recent posts
-  - **Stack Overflow Activity Feed**: Backend proxy endpoint fetches recent questions and answers
-    - Automatically enriches answer items with parent question titles for readable display
-    - Displays score, accepted status, tags, and activity metadata
-    - Backend endpoint: GET `/api/stackoverflow/:userId/activity`
-    - Fetches up to 5 most recent activities (questions and answers combined)
-    - Handles Stack Exchange API quota limits with graceful error fallbacks
-  - Professional links section with LinkedIn, GitHub, Twitter, and Stack Overflow
-  - Positioned between Experience and Patents sections on portfolio page
-  - GitHub API integration fetches up to 5 most recent commits from public events
-  - Three-column responsive grid layout (GitHub, Stack Overflow, Twitter)
-  - End-to-end tested with admin profile updates and public display verification
-- ✅ **Blog Management & Theme Editor** (October 24, 2025)
-  - Complete blog post management with markdown support
-  - Draft/Published status with automatic publishedAt timestamps
-  - Public blog page at `/blog` displaying published posts only
-  - Theme customization with HSL color inputs (primary, accent, background, foreground)
-  - Font family selection for body and heading text
-  - Admin tabs for Blog and Theme in the admin panel
-  - End-to-end tested blog lifecycle (create, publish, unpublish, delete)
-- ✅ Implemented clickable skills with bidirectional many-to-many navigation
-  - Created skillItems and projectSkillItems junction tables for proper relationships
-  - Skills in SkillsMatrix are clickable and filter projects by selected skill
-  - Projects display skills from database with clickable badges for bidirectional navigation
-  - Implemented consistent slug generation handling special cases (C++ → cpp, C# → csharp, Objective-C → objective-c)
-  - Filter UI with Clear Filter button and selected skill indicator
-- ✅ Added real company logos and app screenshots throughout portfolio
-  - FiLMiC Pro and FiLMiC Remote app icons in projects
-  - Souls agentic AI platform macOS app screenshot (featured project)
-  - Official Truepic company logo (wordmark)
-  - Official Belief Agency stacked logo (hand icon + text)
-  - Company logos for AI Layer Labs, Wire Network, FiLMiC Inc, Paladin Innovators, General Assembly, Analytics Pros
-  - Fixed static file serving to prevent content-type issues (images now served as image/png, image/webp, image/jpeg)
-- ✅ Added complete work experience timeline (6 companies spanning 2013-2025)
-- ✅ Fixed resume download - now serves actual PDF (167KB) instead of blank file
-- Implemented secure session-based authentication with CSRF protection
-- Added schema validation to all CRUD API routes
-- Enhanced color vibrancy (85% saturation) for a more alive, professional feel
-- Successfully tested end-to-end with admin and public flows
-- Created comprehensive security documentation (SECURITY.md)
+This full-stack portfolio website for Jonathan Clem, a Senior iOS Engineer and Innovation Architect, showcases professional experience, technical skills, patents, and project highlights. It features an interactive public-facing portfolio and an authenticated admin panel for content management. The application aims to provide a comprehensive, interactive representation of Jonathan Clem's professional journey and technical prowess, targeting potential employers, collaborators, and clients. It is built using a modern web stack with React, Express, PostgreSQL (via Neon), and Drizzle ORM.
 
 ## User Preferences
-
 Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 
 ### Frontend Architecture
-
-**Framework & Build System**
-- React 18 with TypeScript for type-safe component development
-- Vite as the build tool and development server with HMR (Hot Module Replacement)
-- Wouter for lightweight client-side routing (smaller alternative to React Router)
-- TanStack Query (React Query) for server state management, data fetching, and caching
-
-**UI Component Library**
-- Radix UI primitives as the foundation for accessible, unstyled components
-- shadcn/ui design system (New York style) providing pre-styled, customizable components
-- Tailwind CSS for utility-first styling with custom design tokens
-- Class Variance Authority (CVA) for component variant management
-
-**Styling System**
-- Light mode only - dark mode removed entirely
-- Bright, vibrant color scheme with purple primary (270° 90% 58%) and coral accent (15° 95% 88%)
-- Custom color palette based on HSL values with CSS custom properties
-- Design system inspired by Linear's typography and Apple's minimalism
-- Consistent spacing units (4, 6, 8, 12, 16, 20, 24) for visual rhythm
-- Custom hover/active elevation effects using CSS variables
-
-**Form Management**
-- React Hook Form for performant form state management
-- Zod for schema validation on the frontend
-- @hookform/resolvers for integrating Zod schemas with React Hook Form
+- **Framework & Build System**: React 18, TypeScript, Vite, Wouter (routing), TanStack Query (data fetching).
+- **UI Component Library**: Radix UI (accessible primitives), shadcn/ui (New York style components), Tailwind CSS, Class Variance Authority (CVA).
+- **Styling System**: Light mode only, vibrant purple primary and coral accent color scheme (HSL values), custom color palette, Linear/Apple-inspired typography, consistent spacing, CSS variable-based elevation effects.
+- **Form Management**: React Hook Form, Zod for validation, @hookform/resolvers.
 
 ### Backend Architecture
-
-**Server Framework**
-- Express.js as the HTTP server framework
-- Session-based authentication using express-session
-- PostgreSQL session store via connect-pg-simple for persistent sessions
-
-**API Design**
-- RESTful API endpoints under `/api` prefix
-- CRUD operations for all portfolio entities (profile, skills, experiences, patents, projects, companies)
-- Admin-only mutations protected by `requireAdmin` middleware
-- All routes return JSON responses
-
-**Data Access Layer**
-- Storage abstraction pattern (`server/storage.ts`) providing a clean interface for database operations
-- Methods for each entity type (get, create, update, delete)
-- Type-safe operations using TypeScript interfaces derived from Drizzle schema
+- **Server Framework**: Express.js, session-based authentication with `express-session`, PostgreSQL-backed session store via `connect-pg-simple`.
+- **API Design**: RESTful API under `/api`, CRUD operations for all entities, admin-only routes protected by middleware, JSON responses.
+- **Data Access Layer**: `server/storage.ts` abstraction for database operations, type-safe via TypeScript interfaces derived from Drizzle schema.
 
 ### Authentication & Authorization
-
-**Session Management**
-- Server-side sessions with HttpOnly cookies to prevent XSS attacks
-- SameSite='lax' cookie setting for CSRF protection
-- Session regeneration on login to prevent session fixation attacks
-- 24-hour session expiration with automatic cleanup
-
-**Admin Access Control**
-- Single admin user model with password-based authentication
-- Environment variable configuration for admin password (ADMIN_PASSWORD)
-- `requireAdmin` middleware protecting all mutating routes (POST, PATCH, DELETE)
-- Session-based authorization check on admin panel access
-- Client-side route protection with server-side session validation
-
-**Security Features**
-- Secure cookie flag automatically enabled in production
-- SESSION_SECRET environment variable for session encryption
-- Server-side password validation (no client-side password storage)
-- Automatic logout on unauthorized access attempts
+- **Session Management**: Server-side sessions, HttpOnly cookies, SameSite='lax', session regeneration on login, 24-hour expiration.
+- **Admin Access Control**: Single admin user, password-based authentication (ADMIN_PASSWORD env var), `requireAdmin` middleware for mutating routes, session-based authorization.
+- **Security Features**: Secure cookie flag, SESSION_SECRET for encryption, server-side password validation, automatic logout on unauthorized access.
 
 ### Database Architecture
-
-**ORM & Schema**
-- Drizzle ORM for type-safe database queries and migrations
-- Schema-first approach with TypeScript types automatically generated
-- Zod schema integration via drizzle-zod for runtime validation
-
-**Database Schema**
-- `users` table for admin authentication (currently minimal, extensible for future multi-user support)
-- `profile` table (singleton) for main portfolio information
-- `skills` table with categories, icons, and sort ordering
-- `experiences` table with company relationships and date ranges
-- `patents` table with status tracking and external links
-- `projects` table with technology tags and impact metrics
-- `companies` table for featured company logos and information
-
-**Data Validation**
-- Insert schemas generated from Drizzle tables using createInsertSchema
-- Partial schemas for PATCH operations supporting incremental updates
-- Consistent validation between frontend and backend using shared Zod schemas
+- **ORM & Schema**: Drizzle ORM for type-safe queries and migrations, schema-first approach with TypeScript types, Zod schema integration via `drizzle-zod`.
+- **Database Schema**: `users`, `profile`, `skills`, `experiences`, `patents`, `projects`, `companies` tables, along with `chat_conversations`, `chat_messages`, `chat_prompts`, and `media_assets` for AI chatbot and media features.
+- **Data Validation**: Insert and partial schemas from Drizzle for consistent frontend/backend validation.
 
 ### Deployment Architecture
+- **Development Mode**: Vite dev server integrated with Express, HMR, Replit plugins, static file serving for attached assets.
+- **Production Build**: Vite builds frontend to `dist/public`, esbuild bundles backend to `dist/index.js`, static file serving from Express.
+- **Environment Configuration**: NODE_ENV, DATABASE_URL, SESSION_SECRET, ADMIN_PASSWORD.
 
-**Development Mode**
-- Vite dev server with middleware mode integrated into Express
-- HMR for rapid frontend development
-- Replit-specific plugins for error overlay and development banners
-- Static file serving for attached_assets mounted before Vite middleware (critical: prevents content-type issues)
-
-**Production Build**
-- Frontend: Vite builds static assets to `dist/public`
-- Backend: esbuild bundles server code to `dist/index.js`
-- Static file serving from Express in production
-- ESM (ES Modules) throughout the codebase
-
-**Environment Configuration**
-- NODE_ENV for environment detection
-- DATABASE_URL for PostgreSQL connection (required)
-- SESSION_SECRET for session encryption (generated via openssl in production)
-- ADMIN_PASSWORD for admin authentication (must be changed from default)
+### Key Features
+- **AI Chatbot**: RAG-enabled using OpenAI gpt-4o, contextual responses from resume/patents/experience, iPhone carousel for media display, admin management for prompts.
+- **Voice Chat**: ElevenLabs text-to-speech integration for natural voice responses, voice toggle, manual replay, concise responses with markdown links.
+- **Featured In Section**: Showcases media appearances with embedded YouTube videos, CRUD admin management.
+- **Social Activity Integration**: Displays recent GitHub commits, Stack Overflow activity feed, Twitter/X embedded timeline.
+- **Blog Management**: Full CRUD for blog posts with markdown support, draft/published status.
+- **Theme Customization**: Admin panel for HSL color inputs (primary, accent, background, foreground) and font selection.
+- **Interactive Skills**: Clickable skills filter projects, projects display clickable skill badges for bidirectional navigation.
+- **Content Management**: Comprehensive CRUD for all portfolio sections (Patents, Skills, Experience, Projects, Companies, Media Appearances) via authenticated admin panel.
 
 ## External Dependencies
 
 ### Database
-- **Neon PostgreSQL**: Serverless PostgreSQL database via @neondatabase/serverless
-- WebSocket-based connection using ws package for compatibility
-- Connection pooling via Neon's Pool implementation
+- **Neon PostgreSQL**: Serverless PostgreSQL via `@neondatabase/serverless`, WebSocket-based connection.
 
 ### UI Component Libraries
-- **Radix UI**: Comprehensive set of accessible, unstyled components (@radix-ui/react-*)
-- **Lucide React**: Icon library for consistent iconography
-- **Embla Carousel**: Carousel/slider functionality for project showcase
-- **cmdk**: Command palette component (extensible for future features)
+- **Radix UI**: `@radix-ui/react-*` for accessible components.
+- **Lucide React**: Icon library.
+- **Embla Carousel**: Carousel/slider functionality.
+- **cmdk**: Command palette.
 
 ### Styling & Theming
-- **Tailwind CSS**: Utility-first CSS framework
-- **PostCSS**: CSS processing with autoprefixer
-- **clsx & tailwind-merge**: Conditional class name utilities
+- **Tailwind CSS**: Utility-first CSS framework.
+- **PostCSS**: CSS processing.
+- **clsx & tailwind-merge**: Conditional class name utilities.
 
 ### Data Management
-- **TanStack Query**: Server state management and caching
-- **React Hook Form**: Form state management
-- **Zod**: Schema validation and type inference
-- **date-fns**: Date formatting and manipulation
+- **TanStack Query**: Server state management.
+- **React Hook Form**: Form state management.
+- **Zod**: Schema validation.
+- **date-fns**: Date formatting.
 
 ### Development Tools
-- **TypeScript**: Type safety across frontend and backend
-- **Drizzle Kit**: Database migration management
-- **tsx**: TypeScript execution for development server
-- **esbuild**: Production build bundling for server code
+- **TypeScript**: Type safety.
+- **Drizzle Kit**: Database migration management.
+- **tsx**: TypeScript execution.
+- **esbuild**: Production bundling.
 
 ### Session & Security
-- **express-session**: Session middleware
-- **connect-pg-simple**: PostgreSQL session store
-- **ws**: WebSocket implementation for Neon database connections
+- **express-session**: Session middleware.
+- **connect-pg-simple**: PostgreSQL session store.
+- **ws**: WebSocket implementation (for Neon).
+
+### AI & Voice
+- **OpenAI API**: For AI Chatbot (gpt-4o).
+- **ElevenLabs API**: For text-to-speech voice responses.
+
+### Third-Party APIs
+- **GitHub API**: For fetching recent commits.
+- **Stack Exchange API**: For fetching Stack Overflow activity.
+- **YouTube API**: For embedding videos in "Featured In" section.
 
 ### Fonts
-- **Google Fonts**: Inter (for UI) and JetBrains Mono (for code/technical elements)
-- Preconnected for performance optimization
+- **Google Fonts**: Inter and JetBrains Mono.
