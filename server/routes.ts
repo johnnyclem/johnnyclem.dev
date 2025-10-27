@@ -109,7 +109,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Fetch both answers and questions
       const [answersResponse, questionsResponse] = await Promise.all([
         fetch(
-          `https://api.stackexchange.com/2.3/users/${userId}/answers?order=desc&sort=activity&site=stackoverflow&pagesize=5&filter=withbody`,
+          `https://api.stackexchange.com/2.3/users/${userId}/answers?order=desc&sort=activity&site=stackoverflow&pagesize=10`,
           {
             headers: {
               'Accept': 'application/json',
@@ -118,7 +118,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         ),
         fetch(
-          `https://api.stackexchange.com/2.3/users/${userId}/questions?order=desc&sort=activity&site=stackoverflow&pagesize=5&filter=withbody`,
+          `https://api.stackexchange.com/2.3/users/${userId}/questions?order=desc&sort=activity&site=stackoverflow&pagesize=5`,
           {
             headers: {
               'Accept': 'application/json',
@@ -137,9 +137,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         questionsResponse.json(),
       ]);
 
+      // For answers, we need to fetch the parent question titles
+      const answerItems = answersData.items || [];
+      const questionIds = answerItems.map((answer: any) => answer.question_id).join(';');
+      
+      let enrichedAnswers = answerItems;
+      if (questionIds) {
+        const questionsForAnswersResponse = await fetch(
+          `https://api.stackexchange.com/2.3/questions/${questionIds}?site=stackoverflow`,
+          {
+            headers: {
+              'Accept': 'application/json',
+              'Accept-Encoding': 'gzip',
+            },
+          }
+        );
+
+        if (questionsForAnswersResponse.ok) {
+          const questionsForAnswersData = await questionsForAnswersResponse.json();
+          const questionTitleMap = new Map(
+            (questionsForAnswersData.items || []).map((q: any) => [q.question_id, q.title])
+          );
+
+          enrichedAnswers = answerItems.map((answer: any) => ({
+            ...answer,
+            title: questionTitleMap.get(answer.question_id) || 'Answer',
+            type: 'answer',
+          }));
+        }
+      }
+
       // Combine and sort by activity_date
       const activities = [
-        ...(answersData.items || []).map((item: any) => ({ ...item, type: 'answer' })),
+        ...enrichedAnswers.map((item: any) => ({ ...item, type: 'answer' })),
         ...(questionsData.items || []).map((item: any) => ({ ...item, type: 'question' })),
       ].sort((a, b) => b.last_activity_date - a.last_activity_date)
         .slice(0, 5); // Get top 5 most recent

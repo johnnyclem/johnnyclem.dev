@@ -325,7 +325,7 @@ export default function SocialActivity() {
                             )}
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium mb-1 line-clamp-2">
-                                {item.title}
+                                {item.title || (item.type === 'answer' ? 'Stack Overflow Answer' : 'Stack Overflow Question')}
                               </p>
                               <div className="flex items-center gap-2 flex-wrap">
                                 <Badge
