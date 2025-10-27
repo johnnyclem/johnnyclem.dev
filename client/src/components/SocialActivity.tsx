@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Github, Linkedin, ExternalLink, GitCommit, Twitter } from "lucide-react";
+import { Github, Linkedin, ExternalLink, GitCommit, Twitter, MessageCircle, HelpCircle } from "lucide-react";
 import { SiStackoverflow } from "react-icons/si";
 import type { Profile } from "@shared/schema";
 import { useEffect, useRef } from "react";
@@ -33,12 +33,33 @@ interface GitHubCommit {
   };
 }
 
+interface StackOverflowActivity {
+  type: 'answer' | 'question';
+  title: string;
+  link: string;
+  score: number;
+  is_accepted?: boolean;
+  last_activity_date: number;
+  tags?: string[];
+  answer_count?: number;
+  view_count?: number;
+}
+
 export default function SocialActivity() {
   const twitterContainerRef = useRef<HTMLDivElement>(null);
   
   const { data: profile } = useQuery<Profile>({
     queryKey: ["/api/profile"],
   });
+
+  // Extract Stack Overflow user ID from URL
+  const getStackOverflowUserId = (url: string | null | undefined): string | null => {
+    if (!url) return null;
+    const match = url.match(/users\/(\d+)/);
+    return match ? match[1] : null;
+  };
+
+  const stackOverflowUserId = getStackOverflowUserId(profile?.stackOverflowUrl);
 
   const { data: commits = [], isLoading: commitsLoading } = useQuery<GitHubCommit[]>({
     queryKey: ["github-commits", profile?.githubUsername],
@@ -93,6 +114,27 @@ export default function SocialActivity() {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
+  const { data: stackOverflowActivity = [], isLoading: soLoading } = useQuery<StackOverflowActivity[]>({
+    queryKey: ["stackoverflow-activity", stackOverflowUserId],
+    queryFn: async () => {
+      if (!stackOverflowUserId) return [];
+      
+      try {
+        const response = await fetch(`/api/stackoverflow/${stackOverflowUserId}/activity`);
+        
+        if (!response.ok) throw new Error('Failed to fetch Stack Overflow activity');
+        
+        const data = await response.json();
+        return data.items || [];
+      } catch (error) {
+        console.error('Error fetching Stack Overflow activity:', error);
+        return [];
+      }
+    },
+    enabled: !!stackOverflowUserId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
   // Load Twitter widget script
   useEffect(() => {
     if (profile?.twitterHandle && twitterContainerRef.current) {
@@ -139,7 +181,7 @@ export default function SocialActivity() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* GitHub Recent Commits */}
             {profile?.githubUsername && (
               <Card data-testid="card-github-activity">
@@ -222,6 +264,100 @@ export default function SocialActivity() {
               </Card>
             )}
 
+            {/* Stack Overflow Recent Activity */}
+            {stackOverflowUserId && (
+              <Card data-testid="card-stackoverflow-activity">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <SiStackoverflow className="w-5 h-5 text-[#F48024]" />
+                      <CardTitle className="text-xl">Stack Overflow</CardTitle>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      asChild
+                      data-testid="link-stackoverflow-profile"
+                    >
+                      <a
+                        href={profile?.stackOverflowUrl || '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
+                    </Button>
+                  </div>
+                  <CardDescription>
+                    Recent questions & answers
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {soLoading ? (
+                    <div className="space-y-4">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="animate-pulse">
+                          <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
+                          <div className="h-3 bg-muted rounded w-1/2"></div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : stackOverflowActivity.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      No recent activity found
+                    </p>
+                  ) : (
+                    <div className="space-y-4">
+                      {stackOverflowActivity.map((item, idx) => (
+                        <a
+                          key={`${item.type}-${idx}`}
+                          href={item.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block p-3 rounded-md hover-elevate transition-all"
+                          data-testid={`stackoverflow-item-${idx}`}
+                        >
+                          <div className="flex items-start gap-3">
+                            {item.type === 'question' ? (
+                              <HelpCircle className="w-4 h-4 mt-1 flex-shrink-0 text-muted-foreground" />
+                            ) : (
+                              <MessageCircle className="w-4 h-4 mt-1 flex-shrink-0 text-[#F48024]" />
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium mb-1 line-clamp-2">
+                                {item.title}
+                              </p>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <Badge
+                                  variant={item.type === 'answer' ? 'default' : 'secondary'}
+                                  className="text-xs"
+                                >
+                                  {item.type}
+                                </Badge>
+                                {item.is_accepted && (
+                                  <Badge variant="default" className="text-xs bg-green-600">
+                                    ✓ Accepted
+                                  </Badge>
+                                )}
+                                <span className="text-xs text-muted-foreground">
+                                  Score: {item.score}
+                                </span>
+                                {item.tags && item.tags.length > 0 && (
+                                  <span className="text-xs text-muted-foreground truncate">
+                                    {item.tags.slice(0, 2).join(', ')}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
             {/* Twitter/X Timeline */}
             {profile?.twitterHandle && (
               <Card data-testid="card-twitter-timeline">
@@ -268,7 +404,7 @@ export default function SocialActivity() {
             )}
 
             {/* Professional Links */}
-            <Card data-testid="card-professional-links" className="md:col-span-2">
+            <Card data-testid="card-professional-links" className="md:col-span-2 lg:col-span-3">
               <CardHeader>
                 <CardTitle className="text-xl">Connect With Me</CardTitle>
                 <CardDescription>

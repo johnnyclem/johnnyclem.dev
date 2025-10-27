@@ -101,6 +101,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ isAuthenticated: req.session.isAdmin === true });
   });
 
+  // Stack Overflow activity proxy (avoids CORS issues)
+  app.get("/api/stackoverflow/:userId/activity", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      
+      // Fetch both answers and questions
+      const [answersResponse, questionsResponse] = await Promise.all([
+        fetch(
+          `https://api.stackexchange.com/2.3/users/${userId}/answers?order=desc&sort=activity&site=stackoverflow&pagesize=5&filter=withbody`,
+          {
+            headers: {
+              'Accept': 'application/json',
+              'Accept-Encoding': 'gzip',
+            },
+          }
+        ),
+        fetch(
+          `https://api.stackexchange.com/2.3/users/${userId}/questions?order=desc&sort=activity&site=stackoverflow&pagesize=5&filter=withbody`,
+          {
+            headers: {
+              'Accept': 'application/json',
+              'Accept-Encoding': 'gzip',
+            },
+          }
+        ),
+      ]);
+
+      if (!answersResponse.ok || !questionsResponse.ok) {
+        return res.status(500).json({ error: 'Failed to fetch Stack Overflow activity' });
+      }
+
+      const [answersData, questionsData] = await Promise.all([
+        answersResponse.json(),
+        questionsResponse.json(),
+      ]);
+
+      // Combine and sort by activity_date
+      const activities = [
+        ...(answersData.items || []).map((item: any) => ({ ...item, type: 'answer' })),
+        ...(questionsData.items || []).map((item: any) => ({ ...item, type: 'question' })),
+      ].sort((a, b) => b.last_activity_date - a.last_activity_date)
+        .slice(0, 5); // Get top 5 most recent
+
+      res.json({ items: activities, quota_remaining: answersData.quota_remaining });
+    } catch (error) {
+      console.error('Error fetching Stack Overflow activity:', error);
+      res.status(500).json({ error: 'Failed to fetch Stack Overflow activity' });
+    }
+  });
+
   // Profile routes
   app.get("/api/profile", async (_req, res) => {
     const profile = await storage.getProfile();
