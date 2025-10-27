@@ -49,9 +49,16 @@ The application is built as a modern web stack with React frontend, Express back
   - Added social media fields to profile (GitHub username, Twitter handle, Stack Overflow URL)
   - Created SocialActivity component displaying recent GitHub commits via public API
   - Integrated Twitter/X embedded timeline for recent posts
+  - **Stack Overflow Activity Feed**: Backend proxy endpoint fetches recent questions and answers
+    - Automatically enriches answer items with parent question titles for readable display
+    - Displays score, accepted status, tags, and activity metadata
+    - Backend endpoint: GET `/api/stackoverflow/:userId/activity`
+    - Fetches up to 5 most recent activities (questions and answers combined)
+    - Handles Stack Exchange API quota limits with graceful error fallbacks
   - Professional links section with LinkedIn, GitHub, Twitter, and Stack Overflow
   - Positioned between Experience and Patents sections on portfolio page
   - GitHub API integration fetches up to 5 most recent commits from public events
+  - Three-column responsive grid layout (GitHub, Stack Overflow, Twitter)
   - End-to-end tested with admin profile updates and public display verification
 - ✅ **Blog Management & Theme Editor** (October 24, 2025)
   - Complete blog post management with markdown support
