@@ -8,7 +8,16 @@ The application is built as a modern web stack with React frontend, Express back
 
 **Status**: ✅ Production-ready (pending environment variable configuration)
 
-**Recent Updates** (October 25, 2025):
+**Recent Updates** (October 27, 2025):
+- ✅ **CRITICAL FIX: PostgreSQL Session Store for Production**
+  - Fixed admin login loop bug on public deployment domains
+  - Replaced default in-memory session store with PostgreSQL-backed session store (connect-pg-simple)
+  - Sessions now persist across server restarts, deployments, and scaling
+  - Auto-creates `session` table in PostgreSQL database
+  - Resolves issue where logins worked locally but failed in production
+  - **Action Required**: Re-publish to production for this fix to take effect
+
+**Previous Updates** (October 25, 2025):
 - ✅ **NEW: Voice Chat with ElevenLabs Integration**
   - Integrated ElevenLabs text-to-speech API for natural voice responses
   - Voice-first chat interface with auto-play for assistant responses

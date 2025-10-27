@@ -1,9 +1,11 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
 import path from "path";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { seedDatabase } from "./seed";
+import { pool } from "./db";
 
 const app = express();
 app.use(express.json());
@@ -12,8 +14,16 @@ app.use(express.urlencoded({ extended: false }));
 // Serve attached_assets folder for images/files
 app.use('/attached_assets', express.static(path.resolve(process.cwd(), 'attached_assets')));
 
+// Configure PostgreSQL session store for production persistence
+const PgStore = connectPgSimple(session);
+
 // Session configuration for admin authentication
 app.use(session({
+  store: new PgStore({
+    pool: pool as any,
+    tableName: 'session',
+    createTableIfMissing: true,
+  }),
   secret: process.env.SESSION_SECRET || "dev-secret-change-in-production",
   resave: false,
   saveUninitialized: false,
