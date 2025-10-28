@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Download } from "lucide-react";
+import { type Profile } from "@shared/schema";
 
 interface NavigationProps {
   onDownloadResume?: () => void;
@@ -9,6 +11,10 @@ interface NavigationProps {
 export default function Navigation({ onDownloadResume }: NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  const { data: profile } = useQuery<Profile>({
+    queryKey: ["/api/profile"],
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -49,7 +55,7 @@ export default function Navigation({ onDownloadResume }: NavigationProps) {
             className="text-xl font-bold hover-elevate active-elevate-2 px-3 py-2 rounded-md transition-colors"
             data-testid="button-logo"
           >
-            Jonathan Clem
+            {profile?.name || "Jonathan Clem"}
           </button>
 
           <div className="hidden md:flex items-center gap-1">
