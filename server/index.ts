@@ -8,6 +8,11 @@ import { seedDatabase } from "./seed";
 import { pool } from "./db";
 
 const app = express();
+
+// Trust proxy - required for Replit deployments with custom domains
+// This allows Express to read the X-Forwarded-* headers properly
+app.set('trust proxy', 1);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -30,9 +35,11 @@ app.use(session({
   cookie: {
     secure: process.env.NODE_ENV === "production",
     httpOnly: true,
-    sameSite: 'lax', // CSRF protection
+    sameSite: 'lax',
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    // Don't set domain - let browser handle it for both .replit.dev and custom domains
   },
+  proxy: true, // Trust the reverse proxy for secure cookies
 }));
 
 app.use((req, res, next) => {
