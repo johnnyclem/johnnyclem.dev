@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { MediaAsset } from "@shared/schema";
-import phoneFrameUrl from "@assets/IMG_0556_1761421916346.jpeg";
 
 interface IPhoneCarouselProps {
   autoScrollInterval?: number;
@@ -64,33 +63,29 @@ export function IPhoneCarousel({ autoScrollInterval = 5000, className = "" }: IP
   return (
     <div className={`flex flex-col items-center gap-6 ${className}`} data-testid="container-iphone-carousel">
       <div className="relative w-full max-w-sm">
-        <div className="relative aspect-[9/19.5] rounded-[3rem] overflow-hidden shadow-2xl">
-          <img
-            src={phoneFrameUrl}
-            alt="iPhone frame"
-            className="absolute inset-0 w-full h-full object-cover z-10 pointer-events-none"
-            data-testid="img-iphone-frame"
-          />
+        {/* iPhone Frame Container */}
+        <div className="relative aspect-[9/19.5] bg-gradient-to-br from-gray-900 to-black rounded-[3.5rem] p-3 shadow-2xl">
+          {/* Dynamic Island Notch */}
+          <div className="absolute top-6 left-1/2 -translate-x-1/2 w-32 h-8 bg-black rounded-full z-20" />
           
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="relative w-[88%] h-[95%] rounded-[2.5rem] overflow-hidden bg-black">
-              {assets.map((asset, index) => (
-                <div
-                  key={asset.id}
-                  className={`absolute inset-0 transition-opacity duration-500 ${
-                    index === currentIndex ? "opacity-100" : "opacity-0"
-                  }`}
-                  data-testid={`slide-${index}`}
-                >
-                  <img
-                    src={asset.url}
-                    alt={asset.title || `Slide ${index + 1}`}
-                    className="w-full h-full object-cover"
-                    data-testid={`img-slide-${index}`}
-                  />
-                </div>
-              ))}
-            </div>
+          {/* Screen Container */}
+          <div className="relative w-full h-full rounded-[3rem] overflow-hidden bg-black">
+            {assets.map((asset, index) => (
+              <div
+                key={asset.id}
+                className={`absolute inset-0 transition-opacity duration-500 ${
+                  index === currentIndex ? "opacity-100" : "opacity-0"
+                }`}
+                data-testid={`slide-${index}`}
+              >
+                <img
+                  src={asset.url}
+                  alt={asset.title || `Slide ${index + 1}`}
+                  className="w-full h-full object-cover"
+                  data-testid={`img-slide-${index}`}
+                />
+              </div>
+            ))}
           </div>
         </div>
 
