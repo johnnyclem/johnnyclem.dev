@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,7 @@ export function ConsultingSettingsEditor() {
     refetchOnMount: true,
   });
 
-  useState(() => {
+  useEffect(() => {
     if (settings) {
       setFormData({
         dayRate: settings.dayRate,
@@ -30,7 +30,7 @@ export function ConsultingSettingsEditor() {
         calendlyUrl: settings.calendlyUrl,
       });
     }
-  });
+  }, [settings]);
 
   const updateMutation = useMutation({
     mutationFn: async (data: Partial<InsertConsultingSettings>) => {
