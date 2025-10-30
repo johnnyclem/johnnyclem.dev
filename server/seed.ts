@@ -81,6 +81,55 @@ export async function seedDatabase() {
       }
       console.log("✅ Media appearances seeded successfully!");
     }
+
+    // Seed consulting settings if they don't exist
+    const existingSettings = await storage.getConsultingSettings();
+    if (!existingSettings) {
+      console.log("🌱 Seeding consulting settings...");
+      await storage.createConsultingSettings({
+        dayRate: 2000,
+        hourlyRate: 180,
+        calendlyUrl: "https://calendly.com/johnnyclem/30min",
+      });
+      console.log("✅ Consulting settings seeded successfully!");
+    }
+
+    // Seed testimonials if they don't exist
+    const existingTestimonials = await storage.getAllTestimonials();
+    if (existingTestimonials.length === 0) {
+      console.log("🌱 Seeding testimonials...");
+      const testimonialsData = [
+        {
+          clientName: "Sarah Johnson",
+          clientTitle: "VP of Engineering",
+          clientCompany: "TechCorp Inc",
+          quote: "Jonathan's expertise in iOS development and rapid prototyping helped us launch our flagship app 3 months ahead of schedule. His technical depth and problem-solving abilities are exceptional.",
+          rating: 5,
+          sortOrder: 0,
+        },
+        {
+          clientName: "Michael Chen",
+          clientTitle: "CTO",
+          clientCompany: "StartupXYZ",
+          quote: "Working with Johnny on our AI integration project was transformative. His ability to bridge technical complexity with practical business solutions is unmatched.",
+          rating: 5,
+          sortOrder: 1,
+        },
+        {
+          clientName: "Emily Rodriguez",
+          clientTitle: "Product Manager",
+          clientCompany: "MediaTech Solutions",
+          quote: "Jonathan's consulting on our video processing pipeline saved us months of development time. His deep knowledge of AVFoundation and media technologies is impressive.",
+          rating: 5,
+          sortOrder: 2,
+        },
+      ];
+
+      for (const testimonialData of testimonialsData) {
+        await storage.createTestimonial(testimonialData);
+      }
+      console.log("✅ Testimonials seeded successfully!");
+    }
     
     return;
   }

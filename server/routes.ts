@@ -29,6 +29,10 @@ import {
   updateMediaAssetSchema,
   insertMediaAppearanceSchema,
   updateMediaAppearanceSchema,
+  insertConsultingSettingsSchema,
+  updateConsultingSettingsSchema,
+  insertTestimonialSchema,
+  updateTestimonialSchema,
 } from "@shared/schema";
 import { sendMessage } from "./chat-service";
 import { textToSpeech } from "./elevenlabs-service";
@@ -933,6 +937,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { appearances } = req.body;
       await storage.updateMediaAppearanceOrder(appearances);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Consulting Settings routes
+  app.get("/api/consulting-settings", async (_req, res) => {
+    const settings = await storage.getConsultingSettings();
+    res.json(settings);
+  });
+
+  app.post("/api/admin/consulting-settings", requireAdmin, async (req, res) => {
+    try {
+      const data = insertConsultingSettingsSchema.parse(req.body);
+      const settings = await storage.createConsultingSettings(data);
+      res.json(settings);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/admin/consulting-settings/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = updateConsultingSettingsSchema.parse(req.body);
+      const settings = await storage.updateConsultingSettings(req.params.id, data);
+      if (!settings) {
+        return res.status(404).json({ error: "Settings not found" });
+      }
+      res.json(settings);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  // Testimonials routes
+  app.get("/api/testimonials", async (_req, res) => {
+    const testimonials = await storage.getAllTestimonials();
+    res.json(testimonials);
+  });
+
+  app.post("/api/admin/testimonials", requireAdmin, async (req, res) => {
+    try {
+      const data = insertTestimonialSchema.parse(req.body);
+      const testimonial = await storage.createTestimonial(data);
+      res.json(testimonial);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/admin/testimonials/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = updateTestimonialSchema.parse(req.body);
+      const testimonial = await storage.updateTestimonial(req.params.id, data);
+      if (!testimonial) {
+        return res.status(404).json({ error: "Testimonial not found" });
+      }
+      res.json(testimonial);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/admin/testimonials/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteTestimonial(req.params.id);
       res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
