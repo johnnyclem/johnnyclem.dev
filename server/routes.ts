@@ -944,28 +944,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Consulting Settings routes
-  app.get("/api/consulting-settings", async (_req, res) => {
+  app.get("/api/consulting/settings", async (_req, res) => {
     const settings = await storage.getConsultingSettings();
     res.json(settings);
   });
 
-  app.post("/api/admin/consulting-settings", requireAdmin, async (req, res) => {
-    try {
-      const data = insertConsultingSettingsSchema.parse(req.body);
-      const settings = await storage.createConsultingSettings(data);
-      res.json(settings);
-    } catch (error: any) {
-      res.status(400).json({ error: error.message });
-    }
-  });
-
-  app.patch("/api/admin/consulting-settings/:id", requireAdmin, async (req, res) => {
+  app.patch("/api/consulting/settings", requireAdmin, async (req, res) => {
     try {
       const data = updateConsultingSettingsSchema.parse(req.body);
-      const settings = await storage.updateConsultingSettings(req.params.id, data);
-      if (!settings) {
+      const existing = await storage.getConsultingSettings();
+      if (!existing) {
         return res.status(404).json({ error: "Settings not found" });
       }
+      const settings = await storage.updateConsultingSettings(existing.id, data);
       res.json(settings);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -973,12 +964,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Testimonials routes
-  app.get("/api/testimonials", async (_req, res) => {
+  app.get("/api/consulting/testimonials", async (_req, res) => {
     const testimonials = await storage.getAllTestimonials();
     res.json(testimonials);
   });
 
-  app.post("/api/admin/testimonials", requireAdmin, async (req, res) => {
+  app.post("/api/consulting/testimonials", requireAdmin, async (req, res) => {
     try {
       const data = insertTestimonialSchema.parse(req.body);
       const testimonial = await storage.createTestimonial(data);
@@ -988,7 +979,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/admin/testimonials/:id", requireAdmin, async (req, res) => {
+  app.patch("/api/consulting/testimonials/:id", requireAdmin, async (req, res) => {
     try {
       const data = updateTestimonialSchema.parse(req.body);
       const testimonial = await storage.updateTestimonial(req.params.id, data);
@@ -1001,7 +992,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/admin/testimonials/:id", requireAdmin, async (req, res) => {
+  app.delete("/api/consulting/testimonials/:id", requireAdmin, async (req, res) => {
     try {
       await storage.deleteTestimonial(req.params.id);
       res.json({ success: true });
