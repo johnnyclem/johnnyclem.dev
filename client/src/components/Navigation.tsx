@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Download } from "lucide-react";
 import { type Profile } from "@shared/schema";
@@ -11,6 +12,7 @@ interface NavigationProps {
 export default function Navigation({ onDownloadResume }: NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [location] = useLocation();
   
   const { data: profile } = useQuery<Profile>({
     queryKey: ["/api/profile"],
@@ -41,6 +43,11 @@ export default function Navigation({ onDownloadResume }: NavigationProps) {
     { label: "Contact", id: "contact" },
   ];
 
+  const pageLinks = [
+    { label: "Blog", href: "/blog" },
+    { label: "Consulting", href: "/consulting" },
+  ];
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -59,7 +66,7 @@ export default function Navigation({ onDownloadResume }: NavigationProps) {
           </button>
 
           <div className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
+            {location === "/" && navLinks.map((link) => (
               <button
                 key={link.id}
                 onClick={() => scrollToSection(link.id)}
@@ -69,15 +76,43 @@ export default function Navigation({ onDownloadResume }: NavigationProps) {
                 {link.label}
               </button>
             ))}
-            <Button
-              onClick={onDownloadResume}
-              size="sm"
-              className="ml-2"
-              data-testid="button-download-resume"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Resume
-            </Button>
+            {pageLinks.map((link) => (
+              <Link key={link.href} href={link.href}>
+                <button
+                  className={`px-4 py-2 text-sm font-medium hover-elevate active-elevate-2 rounded-md transition-colors ${
+                    location === link.href
+                      ? "text-foreground bg-accent"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  data-testid={`link-${link.label.toLowerCase()}`}
+                >
+                  {link.label}
+                </button>
+              </Link>
+            ))}
+            <Link href="/">
+              <button
+                className={`px-4 py-2 text-sm font-medium hover-elevate active-elevate-2 rounded-md transition-colors ${
+                  location === "/"
+                    ? "text-foreground bg-accent"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                data-testid="link-portfolio"
+              >
+                Portfolio
+              </button>
+            </Link>
+            {onDownloadResume && (
+              <Button
+                onClick={onDownloadResume}
+                size="sm"
+                className="ml-2"
+                data-testid="button-download-resume"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Resume
+              </Button>
+            )}
           </div>
 
           <button
@@ -91,7 +126,7 @@ export default function Navigation({ onDownloadResume }: NavigationProps) {
 
         {isMobileMenuOpen && (
           <div className="md:hidden mt-4 py-4 border-t flex flex-col gap-2 bg-background rounded-lg" data-testid="mobile-menu">
-            {navLinks.map((link) => (
+            {location === "/" && navLinks.map((link) => (
               <button
                 key={link.id}
                 onClick={() => scrollToSection(link.id)}
@@ -101,15 +136,45 @@ export default function Navigation({ onDownloadResume }: NavigationProps) {
                 {link.label}
               </button>
             ))}
-            <Button
-              onClick={onDownloadResume}
-              size="sm"
-              className="mt-2"
-              data-testid="button-mobile-download"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Download Resume
-            </Button>
+            {pageLinks.map((link) => (
+              <Link key={link.href} href={link.href}>
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`w-full px-4 py-2 text-left text-sm font-medium hover-elevate active-elevate-2 rounded-md transition-colors ${
+                    location === link.href
+                      ? "text-foreground bg-accent"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  data-testid={`link-mobile-${link.label.toLowerCase()}`}
+                >
+                  {link.label}
+                </button>
+              </Link>
+            ))}
+            <Link href="/">
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`w-full px-4 py-2 text-left text-sm font-medium hover-elevate active-elevate-2 rounded-md transition-colors ${
+                  location === "/"
+                    ? "text-foreground bg-accent"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                data-testid="link-mobile-portfolio"
+              >
+                Portfolio
+              </button>
+            </Link>
+            {onDownloadResume && (
+              <Button
+                onClick={onDownloadResume}
+                size="sm"
+                className="mt-2"
+                data-testid="button-mobile-download"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download Resume
+              </Button>
+            )}
           </div>
         )}
       </nav>
