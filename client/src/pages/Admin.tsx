@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { LogOut, User, Code, Briefcase, Award, FolderKanban, Building, BookOpen, Palette, MessageCircle, Image, Mic } from "lucide-react";
+import { LogOut, User, Code, Briefcase, Award, FolderKanban, Building, BookOpen, Palette, MessageCircle, Image, Mic, Handshake } from "lucide-react";
 import { ProfileEditor } from "@/components/admin/ProfileEditor";
 import { SkillsEditor } from "@/components/admin/SkillsEditor";
 import { ExperienceEditor } from "@/components/admin/ExperienceEditor";
@@ -14,6 +14,8 @@ import { ThemeEditor } from "@/components/admin/ThemeEditor";
 import { ChatPromptsEditor } from "@/components/admin/ChatPromptsEditor";
 import { CarouselManager } from "@/components/admin/CarouselManager";
 import AppearancesManager from "@/components/admin/AppearancesManager";
+import { ConsultingSettingsEditor } from "@/components/admin/ConsultingSettingsEditor";
+import { TestimonialsEditor } from "@/components/admin/TestimonialsEditor";
 
 export default function Admin() {
   const [, setLocation] = useLocation();
@@ -74,7 +76,7 @@ export default function Admin() {
 
       <div className="container mx-auto px-6 py-8">
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-11 mb-8">
+          <TabsList className="grid w-full grid-cols-12 mb-8">
             <TabsTrigger value="profile" data-testid="tab-profile">
               <User className="w-4 h-4 mr-2" />
               Profile
@@ -102,6 +104,10 @@ export default function Admin() {
             <TabsTrigger value="blog" data-testid="tab-blog">
               <BookOpen className="w-4 h-4 mr-2" />
               Blog
+            </TabsTrigger>
+            <TabsTrigger value="consulting" data-testid="tab-consulting">
+              <Handshake className="w-4 h-4 mr-2" />
+              Consulting
             </TabsTrigger>
             <TabsTrigger value="chatbot" data-testid="tab-chatbot">
               <MessageCircle className="w-4 h-4 mr-2" />
@@ -147,6 +153,13 @@ export default function Admin() {
 
           <TabsContent value="blog">
             <BlogEditor />
+          </TabsContent>
+
+          <TabsContent value="consulting">
+            <div className="space-y-6">
+              <ConsultingSettingsEditor />
+              <TestimonialsEditor />
+            </div>
           </TabsContent>
 
           <TabsContent value="chatbot">
