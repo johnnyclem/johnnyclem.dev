@@ -370,3 +370,47 @@ export const updateMediaAppearanceSchema = insertMediaAppearanceSchema.partial()
 export type InsertMediaAppearance = z.infer<typeof insertMediaAppearanceSchema>;
 export type UpdateMediaAppearance = z.infer<typeof updateMediaAppearanceSchema>;
 export type MediaAppearance = typeof mediaAppearances.$inferSelect;
+
+// Consulting Settings
+export const consultingSettings = pgTable("consulting_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  dayRate: integer("day_rate").notNull(),
+  hourlyRate: integer("hourly_rate").notNull().default(180),
+  calendlyUrl: text("calendly_url").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertConsultingSettingsSchema = createInsertSchema(consultingSettings).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export const updateConsultingSettingsSchema = insertConsultingSettingsSchema.partial();
+
+export type InsertConsultingSettings = z.infer<typeof insertConsultingSettingsSchema>;
+export type UpdateConsultingSettings = z.infer<typeof updateConsultingSettingsSchema>;
+export type ConsultingSettings = typeof consultingSettings.$inferSelect;
+
+// Testimonials
+export const testimonials = pgTable("testimonials", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  clientName: text("client_name").notNull(),
+  clientTitle: text("client_title").notNull(),
+  clientCompany: text("client_company").notNull(),
+  quote: text("quote").notNull(),
+  avatarUrl: text("avatar_url"),
+  rating: integer("rating").notNull().default(5),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertTestimonialSchema = createInsertSchema(testimonials).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const updateTestimonialSchema = insertTestimonialSchema.partial();
+
+export type InsertTestimonial = z.infer<typeof insertTestimonialSchema>;
+export type UpdateTestimonial = z.infer<typeof updateTestimonialSchema>;
+export type Testimonial = typeof testimonials.$inferSelect;

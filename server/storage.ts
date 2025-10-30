@@ -43,6 +43,12 @@ import {
   type MediaAppearance,
   type InsertMediaAppearance,
   type UpdateMediaAppearance,
+  type ConsultingSettings,
+  type InsertConsultingSettings,
+  type UpdateConsultingSettings,
+  type Testimonial,
+  type InsertTestimonial,
+  type UpdateTestimonial,
   users,
   profile,
   skills,
@@ -61,6 +67,8 @@ import {
   chatContextDocs,
   mediaAssets,
   mediaAppearances,
+  consultingSettings,
+  testimonials,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, asc, and } from "drizzle-orm";
@@ -183,6 +191,18 @@ export interface IStorage {
   updateMediaAppearance(id: string, data: UpdateMediaAppearance): Promise<MediaAppearance | undefined>;
   updateMediaAppearanceOrder(appearances: Array<{ id: string; sortOrder: number }>): Promise<void>;
   deleteMediaAppearance(id: string): Promise<void>;
+
+  // Consulting Settings methods
+  getConsultingSettings(): Promise<ConsultingSettings | undefined>;
+  createConsultingSettings(data: InsertConsultingSettings): Promise<ConsultingSettings>;
+  updateConsultingSettings(id: string, data: UpdateConsultingSettings): Promise<ConsultingSettings | undefined>;
+
+  // Testimonial methods
+  getAllTestimonials(): Promise<Testimonial[]>;
+  getTestimonial(id: string): Promise<Testimonial | undefined>;
+  createTestimonial(data: InsertTestimonial): Promise<Testimonial>;
+  updateTestimonial(id: string, data: UpdateTestimonial): Promise<Testimonial | undefined>;
+  deleteTestimonial(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -678,6 +698,54 @@ export class DatabaseStorage implements IStorage {
 
   async deleteMediaAppearance(id: string): Promise<void> {
     await db.delete(mediaAppearances).where(eq(mediaAppearances.id, id));
+  }
+
+  // Consulting Settings methods
+  async getConsultingSettings(): Promise<ConsultingSettings | undefined> {
+    const [settings] = await db.select().from(consultingSettings).limit(1);
+    return settings || undefined;
+  }
+
+  async createConsultingSettings(data: InsertConsultingSettings): Promise<ConsultingSettings> {
+    const [settings] = await db.insert(consultingSettings).values(data).returning();
+    return settings;
+  }
+
+  async updateConsultingSettings(id: string, data: UpdateConsultingSettings): Promise<ConsultingSettings | undefined> {
+    const [updated] = await db
+      .update(consultingSettings)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(consultingSettings.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  // Testimonial methods
+  async getAllTestimonials(): Promise<Testimonial[]> {
+    return await db.select().from(testimonials).orderBy(asc(testimonials.sortOrder));
+  }
+
+  async getTestimonial(id: string): Promise<Testimonial | undefined> {
+    const [testimonial] = await db.select().from(testimonials).where(eq(testimonials.id, id));
+    return testimonial || undefined;
+  }
+
+  async createTestimonial(data: InsertTestimonial): Promise<Testimonial> {
+    const [testimonial] = await db.insert(testimonials).values(data).returning();
+    return testimonial;
+  }
+
+  async updateTestimonial(id: string, data: UpdateTestimonial): Promise<Testimonial | undefined> {
+    const [updated] = await db
+      .update(testimonials)
+      .set(data)
+      .where(eq(testimonials.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteTestimonial(id: string): Promise<void> {
+    await db.delete(testimonials).where(eq(testimonials.id, id));
   }
 }
 
