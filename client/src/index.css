@@ -3,154 +3,102 @@
 @tailwind utilities;
 
 /*
- * BACKUP THEME (Original - Dark & Professional)
- * To revert, uncomment this section and comment out the new theme below
+ * TORAD DESIGN SYSTEM — Dark Editorial
+ * Inspired by the blog post: "One of Us: The Ghost in the Merge"
  *
- * Light Mode Colors:
- * --primary: 217 85% 55%; (Blue)
- * --accent: 217 15% 92%; (Neutral Gray)
- * --background: 0 0% 98%; (Light Gray)
- * --foreground: 217 15% 12%; (Dark Blue-Gray)
- * 
- * Dark Mode Colors:
- * --primary: 217 85% 65%; (Lighter Blue)
- * --accent: 217 12% 20%; (Dark Gray)
- * --background: 217 8% 6%; (Very Dark Blue)
- * --foreground: 0 0% 98%; (Off White)
+ * Core philosophy: Signal over noise. Amber on dark. Text as architecture.
  */
 
-/* NEW VIBRANT THEME - Bright, Fun & Expressive! 🎨 */
 :root {
-  --button-outline: rgba(0,0,0, .10);
-  --badge-outline: rgba(0,0,0, .05);
+  --button-outline: rgba(245, 158, 11, 0.20);
+  --badge-outline: rgba(245, 158, 11, 0.15);
+  --opaque-button-border-intensity: -8;
+  --elevate-1: rgba(245, 158, 11, 0.04);
+  --elevate-2: rgba(245, 158, 11, 0.08);
 
-  /* Automatic computation of border around primary / danger buttons */
-  --opaque-button-border-intensity: -8; /* In terms of percentages */
+  /* The substrate — near-black, warm undertone */
+  --background: 220 15% 4%;
 
-  /* Backgrounds applied on top of other backgrounds when hovered/active */
-  --elevate-1: rgba(0,0,0, .03);
-  --elevate-2: rgba(0,0,0, .08);
+  /* Primary text — soft white with warmth */
+  --foreground: 220 15% 90%;
 
-  /* Warm, inviting background - soft cream instead of harsh white */
-  --background: 40 30% 98%;
+  /* Borders — subtle, present but not demanding */
+  --border: 220 12% 15%;
 
-  /* Deep purple-gray text - easier on eyes than black */
-  --foreground: 270 20% 18%;
+  /* Cards — elevated from the void */
+  --card: 220 15% 7%;
+  --card-foreground: 220 15% 90%;
+  --card-border: 220 12% 12%;
 
-  /* Soft purple-tinted borders */
-  --border: 270 15% 88%;
+  /* Sidebar — slightly lighter substrate */
+  --sidebar: 220 15% 6%;
+  --sidebar-foreground: 220 15% 85%;
+  --sidebar-border: 220 12% 12%;
+  --sidebar-primary: 38 92% 50%;
+  --sidebar-primary-foreground: 220 15% 4%;
+  --sidebar-accent: 38 60% 12%;
+  --sidebar-accent-foreground: 38 92% 60%;
+  --sidebar-ring: 38 92% 50%;
 
-  /* Pure white cards for crisp contrast */
-  --card: 0 0% 100%;
+  --popover: 220 15% 7%;
+  --popover-foreground: 220 15% 90%;
+  --popover-border: 220 12% 15%;
 
-  --card-foreground: 270 20% 18%;
+  /* AMBER — the signal, the accent, the human mark */
+  --primary: 38 92% 50%;
+  --primary-foreground: 220 15% 4%;
 
-  /* Slightly darker card borders for definition */
-  --card-border: 270 12% 92%;
+  /* Secondary — muted amber */
+  --secondary: 38 60% 12%;
+  --secondary-foreground: 38 92% 70%;
 
-  /* Light lavender sidebar */
-  --sidebar: 270 25% 96%;
+  /* Muted — for labels, timestamps, secondary text */
+  --muted: 220 12% 12%;
+  --muted-foreground: 220 10% 45%;
 
-  --sidebar-foreground: 270 30% 20%;
+  /* Accent — warm amber glow */
+  --accent: 38 60% 15%;
+  --accent-foreground: 38 92% 70%;
 
-  --sidebar-border: 270 20% 88%;
-
-  /* Vibrant purple primary - fun and energetic! */
-  --sidebar-primary: 270 90% 58%;
-
-  --sidebar-primary-foreground: 0 0% 100%;
-
-  /* Soft lavender accent */
-  --sidebar-accent: 280 30% 92%;
-
-  --sidebar-accent-foreground: 270 30% 22%;
-
-  --sidebar-ring: 270 90% 58%;
-
-  --popover: 0 0% 100%;
-
-  --popover-foreground: 270 20% 18%;
-
-  --popover-border: 270 15% 90%;
-
-  /* Main vibrant purple - this is our signature color! */
-  --primary: 270 90% 58%;
-
-  --primary-foreground: 0 0% 100%;
-
-  /* Light lavender secondary */
-  --secondary: 280 40% 94%;
-
-  --secondary-foreground: 270 30% 22%;
-
-  /* Very light purple-tinted muted backgrounds */
-  --muted: 270 20% 94%;
-
-  --muted-foreground: 270 15% 40%;
-
-  /* Warm coral accent - pops of excitement! */
-  --accent: 15 95% 88%;
-
-  --accent-foreground: 15 80% 25%;
-
-  /* Bright red for destructive actions */
-  --destructive: 0 85% 58%;
-
+  /* Destructive — red for errors, conflicts */
+  --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
 
-  --input: 270 12% 80%;
-  --ring: 270 90% 58%;
-  
-  /* Vibrant rainbow chart colors! */
-  --chart-1: 210 95% 60%; /* Electric Blue */
-  --chart-2: 140 85% 55%; /* Bright Green */
-  --chart-3: 30 100% 60%; /* Sunny Orange */
-  --chart-4: 330 90% 60%; /* Hot Pink */
-  --chart-5: 270 90% 65%; /* Vivid Purple */
+  --input: 220 12% 20%;
+  --ring: 38 92% 50%;
 
-  --font-sans: Inter, sans-serif;
-  --font-serif: Georgia, serif;
-  --font-mono: JetBrains Mono, Menlo, monospace;
-  --radius: .5rem; /* 8px */
-  --shadow-2xs: 0px 1px 2px 0px hsl(270 20% 20% / 0.06);
-  --shadow-xs: 0px 1px 2px 0px hsl(270 20% 20% / 0.08);
-  --shadow-sm: 0px 1px 3px 0px hsl(270 20% 20% / 0.10), 0px 1px 2px -1px hsl(270 20% 20% / 0.10);
-  --shadow: 0px 1px 3px 0px hsl(270 20% 20% / 0.11), 0px 1px 2px -1px hsl(270 20% 20% / 0.11);
-  --shadow-md: 0px 4px 6px -1px hsl(270 20% 20% / 0.10), 0px 2px 4px -2px hsl(270 20% 20% / 0.10);
-  --shadow-lg: 0px 10px 15px -3px hsl(270 20% 20% / 0.10), 0px 4px 6px -4px hsl(270 20% 20% / 0.10);
-  --shadow-xl: 0px 20px 25px -5px hsl(270 20% 20% / 0.10), 0px 8px 10px -6px hsl(270 20% 20% / 0.10);
-  --shadow-2xl: 0px 25px 50px -12px hsl(270 20% 20% / 0.18);
+  /* Chart colors — amber as primary signal */
+  --chart-1: 38 92% 50%;  /* Amber — primary signal */
+  --chart-2: 142 72% 45%; /* Green — alive, AI, success */
+  --chart-3: 38 80% 40%;  /* Amber dim */
+  --chart-4: 0 72% 51%;   /* Red — conflict, error */
+  --chart-5: 38 70% 35%;  /* Amber deep */
+
+  /* Typography — editorial, not corporate */
+  --font-sans: 'Fraunces', Georgia, serif;
+  --font-heading: 'DM Serif Display', Georgia, serif;
+  --font-mono: 'JetBrains Mono', Menlo, monospace;
+  --font-label: 'JetBrains Mono', monospace;
+
+  --radius: 0.125rem; /* Sharp, architectural — 2px */
+  --shadow-2xs: 0px 1px 2px 0px hsl(220 15% 2% / 0.4);
+  --shadow-xs: 0px 1px 2px 0px hsl(220 15% 2% / 0.5);
+  --shadow-sm: 0px 1px 3px 0px hsl(220 15% 2% / 0.5), 0px 1px 2px -1px hsl(220 15% 2% / 0.5);
+  --shadow: 0px 1px 3px 0px hsl(220 15% 2% / 0.6), 0px 1px 2px -1px hsl(220 15% 2% / 0.6);
+  --shadow-md: 0px 4px 6px -1px hsl(220 15% 2% / 0.5), 0px 2px 4px -2px hsl(220 15% 2% / 0.5);
+  --shadow-lg: 0px 10px 15px -3px hsl(220 15% 2% / 0.5), 0px 4px 6px -4px hsl(220 15% 2% / 0.5);
+  --shadow-xl: 0px 20px 25px -5px hsl(220 15% 2% / 0.5), 0px 8px 10px -6px hsl(220 15% 2% / 0.5);
+  --shadow-2xl: 0px 25px 50px -12px hsl(220 15% 2% / 0.7);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 
-  /* Automatically computed borders - intensity can be controlled by the user by the --opaque-button-border-intensity setting */
-
-  /* Fallback for older browsers */
-  --sidebar-primary-border: hsl(var(--sidebar-primary));
+  /* Computed borders */
   --sidebar-primary-border: hsl(from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --sidebar-accent-border: hsl(var(--sidebar-accent));
   --sidebar-accent-border: hsl(from hsl(var(--sidebar-accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --primary-border: hsl(var(--primary));
   --primary-border: hsl(from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --secondary-border: hsl(var(--secondary));
   --secondary-border: hsl(from hsl(var(--secondary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --muted-border: hsl(var(--muted));
   --muted-border: hsl(from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --accent-border: hsl(var(--accent));
   --accent-border: hsl(from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --destructive-border: hsl(var(--destructive));
   --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
 }
 
@@ -275,4 +223,242 @@
   .border.hover-elevate:not(.no-hover-interaction-elevate)::after {
     inset: -1px;
   }
+
+  /* ===========================================
+   * TORAD EDITORIAL TYPOGRAPHY
+   * =========================================== */
+
+  /* Lyric Head — the main editorial headline */
+  .lyric-head {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+    font-style: italic;
+    color: hsl(var(--foreground));
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Section Label — the numbered marker */
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: hsl(var(--primary));
+    text-transform: uppercase;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: hsl(var(--border));
+    max-width: 60px;
+  }
+
+  /* Pullquote — the highlighted text */
+  .pullquote {
+    border-left: 3px solid hsl(var(--primary));
+    padding: 1.5rem 0 1.5rem 2rem;
+    margin: 2.5rem 0;
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+    font-style: italic;
+    color: hsl(var(--foreground));
+    line-height: 1.5;
+  }
+
+  /* Terminal — code blocks with personality */
+  .terminal-block {
+    background: hsl(220 20% 3%);
+    border: 1px solid hsl(var(--border));
+    border-left: 3px solid hsl(var(--primary));
+    padding: 1.5rem 1.75rem;
+    margin: 2rem 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.9;
+    color: hsl(var(--muted-foreground));
+    overflow-x: auto;
+  }
+
+  .terminal-block .ok { color: hsl(142 72% 45%); }
+  .terminal-block .warn { color: hsl(38 92% 50%); }
+  .terminal-block .error { color: hsl(0 72% 51%); }
+  .terminal-block .comment { color: hsl(220 10% 30%); }
+
+  /* Divider — the section break */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem 0;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: hsl(var(--border));
+  }
+
+  .divider-symbol {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: hsl(38 60% 30%);
+    letter-spacing: 0.3em;
+  }
+
+  /* Agent Counter — the inline stat */
+  .agent-counter {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    background: hsl(38 60% 12%);
+    border: 1px solid hsl(38 60% 20%);
+    padding: 2px 10px;
+    border-radius: 2px;
+  }
+
+  .agent-counter .n {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.2em;
+    color: hsl(var(--primary));
+    font-weight: 600;
+  }
+
+  .agent-counter .label {
+    font-size: 0.75em;
+    color: hsl(var(--muted-foreground));
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.1em;
+  }
+
+  /* Progress Bar — reading indicator */
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: hsl(var(--primary));
+    width: 0%;
+    z-index: 9999;
+    transition: width 0.1s linear;
+  }
+
+  /* Amber glow effects */
+  .glow-amber {
+    box-shadow: 0 0 40px rgba(245, 158, 11, 0.15);
+  }
+
+  .glow-amber-sm {
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.1);
+  }
+
+  /* Text gradient for headlines */
+  .text-gradient-amber {
+    background: linear-gradient(135deg, hsl(38 92% 55%) 0%, hsl(38 80% 45%) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Canvas container */
+  .canvas-container {
+    position: relative;
+    width: 100%;
+    background: hsl(var(--card));
+    border-top: 1px solid hsl(var(--border));
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  .canvas-label {
+    position: absolute;
+    top: 20px;
+    left: 30px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: hsl(var(--muted-foreground));
+    text-transform: uppercase;
+    z-index: 10;
+  }
+
+  /* Section reveal animations */
+  .section-reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .section-reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(220 12% 25%);
+  }
+}
+
+/* ===========================================
+ * KEYFRAME ANIMATIONS
+ * =========================================== */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Selection styling */
+::selection {
+  background: hsl(38 92% 50% / 0.3);
+  color: hsl(var(--foreground));
+}
+
+/* Focus styling */
+:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
 }

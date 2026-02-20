@@ -3,14 +3,10 @@ import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
 import SkillsMatrix from "@/components/SkillsMatrix";
 import ExperienceTimeline from "@/components/ExperienceTimeline";
-import SocialActivity from "@/components/SocialActivity";
 import PatentPortfolio from "@/components/PatentPortfolio";
 import ProjectHighlights from "@/components/ProjectHighlights";
-import SpecializationSection from "@/components/SpecializationSection";
 import ContactSection from "@/components/ContactSection";
 import { ChatBot } from "@/components/ChatBot";
-import { IPhoneCarousel } from "@/components/IPhoneCarousel";
-import FeaturedIn from "@/components/FeaturedIn";
 
 export default function Portfolio() {
   const [selectedSkillSlug, setSelectedSkillSlug] = useState<string | null>(null);
@@ -30,8 +26,6 @@ export default function Portfolio() {
   };
 
   const handleDownloadCoverLetter = () => {
-    // TODO: Implement actual cover letter download
-    console.log("Downloading cover letter...");
     const link = document.createElement("a");
     link.href = "/attached_assets/Cover Letter - Staff iOS Engineer_1761050342129.pdf";
     link.download = "Jonathan_Clem_Cover_Letter.pdf";
@@ -47,7 +41,6 @@ export default function Portfolio() {
 
   const handleSkillClick = (skillSlug: string) => {
     setSelectedSkillSlug(skillSlug);
-    // Scroll to projects section
     const projectsSection = document.getElementById("projects");
     if (projectsSection) {
       projectsSection.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -59,50 +52,55 @@ export default function Portfolio() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-[#0a0b0d] text-[#e2e4e9]">
       <Navigation onDownloadResume={handleDownloadResume} />
 
       <main>
+        {/* Hero */}
         <HeroSection onDownloadResume={handleDownloadResume} onViewPatents={handleViewPatents} />
-        
-        {/* AI Chatbot Section */}
-        <section className="container mx-auto px-6 py-16 md:py-24">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Ask Me Anything</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Chat with an AI assistant trained on my resume, patents, and professional experience.
-            </p>
-          </div>
-          <ChatBot />
-        </section>
 
-        <SkillsMatrix 
-          onSkillClick={handleSkillClick} 
+        {/* Skills */}
+        <SkillsMatrix
+          onSkillClick={handleSkillClick}
           selectedSkillSlug={selectedSkillSlug}
         />
+
+        {/* Experience */}
         <ExperienceTimeline />
-        <SocialActivity />
+
+        {/* Patents */}
         <PatentPortfolio />
-        <ProjectHighlights 
+
+        {/* Projects */}
+        <ProjectHighlights
           selectedSkillSlug={selectedSkillSlug}
           onSkillClick={handleSkillClick}
           onClearFilter={handleClearFilter}
         />
-        
-        {/* iPhone Carousel Section */}
-        <section className="container mx-auto px-6 py-16 md:py-24" id="carousel">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Apps in Action</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              See my iOS applications and projects in action
-            </p>
+
+        {/* AI Chatbot */}
+        <section className="py-24 bg-[#111318]">
+          <div className="max-w-4xl mx-auto px-6">
+            <div className="mb-12">
+              <div className="section-label">Chat</div>
+              <h2
+                className="lyric-head"
+                style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+              >
+                Ask Me Anything
+              </h2>
+              <p
+                className="text-lg text-[#6b7280] max-w-2xl"
+                style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+              >
+                Chat with an AI assistant trained on my resume, patents, and professional experience
+              </p>
+            </div>
+            <ChatBot />
           </div>
-          <IPhoneCarousel />
         </section>
 
-        <FeaturedIn />
-
-        <SpecializationSection />
+        {/* Contact */}
         <ContactSection
           onDownloadResume={handleDownloadResume}
           onDownloadCoverLetter={handleDownloadCoverLetter}

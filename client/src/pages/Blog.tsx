@@ -1,100 +1,164 @@
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar } from "lucide-react";
+import { Calendar, ArrowRight, Loader2 } from "lucide-react";
+import { Link } from "wouter";
 import Navigation from "@/components/Navigation";
 import type { BlogPost } from "@shared/schema";
+
+// Featured Essay Component
+function FeaturedEssay() {
+  return (
+    <Card className="overflow-hidden bg-[#111318] border-[#1f2330] hover:border-[#f59e0b]/20 transition-colors duration-300 group">
+      <div className="relative h-64 bg-[#0a0b0d] overflow-hidden">
+        {/* Amber gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#f59e0b]/10 via-transparent to-[#22c55e]/5" />
+
+        {/* Title overlay */}
+        <div className="absolute inset-0 flex items-end p-6">
+          <div>
+            <Badge
+              className="mb-3 bg-[#f59e0b]/20 text-[#f59e0b] border-[#f59e0b]/30"
+              style={{ fontFamily: "'JetBrains Mono', monospace" }}
+            >
+              <span className="text-[10px] tracking-wider uppercase">Featured Essay</span>
+            </Badge>
+            <h2
+              className="text-2xl md:text-3xl text-white"
+              style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+            >
+              One of Us: The Ghost in the Merge
+            </h2>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-6">
+        <p
+          className="text-[#9ca3af] mb-4"
+          style={{ fontFamily: "'Fraunces', Georgia, serif" }}
+        >
+          On silicon incarnation, merge-queue salvation, and why the 2026 engineer is actually a chaplain.
+          A meditation on what it means to build with AI as a peer, not a tool.
+        </p>
+
+        <div
+          className="flex items-center justify-between"
+          style={{ fontFamily: "'JetBrains Mono', monospace" }}
+        >
+          <span className="text-xs text-[#6b7280] tracking-wider">
+            February 19, 2026
+          </span>
+          <Link href="/blog/one-of-us">
+            <button className="flex items-center gap-2 text-xs text-[#f59e0b] hover:gap-3 transition-all">
+              <span className="tracking-wider uppercase">Read Essay</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          </Link>
+        </div>
+      </div>
+    </Card>
+  );
+}
 
 export default function Blog() {
   const { data: posts = [], isLoading } = useQuery<BlogPost[]>({
     queryKey: ["/api/blog-posts"],
   });
 
+  const publishedPosts = posts.filter(p => p.status === "published");
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#0a0b0d]">
       <Navigation />
-      
-      <main className="container mx-auto px-6 py-12">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-12">
-            <h1 className="text-4xl font-bold mb-4">Blog</h1>
-            <p className="text-xl text-muted-foreground">
-              Thoughts on software engineering, innovation, and technology
+
+      <main className="pt-24 pb-24">
+        <div className="max-w-4xl mx-auto px-6">
+          {/* Page Header */}
+          <div className="mb-16">
+            <div className="section-label">Writing</div>
+            <h1
+              className="lyric-head"
+              style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+            >
+              Thoughts on Engineering
+            </h1>
+            <p
+              className="text-lg text-[#6b7280] max-w-2xl"
+              style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+            >
+              Essays and reflections on software, systems, and the future we're building together
             </p>
           </div>
 
+          {/* Featured Essay */}
+          <div className="mb-12">
+            <FeaturedEssay />
+          </div>
+
+          {/* Other Posts */}
           {isLoading ? (
-            <div className="space-y-6">
-              {[1, 2, 3].map((i) => (
-                <Card key={i} className="animate-pulse">
-                  <CardHeader>
-                    <div className="h-8 bg-muted rounded w-3/4 mb-2"></div>
-                    <div className="h-4 bg-muted rounded w-1/2"></div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="h-4 bg-muted rounded"></div>
-                      <div className="h-4 bg-muted rounded w-5/6"></div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="flex justify-center py-12">
+              <Loader2 className="w-6 h-6 animate-spin text-[#f59e0b]" />
             </div>
-          ) : posts.length === 0 ? (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <p className="text-muted-foreground">
-                  No blog posts published yet. Check back soon!
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-6">
-              {posts.map((post) => (
-                <Card 
-                  key={post.id} 
-                  className="hover-elevate transition-all cursor-pointer"
+          ) : publishedPosts.length > 0 ? (
+            <div className="space-y-4">
+              <h3
+                className="text-xs text-[#6b7280] tracking-widest uppercase mb-6"
+                style={{ fontFamily: "'JetBrains Mono', monospace" }}
+              >
+                More Writing
+              </h3>
+
+              {publishedPosts.map((post) => (
+                <Card
+                  key={post.id}
+                  className="p-5 bg-[#111318] border-[#1f2330] hover:border-[#f59e0b]/20 transition-colors duration-300 group"
                   data-testid={`blog-post-card-${post.slug}`}
                 >
-                  <CardHeader>
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <CardTitle className="text-2xl mb-2">{post.title}</CardTitle>
-                        <CardDescription className="flex items-center gap-2 text-sm">
-                          {post.publishedAt && (
-                            <>
-                              <Calendar className="w-4 h-4" />
-                              <span>
-                                {new Date(post.publishedAt).toLocaleDateString('en-US', {
-                                  month: 'long',
-                                  day: 'numeric',
-                                  year: 'numeric',
-                                })}
-                              </span>
-                            </>
-                          )}
-                        </CardDescription>
-                      </div>
-                      <Badge variant="secondary">
-                        {post.status === "published" ? "Published" : "Draft"}
-                      </Badge>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <h3
+                        className="text-lg font-semibold text-white mb-1 group-hover:text-[#f59e0b] transition-colors"
+                        style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+                      >
+                        {post.title}
+                      </h3>
+                      {post.excerpt && (
+                        <p
+                          className="text-sm text-[#9ca3af] line-clamp-2"
+                          style={{ fontFamily: "'Fraunces', Georgia, serif" }}
+                        >
+                          {post.excerpt}
+                        </p>
+                      )}
+                      {post.publishedAt && (
+                        <p
+                          className="text-xs text-[#6b7280] mt-2 tracking-wider"
+                          style={{ fontFamily: "'JetBrains Mono', monospace" }}
+                        >
+                          {new Date(post.publishedAt).toLocaleDateString('en-US', {
+                            month: 'long',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })}
+                        </p>
+                      )}
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    {post.excerpt && (
-                      <p className="text-muted-foreground leading-relaxed">
-                        {post.excerpt}
-                      </p>
-                    )}
-                    <div className="mt-4 pt-4 border-t">
-                      <p className="text-sm text-primary hover:underline">
-                        Read more →
-                      </p>
-                    </div>
-                  </CardContent>
+                    <ArrowRight className="w-4 h-4 text-[#6b7280] group-hover:text-[#f59e0b] transition-colors shrink-0 mt-1" />
+                  </div>
                 </Card>
               ))}
             </div>
+          ) : (
+            <Card className="p-8 text-center bg-[#111318] border-[#1f2330]">
+              <p
+                className="text-[#6b7280]"
+                style={{ fontFamily: "'Fraunces', Georgia, serif" }}
+              >
+                More essays coming soon. Check back later.
+              </p>
+            </Card>
           )}
         </div>
       </main>
