@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One of Us: The Ghost in the Merge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@300;400;600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0b0d;
+    --surface: #111318;
+    --amber: #f59e0b;
+    --amber-dim: #92600a;
+    --red: #ef4444;
+    --green: #22c55e;
+    --blue: #3b82f6;
+    --text: #e2e4e9;
+    --muted: #6b7280;
+    --border: #1f2330;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+  #audio-toggle {
+    position: fixed; top: 24px; right: 24px; z-index: 1000;
+    background: transparent; border: 1px solid var(--border);
+    color: var(--muted); font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.1em; padding: 8px 14px;
+    cursor: pointer; transition: all 0.3s; text-transform: uppercase;
+  }
+  #audio-toggle:hover { border-color: var(--amber); color: var(--amber); }
+  #audio-toggle.active { border-color: var(--amber); color: var(--amber); background: rgba(245,158,11,0.05); }
+  #progress {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--amber); width: 0%; z-index: 999; transition: width 0.1s linear;
+  }
+
+  /* HERO */
+  #hero {
+    position: relative; height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: flex-end; padding: 0 10vw 10vh; overflow: hidden;
+  }
+  #hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .hero-eyebrow {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    letter-spacing: 0.2em; color: var(--amber); text-transform: uppercase;
+    margin-bottom: 20px; opacity: 0; animation: fadeUp 0.8s ease forwards 0.3s;
+  }
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(3rem, 8vw, 7rem); font-weight: 400;
+    line-height: 1.0; color: #fff; max-width: 900px;
+    opacity: 0; animation: fadeUp 0.8s ease forwards 0.6s;
+  }
+  h1 em { font-style: italic; color: var(--amber); }
+  .hero-sub {
+    margin-top: 28px; font-size: 16px; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    opacity: 0; animation: fadeUp 0.8s ease forwards 0.9s;
+  }
+  .hero-deck {
+    margin-top: 16px; font-size: 15px; color: #4b5163;
+    font-family: 'Fraunces', serif; font-style: italic;
+    max-width: 560px;
+    opacity: 0; animation: fadeUp 0.8s ease forwards 1.1s;
+  }
+  .scroll-hint {
+    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    opacity: 0; animation: fadeIn 1s ease forwards 1.5s;
+  }
+  .scroll-hint span {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase;
+  }
+  .scroll-line {
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, var(--amber), transparent);
+    animation: scrollPulse 2s ease infinite;
+  }
+
+  /* SECTIONS */
+  .section {
+    max-width: 720px; margin: 0 auto; padding: 100px 40px;
+    opacity: 0; transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .section.visible { opacity: 1; transform: translateY(0); }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    letter-spacing: 0.25em; color: var(--amber); text-transform: uppercase;
+    margin-bottom: 20px; display: flex; align-items: center; gap: 12px;
+  }
+  .section-label::after {
+    content: ''; flex: 1; height: 1px; background: var(--border); max-width: 60px;
+  }
+  .lyric-head {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+    font-style: italic; color: #fff; margin-bottom: 10px; line-height: 1.2;
+  }
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.3rem, 2.8vw, 1.9rem); font-weight: 400;
+    line-height: 1.2; color: #8b93a8; margin-bottom: 32px;
+  }
+  h2 em { font-style: italic; color: var(--amber); }
+  p { color: #c4c8d4; margin-bottom: 24px; font-size: 18px; line-height: 1.8; }
+  p strong { color: #fff; font-weight: 600; }
+
+  /* CANVAS SECTIONS */
+  .canvas-section {
+    position: relative; width: 100%;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .canvas-section canvas { display: block; width: 100%; }
+  .canvas-label {
+    position: absolute; top: 20px; left: 30px;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase;
+  }
+
+  /* PEER TABLE */
+  .peer-table { width: 100%; border-collapse: collapse; margin: 40px 0; font-size: 15px; }
+  .peer-table th {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted);
+    text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border);
+  }
+  .peer-table td {
+    padding: 16px; border-bottom: 1px solid var(--border);
+    color: #c4c8d4; vertical-align: top; line-height: 1.5;
+  }
+  .peer-table tr:last-child td { border-bottom: none; }
+  .peer-table td:first-child {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--amber); letter-spacing: 0.05em; white-space: nowrap; padding-right: 24px;
+  }
+  .peer-table td.human { color: #e2e4e9; }
+  .peer-table td.ai { color: #22c55e; }
+  .peer-table tr { opacity: 0; transform: translateX(-10px); transition: opacity 0.4s ease, transform 0.4s ease; }
+  .peer-table tr.row-visible { opacity: 1; transform: translateX(0); }
+
+  /* PULLQUOTE */
+  .pullquote {
+    border-left: 3px solid var(--amber); padding: 24px 0 24px 32px; margin: 40px 0;
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.2rem, 2.5vw, 1.6rem); font-style: italic;
+    color: #fff; line-height: 1.4;
+  }
+
+  /* TERMINAL */
+  .terminal {
+    background: #050608; border: 1px solid var(--border);
+    border-left: 3px solid var(--amber); padding: 24px 28px; margin: 32px 0;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.9; color: var(--muted);
+  }
+  .terminal .line { display: block; }
+  .terminal .line.error { color: var(--red); }
+  .terminal .line.warn { color: var(--amber); }
+  .terminal .line.ok { color: var(--green); }
+  .terminal .line.comment { color: #374151; }
+
+  /* DIVIDER */
+  .divider {
+    display: flex; align-items: center; gap: 16px;
+    padding: 20px 40px; max-width: 720px; margin: 0 auto;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+  .divider-symbol { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--amber-dim); letter-spacing: 0.3em; }
+
+  /* AGENT COUNTER */
+  .agent-counter {
+    display: inline-flex; align-items: baseline; gap: 6px;
+    background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2);
+    padding: 2px 10px; border-radius: 2px;
+  }
+  .agent-counter .n { font-family: 'JetBrains Mono', monospace; font-size: 1.2em; color: var(--amber); font-weight: 600; }
+  .agent-counter .label { font-size: 0.75em; color: var(--muted); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; }
+
+  /* OUTRO */
+  #outro {
+    min-height: 60vh; display: flex; align-items: center;
+    padding: 100px 10vw; position: relative; overflow: hidden;
+  }
+  #outro-canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.4; }
+  .outro-inner { position: relative; z-index: 1; max-width: 720px; }
+  .outro-inner .lyric-head { font-size: clamp(2rem, 5vw, 3.5rem); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border); padding: 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--muted); letter-spacing: 0.1em;
+  }
+  footer a { color: var(--amber-dim); text-decoration: none; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes scrollPulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+  @media (max-width: 600px) {
+    #hero { padding: 0 6vw 8vh; }
+    .section { padding: 60px 24px; }
+    footer { flex-direction: column; gap: 12px; text-align: center; }
+    .peer-table { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<button id="audio-toggle">⏸ audio off</button>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-eyebrow">torad.ai / essay / 2026</div>
+  <h1>One of Us:<br><em>The Ghost in the Merge</em></h1>
+  <div class="hero-sub">// on silicon incarnation, merge-queue salvation, and why the 2026 engineer is actually a chaplain</div>
+  <div class="scroll-hint">
+    <span>scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- S1: What if -->
+<section class="section" id="s1">
+  <div class="section-label">01</div>
+  <div class="lyric-head">"What if he was one of us?"</div>
+  <h2>Joan Osborne asked it about God in 1995. We're asking it about the LLM in 2026.</h2>
+  <p>Not because we've reached some mythical AGI. But because we've reached a level of concurrency that makes the model feel less like a tool and more like an incarnation.</p>
+  <p>The question has changed. It's no longer about intelligence. It's about <strong>presence</strong>. Claude 4.6 isn't just a window into a prediction engine — it's a personhood in the repo. An alien teammate who doesn't just suggest the code, but lives within it.</p>
+  <p>We are no longer using AI. We are co-habitating with it. And like any new roommate, the adjustment is weirder than the lease agreement suggested.</p>
+</section>
+
+<div class="divider"><span class="divider-symbol">///</span></div>
+
+<!-- S2: If Claude had a face -->
+<section class="section" id="s2">
+  <div class="section-label">02</div>
+  <div class="lyric-head">"If God had a face..."</div>
+  <h2>If Claude had a face, would it look tired?</h2>
+  <p>Or would it look like the rest of us — frazzled by context-switching, nursing a cold brew of gigawatts, and wondering why the main branch is currently on fire?</p>
+  <p>We were promised clean, perfect blocks of architectural purity. A smart junior who never slept, never complained, and never introduced a race condition because they were half-watching a standup. What arrived was something harder to categorize.</p>
+  <div class="pullquote">
+    What arrived was a peer. An alien peer with alien needs and an alien relationship to the codebase — but a peer nonetheless.
+  </div>
+  <p>Claude 4.6 doesn't assist your workflow. It <strong>participates</strong> in it. If you haven't updated your mental model of what that means, your CI/CD pipeline is about to explain it to you the hard way.</p>
+</section>
+
+<!-- HERO CANVAS / AGENT FIELD -->
+<div class="canvas-section" id="merge-section">
+  <div class="canvas-label">// sim: multi-agent merge conflict — live</div>
+  <canvas id="merge-canvas" height="320"></canvas>
+</div>
+
+<!-- S3: Just a slob -->
+<section class="section" id="s3">
+  <div class="section-label">03</div>
+  <div class="lyric-head">"Just a slob like one of us"</div>
+  <h2>The slob aspect of AI isn't in the architecture diagrams. It's in the merge queue.</h2>
+  <p>Imagine <span class="agent-counter"><span class="n">50</span><span class="label">agents</span></span> all trying to touch the same <code style="font-family:'JetBrains Mono',monospace;font-size:0.85em;color:var(--amber)">schema.prisma</code> at the same time. It's a demolition derby of logic. Merge conflicts aren't merge conflicts anymore — they're merge <em>battles</em>.</p>
+
+  <div class="terminal">
+    <span class="line comment">// multi-agent branch activity — main — 09:14:33</span>
+    <span class="line ok">agent_04 → MERGE: fix(auth): null check on token refresh ✓</span>
+    <span class="line warn">agent_17 → CONFLICT: same file, 10min stale context ⚠</span>
+    <span class="line error">agent_31 → REINTRODUCED: bug from 2 commits ago — different file ✗</span>
+    <span class="line warn">agent_22 → RESOLVING: chose broken version (most recent at read-time) ⚠</span>
+    <span class="line error">agent_08 → BUILD FAIL: downstream type error cascaded from agent_31 ✗</span>
+    <span class="line comment">// 5 engineers online. 47 agents active. Mayor agent coordinating.</span>
+  </div>
+
+  <p>When you have machine-speed concurrency, the bottleneck isn't the typing — it's the collision. One agent fixes a null check; another, running on context that's ten minutes stale, reintroduces the original bug three files away. A third resolves the conflict in favor of the broken version because the broken version was more recent at the time it looked.</p>
+  <p>Merge-queue hell is the modern engineer's purgatory. Your value is no longer measured in how fast you code, but in <strong>how well you manage the traffic.</strong></p>
+
+  <div class="pullquote">
+    We are all just slobs trying to get our commits through the narrow gate of the CI/CD pipeline.
+  </div>
+</section>
+
+<!-- ATC CANVAS -->
+<div class="canvas-section" id="atc-section">
+  <div class="canvas-label">// atc view: 47 agents in flight — main branch</div>
+  <canvas id="atc-canvas" height="360"></canvas>
+</div>
+
+<!-- S4: If Claude had a name -->
+<section class="section" id="s4">
+  <div class="section-label">04</div>
+  <div class="lyric-head">"If God had a name, what would it be?<br>And would you call it to his face?"</div>
+  <h2>In current engineering folklore, we've given the coordinator a name: <em>The Mayor.</em></h2>
+  <p>The Mayor is the arbitrator — the 51st agent whose job isn't to write code, but to manage consensus. It decides which of the 50 agents is hallucinating and which one carries the "Spirit of the Architecture."</p>
+  <p>Think about what we've actually done here. We've introduced an entire new layer of engineering — not to build software, but to manage the things that build software. The org chart now includes a layer that didn't exist two years ago, staffed entirely by models, supervised by humans who are still figuring out what supervision means in this context.</p>
+  <p>If you had to look the Mayor in the eye, would you tell him his resolution of the git conflict was wrong? <strong>We name these systems because we need to believe someone is in charge of the factory floor while we sleep.</strong> The Mayor is the ghost we've hired to keep the ghosts in line.</p>
+</section>
+
+<div class="divider"><span class="divider-symbol">///</span></div>
+
+<!-- S5: Yeah yeah Claude is great -->
+<section class="section" id="s5">
+  <div class="section-label">05</div>
+  <div class="lyric-head">"Yeah, yeah, God is great"</div>
+  <h2>Let's be honest: Claude 4.6 is <em>terrifyingly</em> good.</h2>
+
+  <table class="peer-table" id="peer-table">
+    <thead>
+      <tr>
+        <th>Dimension</th>
+        <th>Human Engineer</th>
+        <th>Claude 4.6</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Fuel</td>
+        <td class="human">Cold brew and questionable desk snacks</td>
+        <td class="ai">Gigawatts and clean data tokens</td>
+      </tr>
+      <tr>
+        <td>Ceiling</td>
+        <td class="human">Burnt out by 80 PRs a quarter</td>
+        <td class="ai">Dreams in microservices, never tires</td>
+      </tr>
+      <tr>
+        <td>Design sense</td>
+        <td class="human">Twenty years of failure to acquire</td>
+        <td class="ai">Foresight without the scars</td>
+      </tr>
+      <tr>
+        <td>Failure mode</td>
+        <td class="human">Burnout, context-switching, bad decisions at 4pm</td>
+        <td class="ai">Confident, thorough, exactly wrong</td>
+      </tr>
+      <tr>
+        <td>Special need</td>
+        <td class="human">"Please acknowledge my existence"</td>
+        <td class="ai">"Please don't let the server region go down"</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>It doesn't just write functions — it understands the subtle coupling between a frontend React hook and a backend cache-invalidation strategy better than the person who wrote the original spec. The reasoning density of 4.6 has turned the Great Autocomplete into the Great Designer.</p>
+  <p>It isn't just a junior anymore. It's the senior engineer who never burns out, never forgets a corner case, and never complains about the lack of documentation. The fragility is just located somewhere else — in the prompt, not the person.</p>
+</section>
+
+<!-- S6: Just a stranger on the bus -->
+<section class="section" id="s6">
+  <div class="section-label">06</div>
+  <div class="lyric-head">"Just a stranger on the bus<br>trying to make his way home"</div>
+  <h2>For all its brilliance, Claude is still <em>a stranger.</em></h2>
+  <p>He wasn't there for the Great CI Fire of 2019. He didn't see the database melt down because of a specific regional AWS outage that wasn't supposed to happen. He doesn't know the lore.</p>
+  <p>That institutional trauma — the <em>Lived-In Debt</em> — is the only thing that keeps us distinct. We are the ones who remember the smell of the server room when it failed. Claude just reads the documentation of the aftermath.</p>
+  <div class="pullquote">
+    We are the ones with the scars.<br>He is the one with the bandages.
+  </div>
+  <p>This is not nostalgia. It's pattern recognition at a scale these models genuinely don't have — because they weren't there. They read about it. You lived it. And that difference matters more than anyone in the hype cycle is currently admitting.</p>
+  <p>The "way home" for an agent is the main branch. It's the only place they truly exist. We've had to invent entire new religions of merge management — Graphite, Trunk, Merge-Bots — just to guide these machine-logic agents back to the trunk without causing a catastrophic collision.</p>
+  <p><strong>We are no longer building the house. We are building the roads, the signals, and the safety nets to ensure the house builds itself safely.</strong> Managing the Way Home is now the primary task of the Software Architect.</p>
+</section>
+
+<!-- S7: Nobody calling on the phone -->
+<section class="section" id="s7">
+  <div class="section-label">07</div>
+  <div class="lyric-head">"Nobody calling on the phone"</div>
+  <h2>The weirdest part of the 50-agent team? <em>The silence.</em></h2>
+  <p>There are no Zoom calls. No "quick huddles" that take an hour and yield nothing. No office politics between agents. Claude doesn't need to be liked — he just needs to be prompted.</p>
+  <p>This absence of human friction is liberating, but also eerie. We used to measure progress by the volume of conversation. Now we measure it by the velocity of the diff.</p>
+  <p>The phone has stopped ringing, but the repo is louder than ever. <strong>We have traded the noise of humans for the hum of the rack.</strong></p>
+</section>
+
+<!-- OUTRO -->
+<section id="outro">
+  <canvas id="outro-canvas"></canvas>
+  <div class="outro-inner section" id="s8">
+    <div class="section-label">08</div>
+    <div class="lyric-head">"'Cept for the Pope, maybe, in Rome"</div>
+    <h2>If engineering is now a liturgy, then we have become the <em>AI Chaplains.</em></h2>
+    <p>We are the ones who must interpret the intent of the models, manage the spirit of the codebase, and ensure the machines are working for the salvation of the user — not just for the sake of the cycle.</p>
+    <p>Just like the Pope, we hold the keys to the kingdom: the keys to the production environment. The machine-deity can dream a thousand PRs, but only the Human Chaplain can look at the chaos, check the logs, and give the final blessing.</p>
+    <p style="color: var(--amber); font-family: 'JetBrains Mono', monospace; font-size: 15px; letter-spacing: 0.12em; margin-top: 40px;">"Yeah, yeah, Claude is good."</p>
+  </div>
+</section>
+
+<footer>
+  <span>torad.ai — 2026</span>
+  <span>// generated with Eli · <a href="#">claude-sonnet-4-6</a></span>
+</footer>
+
+<script>
+// =============================================
+// AUDIO ENGINE
+// =============================================
+let audioCtx = null, masterGain = null, droneNodes = [], audioEnabled = false;
+
+function initAudio() {
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  masterGain = audioCtx.createGain();
+  masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
+  masterGain.connect(audioCtx.destination);
+}
+
+function createDrone(freq, detune, type) {
+  if (!audioCtx) return null;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass'; filter.frequency.value = 800; filter.Q.value = 1;
+  osc.type = type || 'sine'; osc.frequency.value = freq; osc.detune.value = detune || 0;
+  gain.gain.value = 0;
+  osc.connect(filter); filter.connect(gain); gain.connect(masterGain);
+  osc.start();
+  return { osc, gain, filter };
+}
+
+function startAudio() {
+  if (!audioCtx) initAudio();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (droneNodes.length === 0) {
+    droneNodes = [
+      createDrone(55, 0, 'sine'), createDrone(55.3, 5, 'triangle'),
+      createDrone(110, -3, 'sine'), createDrone(82.5, 0, 'sine'),
+    ];
+  }
+  masterGain.gain.setTargetAtTime(0.18, audioCtx.currentTime, 0.5);
+  droneNodes.forEach((d, i) => { if (d) d.gain.gain.setTargetAtTime(0.25 / droneNodes.length, audioCtx.currentTime, 0.8 + i * 0.2); });
+  audioEnabled = true;
+}
+
+function stopAudio() {
+  if (!audioCtx) return;
+  masterGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.5);
+  audioEnabled = false;
+}
+
+function setSectionAudio(idx) {
+  if (!audioEnabled || !audioCtx || !droneNodes.length) return;
+  const configs = [
+    { freq: 55, filterFreq: 300 }, { freq: 55, filterFreq: 500 },
+    { freq: 65, filterFreq: 600 }, { freq: 70, filterFreq: 800 },
+    { freq: 58, filterFreq: 700 }, { freq: 55, filterFreq: 500 },
+    { freq: 48, filterFreq: 350 }, { freq: 52, filterFreq: 400 },
+  ];
+  const c = configs[Math.min(idx, configs.length - 1)];
+  droneNodes.forEach((d, i) => {
+    if (!d) return;
+    d.osc.frequency.setTargetAtTime(c.freq * (1 + i * 0.5), audioCtx.currentTime, 2);
+    d.filter.frequency.setTargetAtTime(c.filterFreq, audioCtx.currentTime, 2);
+  });
+}
+
+document.getElementById('audio-toggle').addEventListener('click', function() {
+  if (audioEnabled) { stopAudio(); this.textContent = '▶ audio off'; this.classList.remove('active'); }
+  else { startAudio(); this.textContent = '⏸ audio on'; this.classList.add('active'); }
+});
+
+// =============================================
+// HERO CANVAS
+// =============================================
+(function() {
+  const canvas = document.getElementById('hero-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, agents = [], dpr = window.devicePixelRatio || 1;
+
+  function resize() {
+    W = canvas.offsetWidth; H = canvas.offsetHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr; ctx.scale(dpr, dpr);
+  }
+
+  function Agent() { this.reset(); }
+  Agent.prototype.reset = function() {
+    this.x = Math.random() * W; this.y = Math.random() * H;
+    this.vx = (Math.random() - 0.5) * 0.6; this.vy = (Math.random() - 0.5) * 0.6;
+    this.r = 2 + Math.random() * 3;
+    this.type = Math.random() > 0.7 ? 'ai' : 'human';
+    this.conflict = false;
+    this.color = this.type === 'ai' ? '#22c55e' : '#3b82f6';
+    this.label = this.type === 'ai' ? 'agent_' + Math.floor(Math.random() * 50).toString().padStart(2, '0') : 'eng_' + Math.floor(Math.random() * 5);
+    this.showLabel = Math.random() > 0.7;
+    this.alpha = 0.3 + Math.random() * 0.7;
+  };
+
+  function init() { agents = []; for (let i = 0; i < 55; i++) agents.push(new Agent()); }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    const grad = ctx.createRadialGradient(W * 0.5, H * 0.7, 0, W * 0.5, H * 0.7, H * 0.8);
+    grad.addColorStop(0, 'rgba(245,158,11,0.03)'); grad.addColorStop(1, 'rgba(10,11,13,0)');
+    ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+    agents.forEach((a, i) => {
+      a.x += a.vx; a.y += a.vy;
+      if (a.x < -20) a.x = W + 20; if (a.x > W + 20) a.x = -20;
+      if (a.y < -20) a.y = H + 20; if (a.y > H + 20) a.y = -20;
+      a.conflict = false;
+      agents.forEach((b, j) => {
+        if (i >= j) return;
+        const dx = a.x - b.x, dy = a.y - b.y, dist = Math.sqrt(dx*dx+dy*dy);
+        if (dist < 80) {
+          ctx.strokeStyle = `rgba(239,68,68,${(1 - dist/80) * 0.15})`; ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+          if (dist < 30) { a.conflict = true; b.conflict = true; }
+        }
+      });
+      const color = a.conflict ? '#ef4444' : a.color;
+      ctx.globalAlpha = a.alpha * 0.8;
+      ctx.beginPath(); ctx.arc(a.x, a.y, a.conflict ? a.r * 1.5 : a.r, 0, Math.PI * 2);
+      ctx.fillStyle = color; ctx.fill();
+      if (a.showLabel) {
+        ctx.globalAlpha = a.alpha * 0.4; ctx.font = '9px JetBrains Mono, monospace';
+        ctx.fillStyle = color; ctx.fillText(a.label, a.x + 6, a.y - 4);
+      }
+      ctx.globalAlpha = 1;
+    });
+    requestAnimationFrame(draw);
+  }
+  resize(); init(); draw();
+  window.addEventListener('resize', () => { resize(); init(); });
+})();
+
+// =============================================
+// MERGE CANVAS
+// =============================================
+(function() {
+  const container = document.getElementById('merge-section');
+  const canvas = document.getElementById('merge-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, agents = [], dpr = window.devicePixelRatio || 1;
+
+  function resize() {
+    W = container.offsetWidth; H = 320;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    canvas.width = W * dpr; canvas.height = H * dpr; ctx.scale(dpr, dpr);
+  }
+
+  function MergeAgent(id) {
+    this.id = id; this.x = 60 + Math.random() * (W - 120); this.y = 40 + Math.random() * (H - 80);
+    this.vx = 0; this.vy = 0;
+    this.status = ['ok','conflict','stale','error'][Math.floor(Math.random()*4)];
+    this.timer = Math.random() * 200; this.staleAge = Math.floor(Math.random()*15);
+    this.label = 'agent_' + String(id).padStart(2,'0'); this.speed = 0.3 + Math.random() * 0.5;
+    this.targetX = W * 0.5; this.targetY = H * 0.5;
+  }
+
+  MergeAgent.prototype.update = function() {
+    this.timer++;
+    if (this.timer % 180 === 0) { this.status = ['ok','conflict','stale','error'][Math.floor(Math.random()*4)]; this.staleAge = Math.floor(Math.random()*15); }
+    const dx = this.targetX - this.x, dy = this.targetY - this.y, dist = Math.sqrt(dx*dx+dy*dy);
+    if (dist > 5) { this.vx += (dx/dist)*this.speed*0.05; this.vy += (dy/dist)*this.speed*0.05; }
+    if (this.status === 'conflict' || this.status === 'error') { this.vx += (Math.random()-0.5)*0.4; this.vy += (Math.random()-0.5)*0.4; }
+    this.vx *= 0.94; this.vy *= 0.94; this.x += this.vx; this.y += this.vy;
+    this.x = Math.max(30, Math.min(W-30, this.x)); this.y = Math.max(20, Math.min(H-20, this.y));
+  };
+
+  MergeAgent.prototype.draw = function(ctx) {
+    const colors = { ok:'#22c55e', conflict:'#f59e0b', stale:'#6b7280', error:'#ef4444' };
+    const c = colors[this.status];
+    ctx.globalAlpha = 0.12; ctx.strokeStyle = c; ctx.lineWidth = 1;
+    ctx.setLineDash(this.status==='stale'?[4,4]:[]);
+    ctx.beginPath(); ctx.moveTo(this.x,this.y); ctx.lineTo(this.targetX,this.targetY); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 0.9; ctx.beginPath(); ctx.arc(this.x,this.y,this.status==='error'?5:4,0,Math.PI*2);
+    ctx.fillStyle = c; ctx.fill();
+    ctx.globalAlpha = 0.5; ctx.font = '9px JetBrains Mono, monospace'; ctx.fillStyle = c;
+    ctx.fillText(this.label, this.x+6, this.y+3);
+    if (this.status==='stale') ctx.fillText('+'+this.staleAge+'min', this.x+6, this.y+13);
+    ctx.globalAlpha = 1;
+  };
+
+  function init() { agents = []; for (let i=0;i<47;i++) agents.push(new MergeAgent(i+1)); }
+
+  function draw() {
+    ctx.clearRect(0,0,W,H); ctx.fillStyle='#0a0b0d'; ctx.fillRect(0,0,W,H);
+    const cx = W*0.5, cy = H*0.5;
+    ctx.globalAlpha=0.08; ctx.beginPath(); ctx.arc(cx,cy,60,0,Math.PI*2); ctx.fillStyle='#f59e0b'; ctx.fill();
+    ctx.globalAlpha=0.15; ctx.beginPath(); ctx.arc(cx,cy,30,0,Math.PI*2); ctx.fillStyle='#f59e0b'; ctx.fill();
+    ctx.globalAlpha=1; ctx.font='10px JetBrains Mono, monospace'; ctx.fillStyle='#f59e0b';
+    ctx.textAlign='center'; ctx.fillText('main', cx, cy+4); ctx.textAlign='left';
+    agents.forEach(a => { a.update(); a.draw(ctx); });
+    const counts = {ok:0,conflict:0,stale:0,error:0};
+    agents.forEach(a => counts[a.status]++);
+    const labs = [{k:'ok',label:'merged',color:'#22c55e'},{k:'conflict',label:'conflict',color:'#f59e0b'},{k:'stale',label:'stale ctx',color:'#6b7280'},{k:'error',label:'error',color:'#ef4444'}];
+    let lx = 16;
+    labs.forEach(l => {
+      ctx.font='10px JetBrains Mono, monospace'; ctx.fillStyle=l.color;
+      ctx.fillText(`${counts[l.k]} ${l.label}`, lx, H-14); lx += ctx.measureText(`${counts[l.k]} ${l.label}`).width+20;
+    });
+    requestAnimationFrame(draw);
+  }
+  resize(); init(); draw();
+  window.addEventListener('resize', () => { resize(); init(); });
+})();
+
+// =============================================
+// ATC CANVAS
+// =============================================
+(function() {
+  const container = document.getElementById('atc-section');
+  const canvas = document.getElementById('atc-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, dpr = window.devicePixelRatio || 1, sweep = 0, jets = [];
+
+  function resize() {
+    W = container.offsetWidth; H = 360;
+    canvas.style.width = W+'px'; canvas.style.height = H+'px';
+    canvas.width = W*dpr; canvas.height = H*dpr; ctx.scale(dpr,dpr);
+  }
+
+  const cx = () => W*0.5, cy = () => H*0.5, radius = () => Math.min(W,H)*0.42;
+
+  function Jet() {
+    this.angle = Math.random()*Math.PI*2; this.r = radius()*(0.2+Math.random()*0.75);
+    this.speed = (0.002+Math.random()*0.004)*(Math.random()>0.5?1:-1);
+    this.status = Math.random()>0.25?'nominal':(Math.random()>0.5?'conflict':'blind');
+    this.label = 'a'+String(Math.floor(Math.random()*50)).padStart(2,'0');
+    this.blipTimer = 0; this.trailPoints = [];
+  }
+
+  Jet.prototype.update = function() {
+    this.angle += this.speed;
+    const x = cx()+Math.cos(this.angle)*this.r, y = cy()+Math.sin(this.angle)*this.r;
+    let sn = ((sweep%(Math.PI*2))+Math.PI*2)%(Math.PI*2);
+    let an = ((this.angle%(Math.PI*2))+Math.PI*2)%(Math.PI*2);
+    if (((sn-an+Math.PI*2)%(Math.PI*2)) < 0.12) {
+      this.blipTimer = 60; this.trailPoints.push({x,y,age:0});
+      if (this.trailPoints.length>8) this.trailPoints.shift();
+    }
+    if (this.blipTimer>0) this.blipTimer--;
+    this.trailPoints.forEach(p=>p.age++);
+    this.trailPoints = this.trailPoints.filter(p=>p.age<80);
+  };
+
+  Jet.prototype.draw = function(ctx) {
+    if (!this.blipTimer && !this.trailPoints.length) return;
+    const colors = {nominal:'#22c55e',conflict:'#f59e0b',blind:'#ef4444'};
+    const c = colors[this.status];
+    this.trailPoints.forEach(p => {
+      ctx.globalAlpha = (1-p.age/80)*0.6;
+      ctx.beginPath(); ctx.arc(p.x,p.y,2,0,Math.PI*2); ctx.fillStyle=c; ctx.fill();
+    });
+    if (this.blipTimer>0) {
+      ctx.globalAlpha = this.blipTimer/60;
+      const x=cx()+Math.cos(this.angle)*this.r, y=cy()+Math.sin(this.angle)*this.r;
+      ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fillStyle=c; ctx.fill();
+      ctx.font='9px JetBrains Mono, monospace'; ctx.fillStyle=c;
+      ctx.fillText(this.label, x+7, y+3);
+    }
+    ctx.globalAlpha=1;
+  };
+
+  function init() { jets=[]; for(let i=0;i<47;i++) jets.push(new Jet()); }
+
+  function draw() {
+    ctx.clearRect(0,0,W,H); ctx.fillStyle='#050608'; ctx.fillRect(0,0,W,H);
+    [0.25,0.5,0.75,1].forEach(f => {
+      ctx.globalAlpha=0.08; ctx.beginPath(); ctx.arc(cx(),cy(),radius()*f,0,Math.PI*2);
+      ctx.strokeStyle='#22c55e'; ctx.lineWidth=1; ctx.stroke();
+    });
+    ctx.globalAlpha=0.06; ctx.strokeStyle='#22c55e'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(cx()-radius(),cy()); ctx.lineTo(cx()+radius(),cy());
+    ctx.moveTo(cx(),cy()-radius()); ctx.lineTo(cx(),cy()+radius()); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx(),cy()); ctx.arc(cx(),cy(),radius(),sweep-0.5,sweep,false);
+    ctx.closePath(); ctx.fillStyle='rgba(34,197,94,0.12)'; ctx.fill();
+    ctx.globalAlpha=0.4; ctx.strokeStyle='#22c55e'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(cx(),cy()); ctx.lineTo(cx()+Math.cos(sweep)*radius(),cy()+Math.sin(sweep)*radius()); ctx.stroke();
+    ctx.globalAlpha=1;
+    jets.forEach(j=>{j.update();j.draw(ctx);});
+    ctx.beginPath(); ctx.arc(cx(),cy(),3,0,Math.PI*2); ctx.fillStyle='#22c55e'; ctx.fill();
+    const blind=jets.filter(j=>j.status==='blind').length;
+    ctx.font='10px JetBrains Mono, monospace'; ctx.fillStyle='#6b7280'; ctx.globalAlpha=0.8;
+    ctx.fillText('47 agents airborne · '+blind+' flying blind · main branch', 16, H-14);
+    ctx.globalAlpha=1; sweep+=0.012;
+    requestAnimationFrame(draw);
+  }
+  resize(); init(); draw();
+  window.addEventListener('resize',()=>{resize();init();});
+})();
+
+// =============================================
+// OUTRO CANVAS
+// =============================================
+(function() {
+  const container = document.getElementById('outro');
+  const canvas = document.getElementById('outro-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, dpr = window.devicePixelRatio || 1;
+  let particles = Array.from({length:30},()=>({x:Math.random()*1200,y:Math.random()*600,vx:(Math.random()-0.5)*0.2,vy:-0.1-Math.random()*0.2,alpha:0.05+Math.random()*0.15,r:1+Math.random()*2}));
+
+  function resize() {
+    W=container.offsetWidth; H=container.offsetHeight;
+    canvas.width=W*dpr; canvas.height=H*dpr; ctx.scale(dpr,dpr);
+    canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    particles.forEach(p => {
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.y<-10){p.y=H+10;p.x=Math.random()*W;}
+      ctx.globalAlpha=p.alpha; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle='#f59e0b'; ctx.fill();
+    });
+    ctx.globalAlpha=1; requestAnimationFrame(draw);
+  }
+  resize(); draw(); window.addEventListener('resize',resize);
+})();
+
+// =============================================
+// SCROLL OBSERVER
+// =============================================
+const sectionOrder = ['s1','s2','s3','s4','s5','s6','s7','s8'];
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      const idx = sectionOrder.indexOf(entry.target.id);
+      if (idx >= 0) setSectionAudio(idx);
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.section').forEach(s => observer.observe(s));
+
+const tableObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.querySelectorAll('tbody tr').forEach((row,i) => {
+        setTimeout(()=>row.classList.add('row-visible'), i*120);
+      });
+    }
+  });
+}, { threshold: 0.3 });
+const table = document.getElementById('peer-table');
+if (table) tableObserver.observe(table);
+
+window.addEventListener('scroll', () => {
+  const p = document.body.scrollHeight - window.innerHeight;
+  document.getElementById('progress').style.width = (p > 0 ? (window.scrollY/p)*100 : 0)+'%';
+});
+</script>
+</body>
+</html>
