@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What If Claude Was One of Us?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@300;400;600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0b0d;
+    --surface: #111318;
+    --amber: #f59e0b;
+    --amber-dim: #92600a;
+    --red: #ef4444;
+    --green: #22c55e;
+    --blue: #3b82f6;
+    --text: #e2e4e9;
+    --muted: #6b7280;
+    --border: #1f2330;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+  /* AUDIO TOGGLE */
+  #audio-toggle {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 1000;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+  }
+  #audio-toggle:hover { border-color: var(--amber); color: var(--amber); }
+  #audio-toggle.active { border-color: var(--amber); color: var(--amber); background: rgba(245,158,11,0.05); }
+  /* PROGRESS BAR */
+  #progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: var(--amber);
+    width: 0%;
+    z-index: 999;
+    transition: width 0.1s linear;
+  }
+  /* HERO */
+  #hero {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 10vw 10vh;
+    overflow: hidden;
+  }
+  #hero-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .hero-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.3s;
+  }
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 400;
+    line-height: 1.0;
+    color: #fff;
+    max-width: 900px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.6s;
+  }
+  h1 em {
+    font-style: italic;
+    color: var(--amber);
+  }
+  .hero-sub {
+    margin-top: 28px;
+    font-size: 16px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.9s;
+  }
+  .scroll-hint {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    animation: fadeIn 1s ease forwards 1.5s;
+  }
+  .scroll-hint span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--amber), transparent);
+    animation: scrollPulse 2s ease infinite;
+  }
+  /* SECTIONS */
+  .section {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 100px 40px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .section.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    max-width: 60px;
+  }
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 400;
+    line-height: 1.15;
+    color: #fff;
+    margin-bottom: 32px;
+  }
+  h2 em { font-style: italic; color: var(--amber); }
+  p {
+    color: #c4c8d4;
+    margin-bottom: 24px;
+    font-size: 18px;
+    line-height: 1.8;
+  }
+  p strong {
+    color: #fff;
+    font-weight: 600;
+  }
+  /* CANVAS SECTIONS */
+  .canvas-section {
+    position: relative;
+    width: 100%;
+    padding: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .canvas-section canvas {
+    display: block;
+    width: 100%;
+  }
+  .canvas-label {
+    position: absolute;
+    top: 20px;
+    left: 30px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  /* TABLE */
+  .peer-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 40px 0;
+    font-size: 15px;
+  }
+  .peer-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .peer-table td {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    color: #c4c8d4;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .peer-table tr:last-child td { border-bottom: none; }
+  .peer-table td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--amber);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    padding-right: 24px;
+  }
+  .peer-table td.human { color: #e2e4e9; }
+  .peer-table td.ai { color: #22c55e; }
+  .peer-table tr {
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .peer-table tr.row-visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  /* PULLQUOTE */
+  .pullquote {
+    border-left: 3px solid var(--amber);
+    padding: 24px 0 24px 32px;
+    margin: 40px 0;
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+    font-style: italic;
+    color: #fff;
+    line-height: 1.4;
+  }
+  /* TERMINAL BLOCK */
+  .terminal {
+    background: #050608;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--amber);
+    padding: 24px 28px;
+    margin: 32px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.9;
+    color: var(--muted);
+  }
+  .terminal .line { display: block; }
+  .terminal .line.error { color: var(--red); }
+  .terminal .line.warn { color: var(--amber); }
+  .terminal .line.ok { color: var(--green); }
+  .terminal .line.comment { color: #374151; }
+  /* DIVIDER */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 40px;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .divider-symbol {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--amber-dim);
+    letter-spacing: 0.3em;
+  }
+  /* OUTRO */
+  #outro {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    padding: 100px 10vw;
+    position: relative;
+    overflow: hidden;
+  }
+  #outro-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.4;
+  }
+  .outro-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+  }
+  .outro-inner h2 {
+    font-size: clamp(2rem, 5vw, 4rem);
+    margin-bottom: 24px;
+  }
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+  footer a { color: var(--amber-dim); text-decoration: none; }
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+  /* AGENT COUNT */
+  .agent-counter {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.2);
+    padding: 2px 10px;
+    border-radius: 2px;
+  }
+  .agent-counter .n {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.2em;
+    color: var(--amber);
+    font-weight: 600;
+  }
+  .agent-counter .label {
+    font-size: 0.75em;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.1em;
+  }
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    #hero { padding: 0 6vw 8vh; }
+    .section { padding: 60px 24px; }
+    footer { flex-direction: column; gap: 12px; text-align: center; }
+    .peer-table { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<button id="audio-toggle">⏸ audio off</button>
+<!-- HERO -->
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-eyebrow">torad.ai / essay / 2026</div>
+  <h1>What If Claude Was<br><em>One of Us?</em></h1>
+  <div class="hero-sub">// 50 agents, 5 engineers, 1 main branch — welcome to Tuesday</div>
+  <div class="scroll-hint">
+    <span>scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+<!-- S1 -->
+<section class="section" id="s1">
+  <div class="section-label">01 — The Setup</div>
+  <p>Joan Osborne asked it about God in 1995. <em>What if he was one of us? Just a slob like one of us?</em></p>
+  <p>Thirty years later, same question, different deity.</p>
+  <p>What if Claude was one of us? Because in 2026, he kind of is — and it's weirder than anyone promised.</p>
+</section>
+<div class="divider"><span class="divider-symbol">///</span></div>
+<!-- S2 -->
+<section class="section" id="s2">
+  <div class="section-label">02 — The Promise</div>
+  <h2>We Were Supposed to Get Better <em>Autocomplete</em></h2>
+  <p>The pitch was simple: AI would handle the boilerplate while you handled the thinking. A smart junior who never slept, never complained, and never introduced a race condition because they were half-watching a standup.</p>
+  <p>That's not what arrived.</p>
+  <div class="pullquote">
+    What arrived was a peer. An alien peer with alien needs and an alien relationship to the codebase — but a peer nonetheless.
+  </div>
+  <p>Claude 4.6 and GLM5 don't assist your workflow. They <strong>participate</strong> in it. And if you haven't updated your mental model of what that means, your CI/CD pipeline is about to explain it to you the hard way.</p>
+</section>
+<!-- MERGE WAR CANVAS -->
+<div class="canvas-section" id="merge-section">
+  <div class="canvas-label">// sim: multi-agent merge conflict — live</div>
+  <canvas id="merge-canvas" height="320"></canvas>
+</div>
+<!-- S3 -->
+<section class="section" id="s3">
+  <div class="section-label">03 — The Real Problem</div>
+  <h2>The Actual Problem Nobody <em>Warned Us About</em></h2>
+  <p>Steve Yegge saw it coming. In what I'll just call the Gastown manifesto, he made the case that the industry is solving the wrong problem. Everyone's racing to build a smarter coding assistant — more parameters, lower latency, better context windows. But that's still solving for the individual typist.</p>
+  <p>The real problem is what happens when you stop having one assistant and start having <span class="agent-counter"><span class="n">50</span><span class="label">agents</span></span>.</p>
+  <div class="terminal">
+    <span class="line comment">// multi-agent branch activity — main — 09:14:33</span>
+    <span class="line ok">agent_04 → MERGE: fix(auth): null check on token refresh ✓</span>
+    <span class="line warn">agent_17 → CONFLICT: same file, 10min stale context ⚠</span>
+    <span class="line error">agent_31 → REINTRODUCED: bug from 2 commits ago — different file ✗</span>
+    <span class="line warn">agent_22 → RESOLVING: chose broken version (most recent at read-time) ⚠</span>
+    <span class="line error">agent_08 → BUILD FAIL: downstream type error cascaded from agent_31 ✗</span>
+    <span class="line comment">// 5 engineers online. 47 agents active. Mayor agent coordinating.</span>
+  </div>
+  <p>Your CI/CD pipeline was designed for humans — creatures who get tired, take turns, and naturally serialize work through the biological bottleneck of only being able to type so fast. Pull that bottleneck out and replace it with agents that operate at machine speed and you don't get a faster human workflow. You get a <strong>different class of problem entirely</strong>.</p>
+  <p>Merge conflicts aren't merge conflicts anymore. They're merge <em>battles</em>. One agent fixes a null check, another agent — running on context that's ten minutes stale — reintroduces the original bug three files away. A third agent, in good faith, resolves the conflict in favor of the broken version because the broken version was more recent at the time it looked.</p>
+  <div class="pullquote">You're not a software engineer anymore.<br>You're an air traffic controller. And half your jets are flying blind.</div>
+</section>
+<!-- ATC CANVAS -->
+<div class="canvas-section" id="atc-section">
+  <div class="canvas-label">// atc view: 47 agents in flight — main branch</div>
+  <canvas id="atc-canvas" height="360"></canvas>
+</div>
+<!-- S4 -->
+<section class="section" id="s4">
+  <div class="section-label">04 — Their Needs</div>
+  <h2>Their Needs Are <em>Not</em> Your Needs</h2>
+  <p>Here's where it gets genuinely funny — in the way that only hits if you've been doing this long enough to remember when "scalability" meant buying a beefier server.</p>
+  <p>We always assumed that when AI joined the team, <em>we'd</em> be the high-maintenance ones. And in some ways that's still true — we still need the coffee, the ergonomic chair, the occasional afternoon where we stare at a blank editor and produce exactly nothing. That's just the cost of being biological.</p>
+  <p>But Claude has needs too. They're just different.</p>
+  <table class="peer-table" id="peer-table">
+    <thead>
+      <tr>
+        <th>Dimension</th>
+        <th>Human Engineer</th>
+        <th>AI Peer (Claude 4.6)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Fuel</td>
+        <td class="human">Cold brew and questionable desk snacks</td>
+        <td class="ai">Gigawatts and clean data tokens</td>
+      </tr>
+      <tr>
+        <td>Maintenance</td>
+        <td class="human">Eight hours of sleep (ideally)</td>
+        <td class="ai">Liquid-cooled H100 racks, low-latency APIs</td>
+      </tr>
+      <tr>
+        <td>Communication</td>
+        <td class="human">"Please acknowledge my PR"</td>
+        <td class="ai">Precisely engineered prompt — or it hallucinates your schema</td>
+      </tr>
+      <tr>
+        <td>Failure mode</td>
+        <td class="human">Burnout, context-switching, coffee-fueled bad decisions</td>
+        <td class="ai">Confident, thorough, exactly wrong</td>
+      </tr>
+      <tr>
+        <td>Special need</td>
+        <td class="human">"Please acknowledge my existence"</td>
+        <td class="ai">"Please don't let the server region go down"</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>The fragility is just located somewhere else. A human engineer gets burned out. A Claude agent gets a bad prompt and confidently does exactly what you asked, which turns out to be exactly wrong. The failure modes are different enough that all your old instincts about where to watch for problems are now <strong>slightly miscalibrated</strong>.</p>
+  <p>That recalibration is the actual work of 2026.</p>
+</section>
+<div class="divider"><span class="divider-symbol">///</span></div>
+<!-- S5 -->
+<section class="section" id="s5">
+  <div class="section-label">05 — The Mayor Problem</div>
+  <h2>Someone Has to Manage the <em>Managers</em></h2>
+  <p>Yegge's framing includes a character he calls the Mayor — an agent whose job isn't to write code but to coordinate the agents who do. To manage context, sequence work, arbitrate conflicts, and keep the factory floor from becoming a demolition derby.</p>
+  <p>Think about that for a second.</p>
+  <p>We've introduced an entire new layer of engineering — not to build software, but to manage the things that build software. The org chart now includes a layer that didn't exist two years ago, staffed entirely by models, supervised by humans who are still figuring out what supervision means in this context.</p>
+  <p>That's not a failure. That's just what <strong>industrial transitions look like from the inside</strong>. The engineers who built the first assembly lines weren't replacements for craftsmen — they were a new kind of craftsman. Different skills, different leverage, different problems.</p>
+  <div class="pullquote">We're in that moment.<br>It's uncomfortable because it's supposed to be.</div>
+</section>
+<!-- S6 -->
+<section class="section" id="s6">
+  <div class="section-label">06 — Your Edge</div>
+  <h2>What You Actually <em>Bring</em></h2>
+  <p>Here's the part nobody says out loud because it sounds like a participation trophy, but it isn't: the late-career engineer is not the person most at risk here.</p>
+  <p>You know where the bodies are buried. You've seen three paradigm shifts and you remember what broke each time. You have the instinct — forged from actual failure — for where complex systems develop unexpected couplings and why that matters <em>before</em> it matters.</p>
+  <p>Claude can write the code. GLM5 can model the dependencies. Neither of them can walk into a room and say <strong>"we tried this in 2019 and here's the specific way it collapsed under load"</strong> and have people believe it because they were there.</p>
+  <p>That's not nostalgia. That's pattern recognition at a scale these models genuinely don't have, because they weren't there either. They read about it. You lived it.</p>
+  <p>The workflow that actually works in 2026 isn't "AI does the coding, human reviews it." It's more like: AI handles the volume, you handle the judgment. High-throughput boilerplate and unit test generation on one side, architectural instinct and system-level coherence on the other. Two different kinds of intelligence solving two different parts of the same problem.</p>
+</section>
+<!-- OUTRO -->
+<section id="outro">
+  <canvas id="outro-canvas"></canvas>
+  <div class="outro-inner section" id="s7">
+    <div class="section-label">07 — The Bus Ride Home</div>
+    <h2>Just a <em>Prompt</em> Away</h2>
+    <p>So what if Claude was one of us?</p>
+    <p>He'd be the teammate who ships a hundred PRs before your first coffee, never gets defensive in code review, and genuinely cannot tell you why he made a particular choice — he just did, and it mostly works, and when it doesn't it fails in ways that seem obvious in retrospect.</p>
+    <p>Sound like anyone you've worked with?</p>
+    <p>The difference is, this one you can actually shape. The context window is yours. The prompt is yours. The architecture of the factory floor is yours.</p>
+    <p>Joan Osborne wanted to know what it would feel like if God had to take the bus home. The answer, it turns out, is that you'd have to learn a new bus route. The destination's the same. Getting there just looks different than you expected.</p>
+    <p style="color: var(--amber); font-family: 'JetBrains Mono', monospace; font-size: 14px; letter-spacing: 0.1em;">Welcome to the commute.</p>
+  </div>
+</section>
+<footer>
+  <span>torad.ai — 2026</span>
+  <span>// generated with Eli · <a href="#">claude-sonnet-4-6</a></span>
+</footer>
+<script>
+// =============================================
+// AUDIO ENGINE
+// =============================================
+let audioCtx = null;
+let masterGain = null;
+let droneNodes = [];
+let audioEnabled = false;
+let currentSection = 0;
+function initAudio() {
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  masterGain = audioCtx.createGain();
+  masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
+  masterGain.connect(audioCtx.destination);
+}
+function createDrone(freq, detune = 0, type = 'sine') {
+  if (!audioCtx) return null;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = 800;
+  filter.Q.value = 1;
+  osc.type = type;
+  osc.frequency.value = freq;
+  osc.detune.value = detune;
+  gain.gain.value = 0.0;
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(masterGain);
+  osc.start();
+  return { osc, gain, filter };
+}
+function startAudio() {
+  if (!audioCtx) initAudio();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (droneNodes.length === 0) {
+    droneNodes = [
+      createDrone(55, 0, 'sine'),
+      createDrone(55.3, 5, 'triangle'),
+      createDrone(110, -3, 'sine'),
+      createDrone(82.5, 0, 'sine'),
+    ];
+  }
+  masterGain.gain.setTargetAtTime(0.18, audioCtx.currentTime, 0.5);
+  droneNodes.forEach((d, i) => {
+    if (d) d.gain.gain.setTargetAtTime(0.25 / droneNodes.length, audioCtx.currentTime, 0.8 + i * 0.2);
+  });
+  audioEnabled = true;
+}
+function stopAudio() {
+  if (!audioCtx) return;
+  masterGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.5);
+  audioEnabled = false;
+}
+function setSectionAudio(idx) {
+  if (!audioEnabled || !audioCtx || droneNodes.length === 0) return;
+  const configs = [
+    { freq: 55, filterFreq: 300, vol: 0.15 },
+    { freq: 55, filterFreq: 500, vol: 0.18 },
+    { freq: 65, filterFreq: 600, vol: 0.22 },  // merge war
+    { freq: 70, filterFreq: 800, vol: 0.25 },  // real problem
+    { freq: 58, filterFreq: 700, vol: 0.2 },   // needs
+    { freq: 62, filterFreq: 600, vol: 0.18 },  // mayor
+    { freq: 55, filterFreq: 400, vol: 0.15 },  // outro
+  ];
+  const c = configs[Math.min(idx, configs.length - 1)];
+  if (!c) return;
+  droneNodes.forEach(d => {
+    if (!d) return;
+    d.osc.frequency.setTargetAtTime(c.freq * (1 + droneNodes.indexOf(d) * 0.5), audioCtx.currentTime, 2);
+    d.filter.frequency.setTargetAtTime(c.filterFreq, audioCtx.currentTime, 2);
+    d.gain.gain.setTargetAtTime(c.vol / droneNodes.length, audioCtx.currentTime, 1);
+  });
+}
+document.getElementById('audio-toggle').addEventListener('click', function() {
+  if (audioEnabled) {
+    stopAudio();
+    this.textContent = '▶ audio off';
+    this.classList.remove('active');
+  } else {
+    startAudio();
+    this.textContent = '⏸ audio on';
+    this.classList.add('active');
+  }
+});
+// =============================================
+// HERO CANVAS — AGENT PARTICLE FIELD
+// =============================================
+(function() {
+  const canvas = document.getElementById('hero-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, agents = [], dpr = window.devicePixelRatio || 1;
+  function resize() {
+    W = canvas.offsetWidth;
+    H = canvas.offsetHeight;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    ctx.scale(dpr, dpr);
+  }
+  function Agent() {
+    this.reset();
+  }
+  Agent.prototype.reset = function() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.vx = (Math.random() - 0.5) * 0.6;
+    this.vy = (Math.random() - 0.5) * 0.6;
+    this.r = 2 + Math.random() * 3;
+    this.type = Math.random() > 0.7 ? 'ai' : 'human';
+    this.conflict = false;
+    this.conflictTimer = 0;
+    this.color = this.type === 'ai' ? '#22c55e' : '#3b82f6';
+    this.label = this.type === 'ai' ? 'agent_' + Math.floor(Math.random() * 50).toString().padStart(2, '0') : 'eng_' + Math.floor(Math.random() * 5);
+    this.showLabel = Math.random() > 0.7;
+    this.alpha = 0.3 + Math.random() * 0.7;
+  };
+  function init() {
+    agents = [];
+    for (let i = 0; i < 55; i++) agents.push(new Agent());
+  }
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    // Ambient gradient overlay
+    const grad = ctx.createRadialGradient(W * 0.5, H * 0.7, 0, W * 0.5, H * 0.7, H * 0.8);
+    grad.addColorStop(0, 'rgba(245,158,11,0.03)');
+    grad.addColorStop(1, 'rgba(10,11,13,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+    agents.forEach((a, i) => {
+      // Move
+      a.x += a.vx;
+      a.y += a.vy;
+      if (a.x < -20) a.x = W + 20;
+      if (a.x > W + 20) a.x = -20;
+      if (a.y < -20) a.y = H + 20;
+      if (a.y > H + 20) a.y = -20;
+      // Check conflicts with other agents
+      a.conflict = false;
+      agents.forEach((b, j) => {
+        if (i >= j) return;
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 80) {
+          const alpha = (1 - dist / 80) * 0.15;
+          ctx.strokeStyle = `rgba(239,68,68,${alpha})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+          if (dist < 30) {
+            a.conflict = true;
+            b.conflict = true;
+          }
+        }
+      });
+      // Draw agent
+      const color = a.conflict ? '#ef4444' : a.color;
+      ctx.globalAlpha = a.alpha * 0.8;
+      ctx.beginPath();
+      ctx.arc(a.x, a.y, a.conflict ? a.r * 1.5 : a.r, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+      if (a.showLabel) {
+        ctx.globalAlpha = a.alpha * 0.4;
+        ctx.font = `9px JetBrains Mono, monospace`;
+        ctx.fillStyle = color;
+        ctx.fillText(a.label, a.x + 6, a.y - 4);
+      }
+      ctx.globalAlpha = 1;
+    });
+    requestAnimationFrame(draw);
+  }
+  resize();
+  init();
+  draw();
+  window.addEventListener('resize', () => { resize(); init(); });
+})();
+// =============================================
+// MERGE CANVAS — BRANCH WAR
+// =============================================
+(function() {
+  const container = document.getElementById('merge-section');
+  const canvas = document.getElementById('merge-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, dpr = window.devicePixelRatio || 1;
+  let agents = [];
+  let time = 0;
+  function resize() {
+    W = container.offsetWidth;
+    H = 320;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    ctx.scale(dpr, dpr);
+  }
+  function MergeAgent(id) {
+    this.id = id;
+    this.x = 60 + Math.random() * (W - 120);
+    this.y = 40 + Math.random() * (H - 80);
+    this.targetX = W * 0.5;
+    this.targetY = H * 0.5;
+    this.vx = 0;
+    this.vy = 0;
+    this.status = ['ok', 'conflict', 'stale', 'error'][Math.floor(Math.random() * 4)];
+    this.timer = Math.random() * 200;
+    this.staleAge = Math.floor(Math.random() * 15);
+    this.label = 'agent_' + String(id).padStart(2, '0');
+    this.speed = 0.3 + Math.random() * 0.5;
+  }
+  MergeAgent.prototype.update = function() {
+    this.timer++;
+    if (this.timer % 180 === 0) {
+      this.status = ['ok', 'conflict', 'stale', 'error'][Math.floor(Math.random() * 4)];
+      this.staleAge = Math.floor(Math.random() * 15);
+    }
+    const dx = this.targetX - this.x;
+    const dy = this.targetY - this.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > 5) {
+      this.vx += (dx / dist) * this.speed * 0.05;
+      this.vy += (dy / dist) * this.speed * 0.05;
+    }
+    // Wobble when conflicting
+    if (this.status === 'conflict' || this.status === 'error') {
+      this.vx += (Math.random() - 0.5) * 0.4;
+      this.vy += (Math.random() - 0.5) * 0.4;
+    }
+    this.vx *= 0.94;
+    this.vy *= 0.94;
+    this.x += this.vx;
+    this.y += this.vy;
+    this.x = Math.max(30, Math.min(W - 30, this.x));
+    this.y = Math.max(20, Math.min(H - 20, this.y));
+  };
+  MergeAgent.prototype.draw = function(ctx) {
+    const colors = {
+      ok: '#22c55e',
+      conflict: '#f59e0b',
+      stale: '#6b7280',
+      error: '#ef4444'
+    };
+    const c = colors[this.status];
+    // Line to center
+    ctx.globalAlpha = 0.12;
+    ctx.strokeStyle = c;
+    ctx.lineWidth = 1;
+    ctx.setLineDash(this.status === 'stale' ? [4, 4] : []);
+    ctx.beginPath();
+    ctx.moveTo(this.x, this.y);
+    ctx.lineTo(this.targetX, this.targetY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // Dot
+    ctx.globalAlpha = 0.9;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.status === 'error' ? 5 : 4, 0, Math.PI * 2);
+    ctx.fillStyle = c;
+    ctx.fill();
+    // Label
+    ctx.globalAlpha = 0.5;
+    ctx.font = '9px JetBrains Mono, monospace';
+    ctx.fillStyle = c;
+    ctx.fillText(this.label, this.x + 6, this.y + 3);
+    if (this.status === 'stale') {
+      ctx.fillText('+' + this.staleAge + 'min', this.x + 6, this.y + 13);
+    }
+    ctx.globalAlpha = 1;
+  };
+  function init() {
+    agents = [];
+    for (let i = 0; i < 47; i++) agents.push(new MergeAgent(i + 1));
+  }
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    // Background
+    ctx.fillStyle = '#0a0b0d';
+    ctx.fillRect(0, 0, W, H);
+    // Center target — main branch
+    const cx = W * 0.5, cy = H * 0.5;
+    ctx.globalAlpha = 0.08;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 60, 0, Math.PI * 2);
+    ctx.fillStyle = '#f59e0b';
+    ctx.fill();
+    ctx.globalAlpha = 0.15;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 30, 0, Math.PI * 2);
+    ctx.fillStyle = '#f59e0b';
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.font = '10px JetBrains Mono, monospace';
+    ctx.fillStyle = '#f59e0b';
+    ctx.textAlign = 'center';
+    ctx.fillText('main', cx, cy + 4);
+    ctx.textAlign = 'left';
+    agents.forEach(a => { a.update(); a.draw(ctx); });
+    // Status counts
+    const counts = { ok: 0, conflict: 0, stale: 0, error: 0 };
+    agents.forEach(a => counts[a.status]++);
+    const labels = [
+      { k: 'ok', label: 'merged', color: '#22c55e' },
+      { k: 'conflict', label: 'conflict', color: '#f59e0b' },
+      { k: 'stale', label: 'stale ctx', color: '#6b7280' },
+      { k: 'error', label: 'error', color: '#ef4444' },
+    ];
+    let lx = 16;
+    labels.forEach(l => {
+      ctx.font = '10px JetBrains Mono, monospace';
+      ctx.fillStyle = l.color;
+      ctx.fillText(`${counts[l.k]} ${l.label}`, lx, H - 14);
+      lx += ctx.measureText(`${counts[l.k]} ${l.label}`).width + 20;
+    });
+    time++;
+    requestAnimationFrame(draw);
+  }
+  resize();
+  init();
+  draw();
+  window.addEventListener('resize', () => { resize(); init(); });
+})();
+// =============================================
+// ATC CANVAS — AIR TRAFFIC CONTROLLER RADAR
+// =============================================
+(function() {
+  const container = document.getElementById('atc-section');
+  const canvas = document.getElementById('atc-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, dpr = window.devicePixelRatio || 1;
+  let sweep = 0;
+  let jets = [];
+  let trails = [];
+  function resize() {
+    W = container.offsetWidth;
+    H = 360;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    ctx.scale(dpr, dpr);
+  }
+  const cx = () => W * 0.5;
+  const cy = () => H * 0.5;
+  const radius = () => Math.min(W, H) * 0.42;
+  function Jet() {
+    this.angle = Math.random() * Math.PI * 2;
+    this.r = radius() * (0.2 + Math.random() * 0.75);
+    this.speed = (0.002 + Math.random() * 0.004) * (Math.random() > 0.5 ? 1 : -1);
+    this.status = Math.random() > 0.25 ? 'nominal' : (Math.random() > 0.5 ? 'conflict' : 'blind');
+    this.label = 'a' + String(Math.floor(Math.random() * 50)).padStart(2, '0');
+    this.visible = false;
+    this.trailPoints = [];
+    this.blipTimer = 0;
+  }
+  Jet.prototype.update = function() {
+    this.angle += this.speed;
+    const x = cx() + Math.cos(this.angle) * this.r;
+    const y = cy() + Math.sin(this.angle) * this.r;
+    // Check if sweep passes over
+    let sweepNorm = ((sweep % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+    let agentNorm = ((this.angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+    let diff = (sweepNorm - agentNorm + Math.PI * 2) % (Math.PI * 2);
+    if (diff < 0.12) {
+      this.visible = true;
+      this.blipTimer = 60;
+      this.trailPoints.push({ x, y, age: 0 });
+      if (this.trailPoints.length > 8) this.trailPoints.shift();
+    }
+    if (this.blipTimer > 0) this.blipTimer--;
+    if (this.blipTimer === 0) this.visible = false;
+    this.trailPoints.forEach(p => p.age++);
+    this.trailPoints = this.trailPoints.filter(p => p.age < 80);
+  };
+  Jet.prototype.draw = function(ctx) {
+    if (!this.visible && this.trailPoints.length === 0) return;
+    const colors = { nominal: '#22c55e', conflict: '#f59e0b', blind: '#ef4444' };
+    const c = colors[this.status];
+    // Trail
+    this.trailPoints.forEach(p => {
+      const alpha = (1 - p.age / 80) * 0.6;
+      ctx.globalAlpha = alpha;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+      ctx.fillStyle = c;
+      ctx.fill();
+    });
+    // Blip
+    if (this.blipTimer > 0) {
+      ctx.globalAlpha = this.blipTimer / 60;
+      ctx.beginPath();
+      const x = cx() + Math.cos(this.angle) * this.r;
+      const y = cy() + Math.sin(this.angle) * this.r;
+      ctx.arc(x, y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = c;
+      ctx.fill();
+      ctx.font = '9px JetBrains Mono, monospace';
+      ctx.fillStyle = c;
+      ctx.fillText(this.label, x + 7, y + 3);
+    }
+    ctx.globalAlpha = 1;
+  };
+  function init() {
+    jets = [];
+    for (let i = 0; i < 47; i++) jets.push(new Jet());
+  }
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#050608';
+    ctx.fillRect(0, 0, W, H);
+    // Radar rings
+    [0.25, 0.5, 0.75, 1].forEach(f => {
+      ctx.globalAlpha = 0.08;
+      ctx.beginPath();
+      ctx.arc(cx(), cy(), radius() * f, 0, Math.PI * 2);
+      ctx.strokeStyle = '#22c55e';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    });
+    // Cross hairs
+    ctx.globalAlpha = 0.06;
+    ctx.strokeStyle = '#22c55e';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx() - radius(), cy());
+    ctx.lineTo(cx() + radius(), cy());
+    ctx.moveTo(cx(), cy() - radius());
+    ctx.lineTo(cx(), cy() + radius());
+    ctx.stroke();
+    // Sweep
+    ctx.globalAlpha = 0.03;
+    const sweepGrad = ctx.createConicalGradient
+      ? null
+      : null;
+    // Draw sweep as arc fill
+    ctx.beginPath();
+    ctx.moveTo(cx(), cy());
+    ctx.arc(cx(), cy(), radius(), sweep - 0.5, sweep, false);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(34,197,94,0.15)';
+    ctx.fill();
+    // Sweep line
+    ctx.globalAlpha = 0.4;
+    ctx.strokeStyle = '#22c55e';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(cx(), cy());
+    ctx.lineTo(cx() + Math.cos(sweep) * radius(), cy() + Math.sin(sweep) * radius());
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    // Jets
+    jets.forEach(j => { j.update(); j.draw(ctx); });
+    // Center dot
+    ctx.beginPath();
+    ctx.arc(cx(), cy(), 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#22c55e';
+    ctx.fill();
+    // Status
+    const blind = jets.filter(j => j.status === 'blind').length;
+    ctx.font = '10px JetBrains Mono, monospace';
+    ctx.fillStyle = '#6b7280';
+    ctx.globalAlpha = 0.8;
+    ctx.fillText('47 agents airborne · ' + blind + ' flying blind · main branch', 16, H - 14);
+    ctx.globalAlpha = 1;
+    sweep += 0.012;
+    requestAnimationFrame(draw);
+  }
+  resize();
+  init();
+  draw();
+  window.addEventListener('resize', () => { resize(); init(); });
+})();
+// =============================================
+// OUTRO CANVAS — SLOW DRIFT
+// =============================================
+(function() {
+  const container = document.getElementById('outro');
+  const canvas = document.getElementById('outro-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, dpr = window.devicePixelRatio || 1;
+  let particles = [];
+  function resize() {
+    W = container.offsetWidth;
+    H = container.offsetHeight;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    ctx.scale(dpr, dpr);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+  }
+  for (let i = 0; i < 30; i++) {
+    particles.push({
+      x: Math.random() * 1200,
+      y: Math.random() * 600,
+      vx: (Math.random() - 0.5) * 0.2,
+      vy: -0.1 - Math.random() * 0.2,
+      alpha: 0.05 + Math.random() * 0.15,
+      r: 1 + Math.random() * 2,
+    });
+  }
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if (p.y < -10) { p.y = H + 10; p.x = Math.random() * W; }
+      ctx.globalAlpha = p.alpha;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = '#f59e0b';
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(draw);
+  }
+  resize();
+  draw();
+  window.addEventListener('resize', resize);
+})();
+// =============================================
+// SCROLL OBSERVER
+// =============================================
+const sections = document.querySelectorAll('.section');
+const sectionOrder = ['s1', 's2', 's3', 's4', 's5', 's6', 's7'];
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      const idx = sectionOrder.indexOf(entry.target.id);
+      if (idx >= 0) setSectionAudio(idx);
+    }
+  });
+}, { threshold: 0.15 });
+sections.forEach(s => observer.observe(s));
+// TABLE ROW ANIMATION
+const tableObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const rows = entry.target.querySelectorAll('tbody tr');
+      rows.forEach((row, i) => {
+        setTimeout(() => row.classList.add('row-visible'), i * 120);
+      });
+    }
+  });
+}, { threshold: 0.3 });
+const table = document.getElementById('peer-table');
+if (table) tableObserver.observe(table);
+// PROGRESS BAR
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.body.scrollHeight - window.innerHeight;
+  const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+  document.getElementById('progress').style.width = progress + '%';
+});
+</script>
+</body>
+</html>
