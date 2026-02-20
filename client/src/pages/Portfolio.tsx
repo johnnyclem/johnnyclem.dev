@@ -5,6 +5,7 @@ import SkillsMatrix from "@/components/SkillsMatrix";
 import ExperienceTimeline from "@/components/ExperienceTimeline";
 import PatentPortfolio from "@/components/PatentPortfolio";
 import ProjectHighlights from "@/components/ProjectHighlights";
+import OpenSourceSection from "@/components/OpenSourceSection";
 import ContactSection from "@/components/ContactSection";
 import { ChatBot } from "@/components/ChatBot";
 
@@ -77,6 +78,9 @@ export default function Portfolio() {
           onSkillClick={handleSkillClick}
           onClearFilter={handleClearFilter}
         />
+
+        {/* Open Source */}
+        <OpenSourceSection />
 
         {/* AI Chatbot */}
         <section className="py-24 bg-[#111318]">
