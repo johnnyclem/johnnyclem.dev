@@ -4,7 +4,7 @@
   "outputDirectory": "dist/public",
   "functions": {
     "api/index.ts": {
-      "runtime": "node@20.x"
+      "runtime": "node@24.2.0"
     }
   },
   "routes": [
