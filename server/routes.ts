@@ -1,5 +1,6 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
+import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
 import multer from "multer";
 import path from "path";
@@ -36,6 +37,8 @@ import {
 } from "@shared/schema";
 import { sendMessage } from "./chat-service";
 import { textToSpeech } from "./elevenlabs-service";
+import { verifyPassword } from "./utils/password";
+import { sanitizeBlogContent } from "./utils/sanitize";
 
 // Extend express-session
 declare module "express-session" {
@@ -53,20 +56,57 @@ function requireAdmin(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+// Rate limiter for authentication endpoints
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 requests per windowMs
+  message: { error: "Too many login attempts, please try again later" },
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  skipSuccessfulRequests: false, // Count failed requests only
+  keyGenerator: (req) => {
+    // Use X-Forwarded-IP if behind a proxy, otherwise use IP
+    return (req.headers['x-forwarded-for'] as string)?.split(',')[0].trim() || req.ip;
+  },
+});
+
+// Rate limiter for file uploads (more restrictive)
+const uploadLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 20, // Limit each IP to 20 uploads per hour
+  message: { error: "Too many file uploads, please try again later" },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    return (req.headers['x-forwarded-for'] as string)?.split(',')[0].trim() || req.ip;
+  },
+});
+
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Admin authentication
-  app.post("/api/admin/login", async (req, res) => {
+  // Admin authentication with rate limiting
+  app.post("/api/admin/login", authLimiter, async (req, res) => {
     const { password } = req.body;
     const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
-    
+
     if (!ADMIN_PASSWORD) {
       console.error("ADMIN_PASSWORD environment variable is not set");
       return res.status(500).json({ error: "Server configuration error" });
     }
-    
-    console.log(`[Auth] Login attempt received (password length: ${password?.length || 0})`);
-    
-    if (password === ADMIN_PASSWORD) {
+
+    // Support both hashed and plaintext passwords for backwards compatibility
+    // If the password hash starts with $2, it's a bcrypt hash
+    let passwordValid = false;
+
+    if (ADMIN_PASSWORD.startsWith('$2')) {
+      // Hashed password - verify using bcrypt
+      passwordValid = await verifyPassword(password, ADMIN_PASSWORD);
+    } else {
+      // Plaintext password (legacy) - direct comparison
+      // This allows for gradual migration to hashed passwords
+      passwordValid = password === ADMIN_PASSWORD;
+    }
+
+    if (passwordValid) {
       console.log("[Auth] Password correct, creating admin session");
       // Regenerate session to prevent fixation attacks
       req.session.regenerate((err) => {
@@ -498,7 +538,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/blog-posts", requireAdmin, async (req, res) => {
     try {
       const data = insertBlogPostSchema.parse(req.body);
-      const post = await storage.createBlogPost(data);
+      // Sanitize HTML content to prevent XSS
+      const sanitizedData = {
+        ...data,
+        content: sanitizeBlogContent(data.content),
+      };
+      const post = await storage.createBlogPost(sanitizedData);
       res.json(post);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -508,7 +553,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/blog-posts/:id", requireAdmin, async (req, res) => {
     try {
       const data = updateBlogPostSchema.parse(req.body);
-      const post = await storage.updateBlogPost(req.params.id, data);
+      // Sanitize HTML content to prevent XSS
+      const sanitizedData = {
+        ...data,
+        content: data.content ? sanitizeBlogContent(data.content) : undefined,
+      };
+      const post = await storage.updateBlogPost(req.params.id, sanitizedData);
       if (!post) {
         return res.status(404).json({ error: "Blog post not found" });
       }
@@ -596,7 +646,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(204).send();
   });
 
-  // File upload configuration
+  // Magic number validation for image files
+  const allowedMagicNumbers: Record<string, string[]> = {
+    '.jpg': ['ffd8ffe0', 'ffd8ffe1', 'ffd8ffe2', 'ffd8ffe3', 'ffd8ffe8', 'ffd8ffed'],
+    '.jpeg': ['ffd8ffe0', 'ffd8ffe1', 'ffd8ffe2', 'ffd8ffe3', 'ffd8ffe8', 'ffd8ffed'],
+    '.png': ['89504e47'],
+    '.gif': ['47494638'],
+    '.webp': ['52494646'], // RIFF header, further validation needed for WebP
+  };
+
+  // SVG files are blocked due to XSS risks
+
   const upload = multer({
     storage: multer.diskStorage({
       destination: async (_req: any, _file: any, cb: any) => {
@@ -609,20 +669,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
         cb(null, uniqueSuffix + path.extname(file.originalname));
       }
     }),
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB limit (reduced from 10MB)
+      files: 1, // Only allow one file per request
+    },
     fileFilter: (_req: any, file: any, cb: any) => {
-      const allowedTypes = /jpeg|jpg|png|gif|webp|svg/;
-      const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-      const mimetype = allowedTypes.test(file.mimetype);
-      if (extname && mimetype) {
-        return cb(null, true);
+      const ext = path.extname(file.originalname).toLowerCase();
+
+      // Block SVG files due to XSS risks
+      if (ext === '.svg' || ext === '.svgz') {
+        return cb(new Error('SVG files are not allowed for security reasons'));
       }
-      cb(new Error('Only image files are allowed'));
+
+      const allowedTypes = /jpeg|jpg|png|gif|webp/;
+      const extname = allowedTypes.test(ext);
+      const mimetype = allowedTypes.test(file.mimetype);
+
+      if (!extname || !mimetype) {
+        return cb(new Error('Only image files (JPEG, PNG, GIF, WebP) are allowed'));
+      }
+
+      cb(null, true);
     }
   });
 
-  // File upload route
-  app.post("/api/upload", requireAdmin, upload.single('file'), async (req: any, res) => {
+  // Middleware to validate file magic numbers after multer parsing
+  const validateFileMagic = async (req: any, res: Response, next: NextFunction) => {
+    if (!req.file) {
+      return next();
+    }
+
+    try {
+      const ext = path.extname(req.file.originalname).toLowerCase();
+      const fileBuffer = await fs.readFile(req.file.path);
+      const hexHeader = fileBuffer.slice(0, 4).toString('hex');
+
+      // For WebP, check for both RIFF header and WEBP signature
+      if (ext === '.webp') {
+        const webpSignature = fileBuffer.slice(0, 12).toString('hex');
+        if (!webpSignature.startsWith('52494646') || !webpSignature.includes('57454250')) {
+          // Clean up invalid file
+          await fs.unlink(req.file.path);
+          return res.status(400).json({ error: "Invalid WebP file" });
+        }
+      } else {
+        const allowedHeaders = allowedMagicNumbers[ext] || [];
+        if (!allowedHeaders.some(header => hexHeader.startsWith(header))) {
+          // Clean up invalid file
+          await fs.unlink(req.file.path);
+          return res.status(400).json({ error: "File type does not match content" });
+        }
+      }
+
+      next();
+    } catch (error) {
+      console.error("File validation error:", error);
+      res.status(500).json({ error: "Failed to validate file" });
+    }
+  };
+
+  // File upload route with rate limiting and magic number validation
+  app.post("/api/upload", requireAdmin, uploadLimiter, upload.single('file'), validateFileMagic, async (req: any, res) => {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
     }

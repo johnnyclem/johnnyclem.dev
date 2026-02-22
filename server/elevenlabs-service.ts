@@ -1,5 +1,8 @@
-export const ELEVENLABS_VOICE_ID = "pOes13QoIdjnVT9dRau9";
 export const ELEVENLABS_API_URL = "https://api.elevenlabs.io/v1";
+
+// Voice ID should be set via environment variable
+// Default provided for backwards compatibility, but should be overridden
+export const ELEVENLABS_VOICE_ID = process.env.ELEVENLABS_VOICE_ID || "pOes13QoIdjnVT9dRau9";
 
 interface ElevenLabsOptions {
   voiceId?: string;

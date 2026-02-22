@@ -7,6 +7,41 @@ import { setupVite, serveStatic, log } from "./vite";
 import { seedDatabase } from "./seed";
 import { pool } from "./db";
 
+// Graceful shutdown handling
+let server: any = null;
+
+async function gracefulShutdown(signal: string) {
+  log(`Received ${signal}. Shutting down gracefully...`);
+
+  // Close the HTTP server
+  if (server) {
+    server.close(async () => {
+      log("HTTP server closed");
+
+      // Close the database pool
+      try {
+        await pool.end();
+        log("Database pool closed");
+      } catch (err) {
+        console.error("Error closing database pool:", err);
+      }
+
+      process.exit(0);
+    });
+
+    // Force close after 10 seconds
+    setTimeout(() => {
+      console.error("Forcing shutdown after timeout");
+      process.exit(1);
+    }, 10000);
+  } else {
+    process.exit(0);
+  }
+}
+
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+
 const app = express();
 
 // Trust proxy - required for Replit deployments with custom domains
@@ -76,27 +111,39 @@ app.use((req, res, next) => {
   // Validate required environment variables
   if (!process.env.ADMIN_PASSWORD) {
     console.error("\n❌ ERROR: ADMIN_PASSWORD environment variable is required but not set.");
-    console.error("Please set ADMIN_PASSWORD in your Replit Secrets to secure the admin panel.");
+    console.error("Please set ADMIN_PASSWORD in your environment to secure the admin panel.");
     console.error("Example: ADMIN_PASSWORD=your-secure-password-here\n");
     process.exit(1);
   }
 
-  await seedDatabase();
-  const server = await registerRoutes(app);
+  if (!process.env.SESSION_SECRET) {
+    console.error("\n❌ ERROR: SESSION_SECRET environment variable is required but not set.");
+    console.error("Please set SESSION_SECRET in your environment with a strong random value.");
+    console.error("Generate one with: openssl rand -base64 32\n");
+    process.exit(1);
+  }
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  await seedDatabase();
+  const httpServer = await registerRoutes(app);
+
+  app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
-    res.status(status).json({ message });
-    throw err;
+    // Log full error details server-side for debugging
+    console.error(`[Error] ${req.method} ${req.path}:`, err);
+
+    // Send generic error message to client (don't leak internal details)
+    res.status(status).json({
+      message: process.env.NODE_ENV === "production" ? "Internal Server Error" : message,
+    });
   });
 
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
   if (app.get("env") === "development") {
-    await setupVite(app, server);
+    await setupVite(app, httpServer);
   } else {
     serveStatic(app);
   }
@@ -106,6 +153,7 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || '5000', 10);
+  server = httpServer; // Store reference for graceful shutdown
   server.listen({
     port,
     host: "0.0.0.0",
