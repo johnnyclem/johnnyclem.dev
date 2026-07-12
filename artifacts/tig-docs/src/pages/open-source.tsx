@@ -8,29 +8,97 @@ interface Project {
   language: string;
   languageColor: string;
   url: string;
+  stars: number;
+  forks: number;
 }
 
 const projects: Project[] = [
   {
-    name: "smallchat",
-    description: "A minimal, lightweight chat interface. Simple by design.",
+    name: "JCAppleScript",
+    description:
+      "Simple library for using Objective-C variables inside bundled AppleScript / OSAScript.",
     language: "Swift",
     languageColor: "#F05138",
+    url: "https://github.com/johnnyclem/JCAppleScript",
+    stars: 27,
+    forks: 4,
+  },
+  {
+    name: "JSON-TableView-in-Swift",
+    description:
+      "Demo project for learnSwift.io — JSON-driven UITableView patterns in Swift.",
+    language: "Swift",
+    languageColor: "#F05138",
+    url: "https://github.com/johnnyclem/JSON-TableView-in-Swift",
+    stars: 12,
+    forks: 3,
+  },
+  {
+    name: "xcsift-mcp",
+    description:
+      "MCP server for xcsift — token-efficient Xcode build output for coding agents.",
+    language: "Python",
+    languageColor: "#3572A5",
+    url: "https://github.com/johnnyclem/xcsift-mcp",
+    stars: 8,
+    forks: 1,
+  },
+  {
+    name: "smallchat",
+    description: "Object-oriented inference — a minimal, lightweight chat interface.",
+    language: "TypeScript",
+    languageColor: "#3178C6",
     url: "https://github.com/johnnyclem/smallchat",
+    stars: 5,
+    forks: 1,
   },
   {
     name: "AgentVault",
     description: "Secure credential management for AI agents and automated workflows.",
-    language: "Python",
-    languageColor: "#3572A5",
+    language: "TypeScript",
+    languageColor: "#3178C6",
     url: "https://github.com/johnnyclem/AgentVault",
+    stars: 5,
+    forks: 1,
   },
   {
-    name: "JCAppleScript",
-    description: "A collection of AppleScript utilities for macOS automation and productivity.",
-    language: "AppleScript",
-    languageColor: "#101F1F",
-    url: "https://github.com/johnnyclem/JCAppleScript",
+    name: "hypervault",
+    description:
+      "Personal flight deck for AI artifacts — permanent links and agent-friendly storage.",
+    language: "TypeScript",
+    languageColor: "#3178C6",
+    url: "https://github.com/johnnyclem/hypervault",
+    stars: 0,
+    forks: 0,
+  },
+  {
+    name: "concussion-protocol",
+    description:
+      "A discipline for agents: touch the real world before asserting things about it.",
+    language: "TypeScript",
+    languageColor: "#3178C6",
+    url: "https://github.com/johnnyclem/concussion-protocol",
+    stars: 0,
+    forks: 0,
+  },
+  {
+    name: "stenographer",
+    description:
+      "MCP court reporter with GraphRAG — queryable conversation index for AI agents.",
+    language: "TypeScript",
+    languageColor: "#3178C6",
+    url: "https://github.com/johnnyclem/stenographer",
+    stars: 0,
+    forks: 0,
+  },
+  {
+    name: "short-hand",
+    description: "Language middleware for stenographer and smallchat.",
+    language: "TypeScript",
+    languageColor: "#3178C6",
+    url: "https://github.com/johnnyclem/short-hand",
+    stars: 0,
+    forks: 0,
   },
 ];
 
@@ -91,9 +159,11 @@ export default function OpenSourcePage() {
                           </span>
                           <span className="flex items-center gap-1">
                             <Star className="w-3.5 h-3.5" />
+                            {project.stars}
                           </span>
                           <span className="flex items-center gap-1">
                             <GitFork className="w-3.5 h-3.5" />
+                            {project.forks}
                           </span>
                         </div>
                       </div>
