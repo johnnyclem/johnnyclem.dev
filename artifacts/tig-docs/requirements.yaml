@@ -1,0 +1,11 @@
+packages:
+  "lucide-react": "Standard icons for the UI"
+  "clsx": "Utility for constructing className strings conditionally"
+  "tailwind-merge": "Utility to merge tailwind classes"
+
+images: []
+
+notes:
+  - This is a static documentation site with no backend dependencies.
+  - The UI faithfully recreates Apple's developer documentation style.
+  - Custom terminal mockups are implemented using pre-formatted monospace blocks.

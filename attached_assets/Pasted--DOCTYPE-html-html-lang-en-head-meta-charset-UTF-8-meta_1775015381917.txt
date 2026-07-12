@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Language That Taught Me to Think</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@300;400;600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,300;1,9..144,500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06070a;
+  --surface: #0c0e14;
+  --surface-2: #12151e;
+  --text: #d8dce6;
+  --text-dim: #8891a4;
+  --accent: #e8943a;
+  --accent-dim: #a06420;
+  --accent-glow: rgba(232,148,58,0.08);
+  --blue: #5b8def;
+  --green: #4ade80;
+  --red: #f87171;
+  --border: #1a1e2e;
+  --code-bg: #0f1219;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Fraunces',Georgia,serif;
+  font-size:19px;
+  line-height:1.8;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* PROGRESS */
+#progress{
+position:fixed;top:0;left:0;height:2px;
+background:linear-gradient(90deg,var(–accent),var(–accent-dim));
+width:0%;z-index:999;transition:width 0.08s linear;
+}
+
+/* NAV BADGE */
+.nav-badge{
+position:fixed;top:24px;left:24px;z-index:1000;
+font-family:‘JetBrains Mono’,monospace;
+font-size:10px;letter-spacing:0.15em;
+color:var(–text-dim);text-transform:uppercase;
+opacity:0;transition:opacity 0.5s;
+}
+.nav-badge.visible{opacity:1;}
+.nav-badge span{color:var(–accent);}
+
+/* HERO */
+#hero{
+position:relative;
+min-height:100vh;min-height:100dvh;
+display:flex;flex-direction:column;
+justify-content:flex-end;
+padding:0 8vw 10vh;
+overflow:hidden;
+}
+#hero-canvas{
+position:absolute;inset:0;width:100%;height:100%;
+opacity:0.5;
+}
+.hero-eyebrow{
+position:relative;z-index:1;
+font-family:‘JetBrains Mono’,monospace;
+font-size:11px;letter-spacing:0.18em;
+color:var(–text-dim);text-transform:uppercase;
+margin-bottom:20px;
+animation:fadeUp 1s ease 0.2s both;
+}
+#hero h1{
+position:relative;z-index:1;
+font-family:‘DM Serif Display’,serif;
+font-size:clamp(2.8rem,7vw,5.5rem);
+font-weight:400;line-height:1.1;
+color:#fff;max-width:900px;
+animation:fadeUp 1s ease 0.4s both;
+}
+#hero h1 em{
+font-style:italic;
+color:var(–accent);
+}
+.hero-sub{
+position:relative;z-index:1;
+font-family:‘JetBrains Mono’,monospace;
+font-size:13px;color:var(–text-dim);
+margin-top:20px;max-width:600px;
+animation:fadeUp 1s ease 0.6s both;
+}
+.scroll-hint{
+position:absolute;bottom:30px;left:50%;
+transform:translateX(-50%);
+display:flex;flex-direction:column;align-items:center;gap:8px;
+font-family:‘JetBrains Mono’,monospace;
+font-size:10px;letter-spacing:0.2em;
+color:var(–text-dim);text-transform:uppercase;
+animation:fadeIn 1s ease 1.2s both;
+}
+.scroll-line{
+width:1px;height:40px;
+background:linear-gradient(to bottom,var(–accent),transparent);
+animation:scrollPulse 2s ease infinite;
+}
+
+/* SECTIONS */
+.section{
+max-width:720px;
+margin:0 auto;
+padding:100px 24px;
+opacity:0;
+transform:translateY(30px);
+transition:opacity 0.8s ease,transform 0.8s ease;
+}
+.section.visible{opacity:1;transform:translateY(0);}
+
+.section-num{
+font-family:‘JetBrains Mono’,monospace;
+font-size:11px;letter-spacing:0.2em;
+color:var(–accent-dim);text-transform:uppercase;
+margin-bottom:12px;
+display:flex;align-items:center;gap:12px;
+}
+.section-num::after{
+content:’’;flex:1;height:1px;
+background:var(–border);
+}
+
+.section h2{
+font-family:‘DM Serif Display’,serif;
+font-size:clamp(1.8rem,4vw,2.6rem);
+font-weight:400;line-height:1.2;
+color:#fff;margin-bottom:28px;
+}
+.section h2 em{color:var(–accent);font-style:italic;}
+
+.section p{
+margin-bottom:22px;
+color:var(–text);
+}
+.section p strong{color:#fff;font-weight:500;}
+.section p code{
+font-family:‘JetBrains Mono’,monospace;
+font-size:0.82em;
+color:var(–accent);
+background:var(–code-bg);
+padding:2px 7px;border-radius:3px;
+border:1px solid var(–border);
+}
+
+/* PULLQUOTE */
+.pullquote{
+position:relative;
+margin:48px 0;
+padding:32px 0 32px 28px;
+border-left:2px solid var(–accent);
+font-family:‘DM Serif Display’,serif;
+font-size:clamp(1.3rem,3vw,1.7rem);
+font-style:italic;
+line-height:1.5;
+color:#fff;
+}
+.pullquote::before{
+content:’’;position:absolute;
+left:-2px;top:0;width:2px;height:100%;
+background:linear-gradient(to bottom,var(–accent),transparent);
+}
+
+/* DISPATCH DIAGRAM */
+.dispatch-viz{
+background:var(–surface);
+border:1px solid var(–border);
+border-radius:8px;
+padding:32px;
+margin:48px 0;
+font-family:‘JetBrains Mono’,monospace;
+font-size:13px;
+line-height:2;
+color:var(–text-dim);
+overflow-x:auto;
+}
+.dispatch-viz .step{
+display:flex;align-items:center;gap:12px;
+opacity:0;transform:translateX(-10px);
+transition:all 0.5s ease;
+}
+.dispatch-viz.visible .step{
+opacity:1;transform:translateX(0);
+}
+.dispatch-viz .step-num{
+width:24px;height:24px;
+border-radius:50%;
+border:1px solid var(–border);
+display:flex;align-items:center;justify-content:center;
+font-size:11px;color:var(–accent);
+flex-shrink:0;
+}
+.dispatch-viz .step-label{color:var(–text);}
+.dispatch-viz .step-desc{color:var(–text-dim);}
+.dispatch-viz .arrow{
+color:var(–accent-dim);
+padding-left:36px;
+font-size:11px;
+}
+
+/* CONCEPT MAP */
+.concept-map{
+display:grid;
+grid-template-columns:1fr auto 1fr;
+gap:2px 0;
+margin:48px 0;
+font-family:‘JetBrains Mono’,monospace;
+font-size:12px;
+}
+.concept-map .col-header{
+padding:10px 16px;
+font-size:11px;
+letter-spacing:0.15em;
+text-transform:uppercase;
+color:var(–accent);
+border-bottom:1px solid var(–border);
+}
+.concept-map .map-arrow{
+padding:10px 12px;
+color:var(–accent-dim);
+display:flex;align-items:center;justify-content:center;
+border-bottom:1px solid var(–border);
+}
+.concept-map .map-cell{
+padding:10px 16px;
+color:var(–text-dim);
+border-bottom:1px solid var(–border);
+background:var(–surface);
+}
+.concept-map .map-cell:nth-child(3n+1){
+border-radius:4px 0 0 4px;
+}
+.concept-map .map-cell:nth-child(3n){
+border-radius:0 4px 4px 0;
+color:var(–text);
+}
+
+/* CODE BLOCK */
+.code-block{
+background:var(–code-bg);
+border:1px solid var(–border);
+border-radius:8px;
+padding:24px 28px;
+margin:32px 0;
+font-family:‘JetBrains Mono’,monospace;
+font-size:13px;
+line-height:1.7;
+overflow-x:auto;
+position:relative;
+}
+.code-block .lang-tag{
+position:absolute;top:10px;right:14px;
+font-size:10px;letter-spacing:0.1em;
+color:var(–text-dim);text-transform:uppercase;
+}
+.code-block .kw{color:var(–blue);}
+.code-block .fn{color:var(–accent);}
+.code-block .str{color:var(–green);}
+.code-block .cmt{color:var(–text-dim);font-style:italic;}
+.code-block .type{color:#c084fc;}
+.code-block .num{color:var(–accent);}
+.code-block .sel{color:var(–red);}
+
+/* CANVAS SECTION */
+.canvas-section{
+position:relative;
+height:300px;
+margin:20px 0;
+overflow:hidden;
+}
+.canvas-section canvas{
+width:100%;height:100%;
+display:block;
+}
+.canvas-label{
+position:absolute;bottom:12px;right:20px;
+font-family:‘JetBrains Mono’,monospace;
+font-size:10px;letter-spacing:0.1em;
+color:var(–text-dim);
+opacity:0.5;
+}
+
+/* DIVIDER */
+.divider{
+text-align:center;
+padding:40px 0;
+color:var(–accent-dim);
+font-family:‘JetBrains Mono’,monospace;
+font-size:14px;letter-spacing:0.4em;
+}
+
+/* FOOTER */
+footer{
+max-width:720px;margin:0 auto;
+border-top:1px solid var(–border);
+padding:40px 24px;
+display:flex;justify-content:space-between;align-items:center;
+font-family:‘JetBrains Mono’,monospace;
+font-size:11px;color:var(–text-dim);
+letter-spacing:0.08em;
+}
+footer a{color:var(–accent-dim);text-decoration:none;}
+footer a:hover{color:var(–accent);}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes scrollPulse{0%,100%{opacity:0.3;}50%{opacity:1;}}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+#hero{padding:0 6vw 8vh;}
+.section{padding:60px 20px;}
+.concept-map{font-size:10px;}
+.concept-map .map-cell,.concept-map .col-header{padding:8px 10px;}
+footer{flex-direction:column;gap:12px;text-align:center;}
+}
+</style>
+
+</head>
+<body>
+
+<div id="progress"></div>
+<div class="nav-badge" id="nav-badge">smallchat <span>///</span> swift</div>
+
+<!-- HERO -->
+
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-eyebrow">torad.ai / essay / 2026</div>
+  <h1>The Language That<br>Taught Me <em>to Think</em></h1>
+  <div class="hero-sub">// on Smalltalk, objc_msgSend, and why tool dispatch was always message passing</div>
+  <div class="scroll-hint">
+    <span>scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- S1 -->
+
+<section class="section" id="s1">
+  <div class="section-num">01 — the failures</div>
+  <h2>I tried to learn to code <em>for years</em></h2>
+  <p>Plural. I bounced off Ruby. I bounced off JavaScript. I bought books, did tutorials, stared at syntax that might as well have been cuneiform. Every language I tried felt like memorizing someone else's notation system for a thought process I couldn't quite see.</p>
+  <p>Then I opened Xcode, looked at Objective-C, and something clicked.</p>
+  <p>Not immediately. Not all at once. But the first time I wrote <code>[tableView reloadData]</code> and understood — not just syntactically but <em>conceptually</em> — what was happening, something shifted. I wasn't calling a function. I was <strong>sending a message</strong>. I was telling this object what I wanted, and it was deciding how to do it.</p>
+</section>
+
+<div class="divider">///</div>
+
+<!-- S2 -->
+
+<section class="section" id="s2">
+  <div class="section-num">02 — the click</div>
+  <h2>Brackets as <em>punctuation</em></h2>
+  <p>That distinction sounds academic until it isn't. For whatever reason, my brain couldn't parse <code>reloadData(tableView)</code> as anything other than arbitrary notation. But <code>[tableView reloadData]</code> — subject, verb — that was a sentence. That was communication.</p>
+  <p>The brackets weren't syntax to me. They were punctuation.</p>
+  <div class="pullquote">
+    Objective-C was my first programming language. Not my first <em>attempt</em> at a programming language — my first success.
+  </div>
+  <p>UIKit and message passing were where programming stopped being a thing I was trying to learn and started being a thing I could <strong>think in</strong>.</p>
+  <p>I went on to spend seven years as CTO of Filmic Pro, building one of the most complex camera apps ever shipped on iOS, living deep inside AVFoundation and the Obj-C runtime. But the seed of all of it was that moment: the realization that computation could be modeled as objects talking to each other.</p>
+  <p>I have Alan Kay to thank for that.</p>
+</section>
+
+<!-- CANVAS: message passing visualization -->
+
+<div class="canvas-section">
+  <canvas id="msg-canvas"></canvas>
+  <div class="canvas-label">// sim: objc_msgSend — selector resolution</div>
+</div>
+
+<!-- S3 -->
+
+<section class="section" id="s3">
+  <div class="section-num">03 — 1972</div>
+  <h2>The big idea is <em>messaging</em></h2>
+  <p>In 1972, Alan Kay designed Smalltalk at Xerox PARC. The core insight was radical and simple: everything is an object, and objects communicate by sending messages. There are no function calls. There is no <code>goto</code>. There is just: you send a message to an object, and the object decides what to do with it.</p>
+  <p>This sounds like computer science trivia until you realize it's the most consequential design decision in the history of programming languages. Kay himself said it plainly:</p>
+  <div class="pullquote">"The big idea is messaging."<br><span style="font-size:0.6em;color:var(--text-dim);font-style:normal;font-family:'JetBrains Mono',monospace;letter-spacing:0.1em;">— ALAN KAY</span></div>
+  <p>Not objects. Not classes. Not inheritance. <strong>Messaging.</strong></p>
+  <p>The receiver decides. That's the whole thing.</p>
+</section>
+
+<div class="divider">///</div>
+
+<!-- S4 -->
+
+<section class="section" id="s4">
+  <div class="section-num">04 — 1984</div>
+  <h2>C with <em>Smalltalk's soul</em></h2>
+  <p>In 1984, Brad Cox created Objective-C by grafting Smalltalk's message-passing onto C. The result was weird and beautiful — a language where you could drop into raw pointer arithmetic on one line and send a polymorphic message to a dynamically-resolved receiver on the next.</p>
+  <p>At the heart of it was <code>objc_msgSend</code>, a single C function that every Objective-C method call compiled down to:</p>
+  <div class="code-block">
+    <div class="lang-tag">obj-c</div>
+    <span class="cmt">// every [object doSomething] becomes:</span><br>
+    <span class="fn">objc_msgSend</span>(object, <span class="sel">@selector</span>(<span class="fn">doSomething</span>))
+  </div>
+  <p><code>objc_msgSend</code> is arguably the most important function in the history of consumer software. Every tap on every iPhone, every frame of every animation, every gesture and scroll and notification — all of it flows through that one function. It's the heartbeat of the runtime.</p>
+</section>
+
+<!-- DISPATCH DIAGRAM -->
+
+<section class="section" id="s5">
+  <div class="section-num">05 — the resolution chain</div>
+  <h2>How <em>objc_msgSend</em> thinks</h2>
+  <p>And it's fast. Absurdly fast. Because the runtime caches method resolutions. The first time you send <code>reloadData</code> to a table view, the runtime walks the class hierarchy, finds the implementation, and caches the mapping. The second time? Direct lookup. Sub-nanosecond.</p>
+  <p>The runtime <em>learns</em> your program's patterns as it runs.</p>
+
+  <div class="dispatch-viz" id="dispatch-viz">
+    <div class="step" style="transition-delay:0.1s"><div class="step-num">1</div><span class="step-label">Cache hit</span><span class="step-desc">&nbsp;→ done. Sub-nanosecond.</span></div>
+    <div class="arrow" style="transition-delay:0.2s">↓ miss</div>
+    <div class="step" style="transition-delay:0.3s"><div class="step-num">2</div><span class="step-label">Dispatch table</span><span class="step-desc">&nbsp;→ selector lookup in class</span></div>
+    <div class="arrow" style="transition-delay:0.4s">↓ miss</div>
+    <div class="step" style="transition-delay:0.5s"><div class="step-num">3</div><span class="step-label">Superclass chain</span><span class="step-desc">&nbsp;→ walk the isa hierarchy</span></div>
+    <div class="arrow" style="transition-delay:0.6s">↓ miss</div>
+    <div class="step" style="transition-delay:0.7s"><div class="step-num">4</div><span class="step-label">forwardInvocation:</span><span class="step-desc">&nbsp;→ last chance to handle</span></div>
+    <div class="arrow" style="transition-delay:0.8s">↓ miss</div>
+    <div class="step" style="transition-delay:0.9s"><div class="step-num">✕</div><span class="step-label" style="color:var(--red)">doesNotRecognizeSelector:</span></div>
+  </div>
+
+  <p>That resolution order hasn't fundamentally changed in <strong>40 years</strong>, because it didn't need to.</p>
+</section>
+
+<div class="divider">///</div>
+
+<!-- S6 -->
+
+<section class="section" id="s6">
+  <div class="section-num">06 — the connection</div>
+  <h2>Tool use <em>is</em> message dispatch</h2>
+  <p>I've been building AI agent tooling for the past year. MCP servers, tool orchestration, the whole stack. And I kept running into the same problem everyone runs into: tool selection doesn't scale.</p>
+  <p>You've got 50 tools. The LLM sees all 50 schemas in its context window on every turn. Thousands of tokens. The model is doing triage in the prompt instead of reasoning about the user's question.</p>
+  <p>And I kept thinking: <strong>I've seen this solved before.</strong></p>
+  <p><code>objc_msgSend</code> solved it in 1984. The runtime doesn't evaluate every method on every class every time you send a message. It caches. It interns selectors. It walks a hierarchy only when it has to.</p>
+
+  <div class="pullquote">
+    The LLM sends a message — "search for code" — and something needs to resolve that to a concrete tool. Right now, the LLM does that resolution itself by staring at 50 tool descriptions. That's like skipping the method cache and re-walking the entire class hierarchy on every single call.
+  </div>
+
+  <p>Once I saw it, I couldn't unsee it.</p>
+</section>
+
+<!-- CONCEPT MAP -->
+
+<section class="section" id="s7">
+  <div class="section-num">07 — the mapping</div>
+  <h2>Smalltalk → <em>smallchat</em></h2>
+
+  <div class="concept-map">
+    <div class="col-header">Obj-C Runtime</div>
+    <div class="col-header" style="text-align:center;"></div>
+    <div class="col-header">smallchat</div>
+
+```
+<div class="map-cell">@selector(name)</div><div class="map-arrow">→</div><div class="map-cell">ToolSelector</div>
+<div class="map-cell">IMP</div><div class="map-arrow">→</div><div class="map-cell">ToolIMP</div>
+<div class="map-cell">objc_msgSend</div><div class="map-arrow">→</div><div class="map-cell">toolkit_dispatch()</div>
+<div class="map-cell">Method cache</div><div class="map-arrow">→</div><div class="map-cell">ResolutionCache</div>
+<div class="map-cell">isa chain</div><div class="map-arrow">→</div><div class="map-cell">Superclass traversal</div>
+<div class="map-cell">forwardInvocation:</div><div class="map-arrow">→</div><div class="map-cell">Forwarding chain</div>
+<div class="map-cell">Method swizzling</div><div class="map-arrow">→</div><div class="map-cell">runtime.swizzle()</div>
+<div class="map-cell">NSProxy</div><div class="map-arrow">→</div><div class="map-cell">ToolProxy</div>
+<div class="map-cell">Protocol</div><div class="map-arrow">→</div><div class="map-cell">ToolProtocol</div>
+<div class="map-cell">Category</div><div class="map-arrow">→</div><div class="map-cell">ToolCategory</div>
+```
+
+  </div>
+
+  <p>I built <a href="https://github.com/johnnyclem/smallchat" style="color:var(--accent);">smallchat</a> — first in TypeScript, because that's where the MCP ecosystem lives. Selector interning. Resolution caching. Superclass chains. Forwarding. Swizzling. The whole Obj-C runtime vocabulary, applied to tool orchestration.</p>
+  <p>It works. It's on npm. People are using it.</p>
+  <p>But it's not <em>home</em> yet.</p>
+</section>
+
+<div class="divider">///</div>
+
+<!-- S8 -->
+
+<section class="section" id="s8">
+  <div class="section-num">08 — homecoming</div>
+  <h2>smallchat-<em>swift</em></h2>
+  <p>smallchat-swift is the native port. Swift 6, strict concurrency, Accelerate framework for vector math, the full deal.</p>
+  <p>And here's the thing about writing this in Swift instead of TypeScript: <strong>the metaphors stop being metaphors.</strong></p>
+  <p>In the TypeScript version, when I call something a "selector" or an "IMP," I'm borrowing vocabulary from a runtime that exists in a different language on a different platform. In Swift, those concepts are <em>native</em>. The Objective-C runtime that inspired the architecture is literally available as an import.</p>
+
+  <div class="code-block">
+    <div class="lang-tag">swift</div>
+    <span class="cmt">// TypeScript: hand-rolled cosine similarity</span><br>
+    <span class="kw">function</span> <span class="fn">cosineSim</span>(a, b) { <span class="cmt">/* 8 lines of math */</span> }<br>
+    <br>
+    <span class="cmt">// Swift: Accelerate does the work</span><br>
+    <span class="kw">import</span> <span class="type">Accelerate</span><br>
+    <span class="kw">let</span> similarity = <span class="fn">vDSP.cosineSimilarity</span>(a, b)
+  </div>
+
+  <p><code>ToolSelector</code> in TypeScript is a struct with a <code>vector</code> field and a <code>canonical</code> string. <code>ToolSelector</code> in Swift is a <code>Sendable</code> value type with Accelerate-backed vector operations and compile-time concurrency safety. The resolution cache uses Swift's actor model instead of manually synchronized Maps.</p>
+
+  <div class="pullquote">
+    The tool dispatch model I built <em>came from</em> this platform's DNA. Bringing it back is like a cover version of a song played by the original artist. The phrasing is just different when you're the one who wrote it.
+  </div>
+</section>
+
+<!-- S9 -->
+
+<section class="section" id="s9">
+  <div class="section-num">09 — on-device</div>
+  <h2>Where <em>objc_msgSend</em> lives</h2>
+  <p>The on-device story is what makes the Swift version essential. TypeScript smallchat runs on servers, in Node, in the cloud. Swift smallchat runs on the device — in an iOS app, in a macOS agent, on the same hardware where <code>objc_msgSend</code> has been running for seventeen years.</p>
+  <p>When your on-device LLM needs to dispatch a tool call, the resolution happens in the same process, on the same chip, with the same Accelerate framework that powers Core ML. No network round-trip. No server. Single-digit millisecond dispatch with a memory footprint measured in kilobytes.</p>
+  <p>That's "feels like <code>objc_msgSend</code>" territory.</p>
+  <p>Which is the whole point.</p>
+</section>
+
+<div class="divider">///</div>
+
+<!-- S10 -->
+
+<section class="section" id="s10">
+  <div class="section-num">10 — full circle</div>
+  <h2>What Alan Kay <em>got right</em></h2>
+  <p>The big idea really is messaging. Not because messages are technically superior to function calls — at the metal, they compile to the same thing. But because messaging as a <em>mental model</em> changes how you think about systems.</p>
+  <p>When I was failing to learn Ruby, nobody told me to think about objects as actors that communicate. They told me to think about classes, inheritance, data structures, algorithms. Important things. True things. But not the thing that made it click.</p>
+  <p>Objective-C taught me that a program is a society of objects sending messages to each other, and each object gets to decide what a message means. That model is flexible enough to build a camera app that pushes AVFoundation to its limits, and it's flexible enough to build a tool dispatch runtime for AI agents.</p>
+
+  <div class="pullquote">
+    The pattern hasn't changed. The messages just got smarter.
+  </div>
+
+  <p>smallchat is my attempt to take the insight that made me a programmer and apply it to the problem I'm spending my career on now. The TypeScript version proves the concept. The Swift version brings it home.</p>
+</section>
+
+<!-- FOOTER -->
+
+<footer>
+  <div>
+    <a href="https://github.com/johnnyclem/smallchat">GitHub</a> ·
+    <a href="https://smallchat.dev">smallchat.dev</a> ·
+    <a href="https://twitter.com/johnnyclem">@johnnyclem</a>
+  </div>
+  <div>torad.ai / 2026</div>
+</footer>
+
+<script>
+// =============================================
+// HERO CANVAS — floating message particles
+// =============================================
+(function(){
+  const canvas = document.getElementById('hero-canvas');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  let W, H;
+  const particles = [];
+  const connections = [];
+
+  class Particle {
+    constructor(){
+      this.reset();
+      this.y = Math.random() * (H || 800);
+    }
+    reset(){
+      this.x = Math.random() * (W || 1200);
+      this.y = -10;
+      this.vx = (Math.random() - 0.5) * 0.3;
+      this.vy = 0.2 + Math.random() * 0.5;
+      this.r = 1.5 + Math.random() * 2;
+      this.alpha = 0.2 + Math.random() * 0.4;
+      this.hue = Math.random() > 0.7 ? 30 : 210; // amber or blue
+    }
+    update(){
+      this.x += this.vx;
+      this.y += this.vy;
+      if(this.y > (H || 800) + 10) this.reset();
+    }
+    draw(){
+      const color = this.hue === 30
+        ? `rgba(232,148,58,${this.alpha})`
+        : `rgba(91,141,239,${this.alpha * 0.6})`;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+  }
+
+  function resize(){
+    W = canvas.parentElement.offsetWidth;
+    H = canvas.parentElement.offsetHeight;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    ctx.scale(dpr, dpr);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+  }
+
+  function init(){
+    resize();
+    const count = Math.min(80, Math.floor(W * H / 8000));
+    for(let i = 0; i < count; i++) particles.push(new Particle());
+  }
+
+  function draw(){
+    ctx.clearRect(0, 0, W, H);
+
+    // Draw connections between nearby particles
+    for(let i = 0; i < particles.length; i++){
+      for(let j = i+1; j < particles.length; j++){
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if(dist < 120){
+          const alpha = (1 - dist/120) * 0.12;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(232,148,58,${alpha})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(draw);
+  }
+
+  init();
+  draw();
+  window.addEventListener('resize', () => { resize(); });
+})();
+
+// =============================================
+// MESSAGE PASSING CANVAS — selector dispatch
+// =============================================
+(function(){
+  const canvas = document.getElementById('msg-canvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  let W, H;
+
+  // Nodes represent objects, pulses represent messages
+  const nodes = [];
+  const pulses = [];
+
+  class Node {
+    constructor(x, y, label){
+      this.x = x; this.y = y; this.label = label;
+      this.r = 4; this.alpha = 0.6;
+    }
+    draw(){
+      ctx.beginPath();
+      ctx.arc(this.x * W, this.y * H, this.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(232,148,58,${this.alpha})`;
+      ctx.fill();
+      ctx.fillStyle = `rgba(136,145,164,0.5)`;
+      ctx.font = '10px JetBrains Mono, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(this.label, this.x * W, this.y * H + 18);
+    }
+  }
+
+  class Pulse {
+    constructor(from, to){
+      this.from = from; this.to = to;
+      this.t = 0; this.speed = 0.008 + Math.random() * 0.008;
+      this.alive = true;
+    }
+    update(){
+      this.t += this.speed;
+      if(this.t >= 1){ this.alive = false; this.to.alpha = 1; setTimeout(()=>this.to.alpha=0.6, 300); }
+    }
+    draw(){
+      const x = (this.from.x + (this.to.x - this.from.x) * this.t) * W;
+      const y = (this.from.y + (this.to.y - this.from.y) * this.t) * H;
+      ctx.beginPath();
+      ctx.arc(x, y, 3, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(232,148,58,${0.9 - this.t * 0.5})`;
+      ctx.fill();
+      // Trail
+      const tx = (this.from.x + (this.to.x - this.from.x) * Math.max(0,this.t-0.1)) * W;
+      const ty = (this.from.y + (this.to.y - this.from.y) * Math.max(0,this.t-0.1)) * H;
+      ctx.beginPath();
+      ctx.moveTo(tx, ty); ctx.lineTo(x, y);
+      ctx.strokeStyle = `rgba(232,148,58,0.3)`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+  }
+
+  function resize(){
+    W = canvas.parentElement.offsetWidth;
+    H = canvas.parentElement.offsetHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.scale(dpr, dpr);
+    canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  }
+
+  function init(){
+    resize();
+    // Create a constellation of "objects"
+    const labels = ['sender','cache','dispatch','isa','IMP','proxy','protocol','forward'];
+    for(let i = 0; i < labels.length; i++){
+      const angle = (i / labels.length) * Math.PI * 2 - Math.PI/2;
+      const rx = 0.3 + Math.random() * 0.05;
+      const ry = 0.35 + Math.random() * 0.05;
+      nodes.push(new Node(
+        0.5 + Math.cos(angle) * rx,
+        0.5 + Math.sin(angle) * ry,
+        labels[i]
+      ));
+    }
+  }
+
+  function spawnPulse(){
+    if(nodes.length < 2) return;
+    const from = nodes[Math.floor(Math.random() * nodes.length)];
+    let to;
+    do { to = nodes[Math.floor(Math.random() * nodes.length)]; } while(to === from);
+    pulses.push(new Pulse(from, to));
+  }
+
+  let frame = 0;
+  function draw(){
+    ctx.clearRect(0, 0, W, H);
+
+    // Draw faint connections
+    for(let i = 0; i < nodes.length; i++){
+      for(let j = i+1; j < nodes.length; j++){
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x*W, nodes[i].y*H);
+        ctx.lineTo(nodes[j].x*W, nodes[j].y*H);
+        ctx.strokeStyle = 'rgba(26,30,46,0.8)';
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+
+    nodes.forEach(n => n.draw());
+    pulses.forEach(p => { p.update(); if(p.alive) p.draw(); });
+    // Remove dead pulses
+    for(let i = pulses.length-1; i >= 0; i--){ if(!pulses[i].alive) pulses.splice(i,1); }
+
+    frame++;
+    if(frame % 40 === 0) spawnPulse();
+
+    requestAnimationFrame(draw);
+  }
+
+  init(); draw();
+  window.addEventListener('resize', resize);
+})();
+
+// =============================================
+// SCROLL OBSERVER
+// =============================================
+const sections = document.querySelectorAll('.section');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting) entry.target.classList.add('visible');
+  });
+}, { threshold: 0.12 });
+sections.forEach(s => observer.observe(s));
+
+// Dispatch viz special observer
+const dispatchViz = document.getElementById('dispatch-viz');
+if(dispatchViz){
+  const vizObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.3 });
+  vizObs.observe(dispatchViz);
+}
+
+// Progress bar
+window.addEventListener('scroll', () => {
+  const p = document.body.scrollHeight - window.innerHeight;
+  document.getElementById('progress').style.width = (p > 0 ? (window.scrollY/p)*100 : 0) + '%';
+
+  // Nav badge
+  const badge = document.getElementById('nav-badge');
+  if(window.scrollY > 300) badge.classList.add('visible');
+  else badge.classList.remove('visible');
+});
+</script>
+
+</body>
+</html>

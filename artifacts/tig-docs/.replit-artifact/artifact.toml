@@ -1,0 +1,26 @@
+kind = "web"
+previewPath = "/"
+title = "Terminal Interface Guidelines"
+version = "1.0.0"
+id = "artifacts/tig-docs"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22180
+
+[services.development]
+run = "pnpm --filter @workspace/tig-docs run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/tig-docs", "run", "build" ]
+run = [ "node", "artifacts/tig-docs/server.mjs" ]
+
+[services.env]
+PORT = "22180"
+BASE_PATH = "/"

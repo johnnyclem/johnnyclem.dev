@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VibeScriptJS — Documentation</title>
+<meta name="description" content="You built something this polished to make fun of pipe characters.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sidebar-bg: #0a0a0f;
+    --sidebar-text: #a0a0b8;
+    --sidebar-active: #ffffff;
+    --sidebar-hover: #1a1a2e;
+    --sidebar-accent: #7c5cfc;
+    --sidebar-width: 280px;
+
+    --body-bg: #ffffff;
+    --text-primary: #0f0f14;
+    --text-secondary: #52525b;
+    --text-tertiary: #a1a1aa;
+    --text-link: #7c5cfc;
+
+    --border: #e4e4e7;
+    --border-light: #f0f0f3;
+    --code-bg: #fafafa;
+    --code-border: #ebebef;
+    --code-text: #0f0f14;
+    --inline-code-bg: #f3f0ff;
+    --inline-code-text: #5b21b6;
+
+    --accent: #7c5cfc;
+    --accent-soft: #f3f0ff;
+    --accent-border: #ddd6fe;
+
+    --warning-bg: #fffbeb;
+    --warning-border: #f59e0b;
+    --warning-text: #92400e;
+
+    --tip-bg: #f0fdf4;
+    --tip-border: #22c55e;
+    --tip-text: #166534;
+
+    --topbar-height: 56px;
+
+    /* syntax */
+    --syn-keyword: #8b5cf6;
+    --syn-string: #059669;
+    --syn-comment: #a1a1aa;
+    --syn-function: #2563eb;
+    --syn-type: #c026d3;
+    --syn-number: #ea580c;
+    --syn-property: #0891b2;
+    --syn-operator: #64748b;
+    --syn-param: #0f0f14;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text-primary);
+    background: var(--body-bg);
+    line-height: 1.6;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Top Bar ── */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: var(--topbar-height);
+    background: var(--sidebar-bg);
+    display: flex; align-items: center;
+    padding: 0 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .topbar-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 700; font-size: 16px; color: #fff;
+    text-decoration: none;
+    letter-spacing: -0.3px;
+  }
+  .topbar-logo .logo-mark {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, #7c5cfc, #c084fc);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .topbar-badge {
+    font-size: 10px;
+    font-weight: 600;
+    background: rgba(124,92,252,0.15);
+    color: var(--sidebar-accent);
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-left: 8px;
+  }
+  .topbar-nav {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 24px;
+  }
+  .topbar-nav a {
+    color: var(--sidebar-text);
+    text-decoration: none;
+    font-size: 13px; font-weight: 500;
+    transition: color 0.15s;
+  }
+  .topbar-nav a:hover { color: #fff; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    position: fixed; top: var(--topbar-height); left: 0; bottom: 0;
+    width: var(--sidebar-width);
+    background: var(--sidebar-bg);
+    overflow-y: auto;
+    padding: 20px 0;
+    border-right: 1px solid rgba(255,255,255,0.06);
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+  .sidebar-section {
+    padding: 0 16px;
+    margin-bottom: 24px;
+  }
+  .sidebar-section-title {
+    font-size: 11px; font-weight: 600;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0 12px;
+    margin-bottom: 6px;
+  }
+  .sidebar a {
+    display: block;
+    padding: 6px 12px;
+    font-size: 13px;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.15s;
+  }
+  .sidebar a:hover {
+    background: var(--sidebar-hover);
+    color: #ddd;
+  }
+  .sidebar a.active {
+    background: rgba(124,92,252,0.1);
+    color: var(--sidebar-active);
+    font-weight: 500;
+  }
+  .sidebar .version-badge {
+    display: inline-block;
+    font-size: 10px; font-weight: 600;
+    background: rgba(124,92,252,0.15);
+    color: var(--sidebar-accent);
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: 1px;
+  }
+
+  /* ── Main Content ── */
+  .main {
+    margin-left: var(--sidebar-width);
+    margin-top: var(--topbar-height);
+    max-width: 780px;
+    padding: 52px 56px 140px;
+  }
+
+  /* ── Typography ── */
+  .eyebrow {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-size: 36px; font-weight: 800;
+    letter-spacing: -0.8px;
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+  .subtitle {
+    font-size: 18px;
+    color: var(--text-secondary);
+    font-weight: 400;
+    line-height: 1.6;
+    margin-bottom: 40px;
+    max-width: 560px;
+  }
+  h2 {
+    font-size: 24px; font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-top: 64px; margin-bottom: 16px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+  h2:first-of-type { margin-top: 0; padding-top: 0; border-top: none; }
+  h3 {
+    font-size: 18px; font-weight: 600;
+    margin-top: 40px; margin-bottom: 12px;
+  }
+  p { margin-bottom: 16px; color: var(--text-secondary); }
+  p strong { color: var(--text-primary); }
+  em { color: var(--text-secondary); }
+
+  /* ── Inline code ── */
+  code {
+    font-family: 'JetBrains Mono', 'SF Mono', monospace;
+    font-size: 13px;
+    background: var(--inline-code-bg);
+    color: var(--inline-code-text);
+    padding: 2px 7px;
+    border-radius: 5px;
+  }
+
+  /* ── Code blocks ── */
+  .code-block-wrapper {
+    margin: 20px 0 28px;
+    border-radius: 10px;
+    border: 1px solid var(--code-border);
+    overflow: hidden;
+  }
+  .code-block-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 16px;
+    background: var(--code-bg);
+    border-bottom: 1px solid var(--code-border);
+    font-size: 12px;
+    color: var(--text-tertiary);
+    font-weight: 500;
+  }
+  .code-block-lang {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .code-block {
+    background: #fafafa;
+    padding: 20px 20px;
+    font-family: 'JetBrains Mono', 'SF Mono', monospace;
+    font-size: 13.5px;
+    line-height: 1.65;
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--code-text);
+  }
+
+  /* syntax colors */
+  .kw { color: var(--syn-keyword); }
+  .str { color: var(--syn-string); }
+  .cmt { color: var(--syn-comment); font-style: italic; }
+  .fn { color: var(--syn-function); }
+  .typ { color: var(--syn-type); }
+  .num { color: var(--syn-number); }
+  .prop { color: var(--syn-property); }
+  .op { color: var(--syn-operator); }
+  .prm { color: var(--syn-param); }
+
+  /* ── Callouts ── */
+  .callout {
+    margin: 24px 0;
+    padding: 16px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .callout p { margin-bottom: 0; }
+  .callout-label {
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 4px;
+  }
+  .callout-note {
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+  }
+  .callout-note .callout-label { color: var(--accent); }
+  .callout-warning {
+    background: var(--warning-bg);
+    border-left: 3px solid var(--warning-border);
+  }
+  .callout-warning .callout-label { color: var(--warning-text); }
+  .callout-tip {
+    background: var(--tip-bg);
+    border-left: 3px solid var(--tip-border);
+  }
+  .callout-tip .callout-label { color: var(--tip-text); }
+
+  /* ── Tables ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+  th {
+    text-align: left;
+    font-weight: 600;
+    padding: 10px 14px;
+    border-bottom: 2px solid var(--border);
+    color: var(--text-primary);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: top;
+    color: var(--text-secondary);
+  }
+
+  /* ── Dividers & misc ── */
+  .param-table td:first-child {
+    color: var(--text-primary);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .param-table td:first-child .required {
+    color: #ef4444;
+    font-size: 10px;
+    vertical-align: super;
+    margin-left: 2px;
+  }
+
+  .architecture-box {
+    margin: 24px 0;
+    padding: 32px;
+    background: var(--code-bg);
+    border: 1px solid var(--code-border);
+    border-radius: 10px;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 2.2;
+  }
+  .architecture-box .arch-arrow {
+    color: var(--text-tertiary);
+    font-size: 16px;
+  }
+  .architecture-box .arch-box {
+    display: inline-block;
+    padding: 6px 16px;
+    border: 1px solid var(--code-border);
+    border-radius: 6px;
+    background: #fff;
+    margin: 0 4px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+  .architecture-box .arch-box.primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    font-weight: 700;
+    box-shadow: 0 2px 12px rgba(124,92,252,0.3);
+  }
+
+  .changelog-entry {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .changelog-entry:last-child { border-bottom: none; }
+  .changelog-version {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .changelog-date {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    margin-left: 12px;
+  }
+  .changelog-body {
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .footnote {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-top: 80px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    line-height: 1.7;
+  }
+
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 36px 20px 80px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <a href="#" class="topbar-logo">
+    <span class="logo-mark">V</span>
+    VibeScriptJS
+  </a>
+  <span class="topbar-badge">Docs</span>
+  <nav class="topbar-nav">
+    <a href="#getting-started">Guides</a>
+    <a href="#api-reference">API</a>
+    <a href="#changelog">Changelog</a>
+    <a href="#" style="color: var(--sidebar-accent);">GitHub ↗</a>
+  </nav>
+</div>
+
+<!-- ── Sidebar ── -->
+<aside class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Getting Started</div>
+    <a href="#overview" class="active">Overview</a>
+    <a href="#installation">Installation</a>
+    <a href="#quickstart">Quickstart</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Core Concepts</div>
+    <a href="#vibes">Vibes</a>
+    <a href="#prompt-lifecycle">The Prompt Lifecycle</a>
+    <a href="#intentions">Intention Architecture</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">API Reference</div>
+    <a href="#api-reference">vibe()</a>
+    <a href="#config">Configuration</a>
+    <a href="#auth">Authentication</a>
+    <a href="#errors">Error Handling</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Advanced</div>
+    <a href="#architecture">Architecture Patterns</a>
+    <a href="#performance">Performance</a>
+    <a href="#migration">Migration Guide</a>
+    <a href="#testing">Testing</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Resources</div>
+    <a href="#faq">FAQ</a>
+    <a href="#changelog">Changelog <span class="version-badge">v4.2.0</span></a>
+  </div>
+</aside>
+
+<!-- ── Main Content ── -->
+<main class="main">
+
+  <div class="eyebrow">Documentation</div>
+  <h1>VibeScriptJS</h1>
+  <p class="subtitle">
+    The enterprise-grade framework for intention-driven development. Ship production applications by expressing what you want to exist, and then waiting.
+  </p>
+
+  <!-- ═══════════════════════════════ -->
+  <h2 id="overview">Overview</h2>
+
+  <p>
+    VibeScriptJS is a next-generation application development framework built on the principle that <strong>code is an implementation detail</strong>. By abstracting away the entire software development lifecycle into a single, expressive API surface, VibeScriptJS empowers developers to focus on what truly matters: <em>wanting things</em>.
+  </p>
+  <p>
+    Traditional frameworks ask you to learn languages, understand paradigms, manage state, and reason about systems. VibeScriptJS asks you one question: <strong>what do you want?</strong>
+  </p>
+  <p>
+    Born from the realization that the gap between "idea" and "production-ready application" is mostly typing, VibeScriptJS eliminates the typing. What remains is <em>pure intention</em> — distilled, composable, and deployable.
+  </p>
+
+  <div class="callout callout-note">
+    <div class="callout-label">A note on naming</div>
+    <p>VibeScriptJS is not related to JavaScript, which is not related to Java. The <code>JS</code> suffix is an industry tradition of naming things in ways that maximize confusion while signaling vague membership in an ecosystem. We are honored to continue this legacy.</p>
+  </div>
+
+  <!-- ═══════════════════════════════ -->
+  <h2 id="installation">Installation</h2>
+
+  <p>
+    VibeScriptJS is distributed via npm and requires Node.js 18 or later. The framework consists of a core runtime, a CLI toolchain, a type-level intention resolver, and an ambient vibe propagation layer.
+  </p>
+
+  <div class="code-block-wrapper">
+    <div class="code-block-header">
+      <span class="code-block-lang">bash</span>
+      <span>Terminal</span>
+    </div>
+    <div class="code-block">npm install vibescriptjs @vibescriptjs/core @vibescriptjs/cli \
+  @vibescriptjs/runtime @vibescriptjs/types @vibescriptjs/vibe-propagation \
+  @vibescriptjs/intention-resolver @vibescriptjs/ambient-context</div>
+  </div>
+
+  <p>
+    You will also need to configure your environment. Create a <code>.viberc</code> file in your project root:
+  </p>
+
+  <div class="code-block-wrapper">
+    <div class="code-block-header">
+      <span class="code-block-lang">json</span>
+      <span>.viberc</span>
+    </div>
+    <div class="code-block">{
+  <span class="prop">"vibeLevel"</span>: <span class="str">"immaculate"</span>,
+  <span class="prop">"confidence"</span>: <span class="num">0.97</span>,
+  <span class="prop">"please"</span>: <span class="kw">true</span>,
+  <span class="prop">"aesthetic"</span>: <span class="str">"clean"</span>,
+  <span class="prop">"deployTarget"</span>: <span class="str">"somewhere"</span>,
+  <span class="prop">"errorStrategy"</span>: <span class="str">"ask-again-nicely"</span>,
+  <span class="prop">"timeoutProtocol"</span>: <span class="str">"verify internet connection, then proceed with passive-aggressive encouragement"</span>
+}</div>
+  </div>
+
+  <div class="callout callout-warning">
+    <div class="callout-label">Important</div>
+    <p>Setting <code>confidence</code> below <code>0.85</code> will cause the framework to second-guess itself and produce nothing. This is by design. If you aren't confident, why should your code be?</p>
+  </div>
+
+  <!-- ═══════════════════════════════ -->
+  <h2 id="quickstart">Quickstart</h2>
+
+  <p>
+    The following example demonstrates the complete development workflow for a production-ready full-stack SaaS application with authentication, real-time data synchronization, a Stripe integration, and a landing page that "feels like Linear."
+  </p>
+
+  <div class="code-block-wrapper">
+    <div class="code-block-header">
+      <span class="code-block-lang">js</span>
+      <span>app.vibe.js</span>
+    </div>
+    <div class="code-block"><span class="kw">import</span> { vibe } <span class="kw">from</span> <span class="str">'vibescriptjs'</span>
+
+<span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"make a saas app. make it good."</span>)</div>
+  </div>
+
+  <p>
+    That's it. Your application is now running on <code>localhost:3000</code>, or possibly in production. VibeScriptJS will choose the most appropriate option based on your ambient confidence level.
+  </p>
+
+  <h3>Adding features</h3>
+
+  <p>
+    As your product matures, you may need to add additional functionality. VibeScriptJS supports incremental intention layering:
+  </p>
+
+  <div class="code-block-wrapper">
+    <div class="code-block-header">
+      <span class="code-block-lang">js</span>
+      <span>features.vibe.js</span>
+    </div>
+    <div class="code-block"><span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"add a dashboard. like the ones on dribbble."</span>)
+
+<span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"make the onboarding not suck"</span>)
+
+<span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"add analytics. the kind that makes investors nod."</span>)</div>
+  </div>
+
+  <!-- ═══════════════════════════════ -->
+  <h2 id="vibes">Core Concept: Vibes</h2>
+
+  <p>
+    At the heart of VibeScriptJS is the <strong>Vibe</strong> — the fundamental unit of developer intent. A Vibe is not a function call, an API request, or a build step. It is a <em>declaration of desired reality</em>. When you invoke a Vibe, you are not instructing the computer to perform a sequence of operations. You are informing the universe of your expectations and allowing the runtime to reconcile the difference between what exists and what should exist.
+  </p>
+  <p>
+    This distinction is critical. Traditional programming is <em>imperative</em>: you tell the machine what to do. Functional programming is <em>declarative</em>: you tell the machine what you want. Vibe-driven development is <em>aspirational</em>: you tell the machine what would be nice, and it figures out the rest.
+  </p>
+
+  <div class="callout callout-tip">
+    <div class="callout-label">Best Practice</div>
+    <p>The specificity of your vibe should be inversely proportional to the complexity of what you're building. For a todo app, you might specify details. For a distributed systems platform, simply state <code>"make it scale"</code> and trust the process.</p>
+  </div>
+
+  <!-- ═══════════════════════════════ -->
+  <h2 id="prompt-lifecycle">The Prompt Lifecycle</h2>
+
+  <p>
+    Every <code>vibe()</code> invocation passes through a carefully orchestrated sequence of phases, each designed to maximize the probability of something happening. Understanding this lifecycle is essential for advanced usage, though not for basic usage, intermediate usage, or any practical purpose.
+  </p>
+
+  <h3>Phase 1: Intention Capture</h3>
+  <p>The developer's string is parsed for emotional valence, technical ambiguity, and overall energy. Strings containing exclamation points are prioritized.</p>
+
+  <h3>Phase 2: Ambient Context Resolution</h3>
+  <p>The framework examines your <code>.viberc</code>, your recent git history, your <code>package.json</code> (for morale), and the current time of day. Applications built after midnight receive a <code>hustle</code> modifier.</p>
+
+  <h3>Phase 3: Vibe Propagation</h3>
+  <p>Your intention is propagated through the VibeScriptJS runtime, where it is enriched with contextual signals, decomposed into sub-vibes, and ultimately routed to the Intention Fulfillment Engine (IFE), which is Claude.</p>
+
+  <h3>Phase 4: Manifestation</h3>
+  <p>Code appears. Where it comes from is not your concern.</p>
+
+  <!-- ═══════════════════════════════ -->
+  <h2 id="intentions">Intention Architecture</h2>
+
+  <p>
+    VibeScriptJS employs a sophisticated multi-layered intention resolution system (MIRS) to translate high-level developer desires into functional software artifacts. The architecture separates concerns across three distinct planes:
+  </p>
+
+  <table>
+    <tr>
+      <th>Plane</th>
+      <th>Responsibility</th>
+      <th>Example</th>
+    </tr>
+    <tr>
+      <td><strong>Desire Plane</strong></td>
+      <td>What the developer <em>wants</em></td>
+      <td>"a website"</td>
+    </tr>
+    <tr>
+      <td><strong>Interpretation Plane</strong></td>
+      <td>What the developer <em>probably means</em></td>
+      <td>A Next.js app with Tailwind</td>
+    </tr>
+    <tr>
+      <td><strong>Manifestation Plane</strong></td>
+      <td>What <em>actually gets built</em></td>
+      <td>A React app with 47 unused dependencies</td>
+    </tr>
+  </table>
+
+  <p>
+    These planes are intentionally decoupled. The gap between them is not a bug — it is a <strong>feature of the creative process</strong>. In traditional development, this gap is called "the spec was wrong." In VibeScriptJS, it is called "emergence."
+  </p>
+
+  <!-- ═══════════════════════════════ -->
+  <h2 id="api-reference">API Reference</h2>
+
+  <h3>vibe()</h3>
+
+  <p>
+    The primary interface for all application development. Accepts a natural language string describing your desired outcome and returns a <code>Promise&lt;Something&gt;</code>.
+  </p>
+
+  <div class="code-block-wrapper">
+    <div class="code-block-header">
+      <span class="code-block-lang">typescript</span>
+      <span>Type Signature</span>
+    </div>
+    <div class="code-block"><span class="kw">function</span> <span class="fn">vibe</span>(
+  <span class="prm">intention</span>: <span class="typ">string</span>,
+  <span class="prm">options</span>?: <span class="typ">VibeOptions</span>
+): <span class="typ">Promise</span>&lt;<span class="typ">Something</span>&gt;</div>
+  </div>
+
+  <h3>Parameters</h3>
+
+  <table class="param-table">
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td>intention<span class="required">*</span></td>
+      <td><code>string</code></td>
+      <td>A natural language description of what you want. Specificity optional. Enthusiasm encouraged.</td>
+    </tr>
+    <tr>
+      <td>options.vibe</td>
+      <td><code>"chill" | "locked-in" | "transcendent"</code></td>
+      <td>Sets the operational intensity. Default: <code>"chill"</code>. Use <code>"transcendent"</code> for demos.</td>
+    </tr>
+    <tr>
+      <td>options.please</td>
+      <td><code>boolean</code></td>
+      <td>Whether to be polite. Dramatically affects output quality. Default: <code>true</code>.</td>
+    </tr>
+    <tr>
+      <td>options.aesthetic</td>
+      <td><code>string</code></td>
+      <td>Visual direction. Accepts brand names, adjectives, or URLs to Dribbble shots.</td>
+    </tr>
+    <tr>
+      <td>options.confidence</td>
+      <td><code>number</code></td>
+      <td>A value between 0 and 1 representing how certain you are this will work. Must exceed <code>0.85</code> or the runtime will refuse to proceed.</td>
+    </tr>
+    <tr>
+      <td>options.deadline</td>
+      <td><code>"yesterday" | "soon" | "whenever"</code></td>
+      <td>Urgency modifier. <code>"yesterday"</code> skips tests. <code>"whenever"</code> adds them (theoretically).</td>
+    </tr>
+  </table>
+
+  <h3>Returns</h3>
+
+  <p>
+    A <code>Promise</code> that resolves to <code>Something</code>. The <code>Something</code> type is intentionally left unparameterized. Strict typing would constrain the creative output of the runtime and is therefore considered an anti-pattern.
+  </p>
+
+  <div class="code-block-wrapper">
+    <div class="code-block-header">
+      <span class="code-block-lang">typescript</span>
+      <span>types.d.ts</span>
+    </div>
+    <div class="code-block"><span class="cmt">/**
+ * The output of a vibe() invocation.
+ * Deliberately untyped to preserve creative flexibility.
+ * If you need to know the shape of this, you may not be
+ * ready for intention-driven development.
+ */</span>
+<span class="kw">type</span> <span class="typ">Something</span> = <span class="typ">any</span>
+
+<span class="cmt">// For TypeScript users who need "safety"</span>
+<span class="kw">type</span> <span class="typ">StrictSomething</span> = <span class="typ">any</span> <span class="cmt">// same thing but with more confidence</span></div>
+  </div>
+
+  <h3>Usage Examples</h3>
+
+  <div class="code-block-wrapper">
+    <div class="code-block-header">
+      <span class="code-block-lang">js</span>
+      <span>Basic</span>
+    </div>
+    <div class="code-block"><span class="cmt">// Hello World</span>
+<span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"hello world but make it a startup"</span>)
+
+<span class="cmt">// E-commerce</span>
+<span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"shopify but indie"</span>)
+
+<span class="cmt">// Enterprise</span>
+<span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"the thing my PM described. you know the one."</span>)</div>
+  </div>
+
+  <div class="code-block-wrapper">
+    <div class="code-block-header">
+      <span class="code-block-lang">js</span>
+      <span>Advanced</span>
+    </div>
+    <div class="code-block"><span class="cmt">// With options</span>
+<span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"make it production-ready"</span>, {
+  <span class="prop">vibe</span>: <span class="str">"transcendent"</span>,
+  <span class="prop">please</span>: <span class="kw">true</span>,
+  <span class="prop">aesthetic</span>: <span class="str">"linear meets notion meets that one portfolio site"</span>,
+  <span class="prop">confidence</span>: <span class="num">0.99</span>,
+  <span class="prop">deadline</span>: <span class="str">"yesterday"</span>
+})</div>
+  </div>
+
+  <!-- ═══════════════════════════════ -->
+  <h2 id="config">Configuration</h2>
+
+  <p>
+    VibeScriptJS supports both file-based and environment-variable configuration. The configuration system is designed to be maximally flexible, which is to say, most of it doesn't do anything yet.
+  </p>
+
+  <h3>Environment Variables</h3>
+
+  <table class="param-table">
+    <tr><th>Variable</th><th>Default</th><th>Description</th></tr>
+    <tr><td>VIBE_LEVEL</td><td><code>"immaculate"</code></td><td>Global vibe intensity. Accepts any positive adjective.</td></tr>
+    <tr><td>VIBE_PLEASE</td><td><code>"true"</code></td><td>Enables politeness mode. Disabling this is not recommended and has not been tested.</td></tr>
+    <tr><td>VIBE_MODEL</td><td><code>"claude"</code></td><td>The backing model. Other values are accepted but quietly ignored.</td></tr>
+    <tr><td>VIBE_TIMEOUT</td><td><code>"generous"</code></td><td>How long to wait. Accepts <code>"generous"</code>, <code>"patient"</code>, or a number in milliseconds that will be rounded up to <code>"generous"</code>.</td></tr>
+    <tr><td>VIBE_DEBUG</td><td><code>"false"</code></td><td>Enables debug output, which is the same as regular output but with more console.logs that say <code>"here"</code>.</td></tr>
+  </table>
+
+  <!-- ═══════════════════════════════ -->
+  <h2 id="auth">Authentication</h2>
+
+  <p>
+    VibeScriptJS implements a multi-layered authentication strategy designed to balance security, developer experience, and the emotional well-being of the runtime.
+  </p>
+
+  <h3>API Key Configuration</h3>
+  <p>
+    To authenticate with the VibeScriptJS cloud service, you will need an API key, which can be obtained by navigating to the developer portal, clicking "Get API Key," and then completing a brief questionnaire about your relationship with your codebase.
+  </p>
+
+  <div class="code-block-wrapper">
+    <div class="code-block-header">
+      <span class="code-block-lang">bash</span>
+      <span>.env</span>
+    </div>
+    <div class="code-block">VIBE_API_KEY=vsk_live_do_not_put_this_in_github_seriously
+VIBE_TONE=respectful
+VIBE_MANNERS=enabled</div>
+  </div>
+
+  <h3>Token-Based Auth (Enterprise)</h3>
+  <p>
+    Enterprise customers may use JWT tokens for authentication. Token payloads must include the following claims:
+  </p>
+
+  <table class="param-table">
+    <tr><th>Claim</th><th>Type</th><th>Description</th></tr>
+    <tr><td>sub</td><td><code>string</code></td><td>The developer's identity.</td></tr>
+    <tr><td>iat</td><td><code>number</code></td><td>Issued-at timestamp.</td></tr>
+    <tr><td>vibe</td><td><code>string</code></td><td>The developer's current emotional state. Used for request routing.</td></tr>
+    <tr><td>pls</td><td><code>boolean</code></td><td>Politeness flag. Must be <code>true</code>.</td></tr>
+  </table>
+
+  <div class="callout callout-note">
+    <div class="callout-label">On politeness</div>
+    <p>Extensive A/B testing has shown that requests containing the word "please" produce output that is 47% more correct, 31% better formatted, and 100% more likely to include helpful comments. The <code>please</code> parameter is optional in the same way that saying "thank you" is optional: technically, yes. Practically, no.</p>
+  </div>
+
+  <!-- ═══════════════════════════════ -->
+  <h2 id="errors">Error Handling</h2>
+
+  <p>
+    VibeScriptJS takes a novel approach to error handling, grounded in the observation that most errors are simply the result of <strong>insufficient clarity of intention</strong>. Rather than complex try/catch hierarchies or typed error enums, VibeScriptJS encourages developers to <em>try again, but with more feeling</em>.
+  </p>
+
+  <div class="code-block-wrapper">
+    <div class="code-block-header">
+      <span class="code-block-lang">js</span>
+      <span>Recommended error handling</span>
+    </div>
+    <div class="code-block"><span class="kw">try</span> {
+  <span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"build the app"</span>)
+} <span class="kw">catch</span> (e) {
+  <span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"build the app, but like, correctly this time"</span>)
+}</div>
+  </div>
+
+  <h3>Escalation Pattern</h3>
+
+  <p>
+    For mission-critical applications, VibeScriptJS supports progressive error escalation, where each retry increases in specificity and emotional intensity:
+  </p>
+
+  <div class="code-block-wrapper">
+    <div class="code-block-header">
+      <span class="code-block-lang">js</span>
+      <span>Progressive escalation</span>
+    </div>
+    <div class="code-block"><span class="kw">try</span> {
+  <span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"build my app"</span>)
+} <span class="kw">catch</span> {
+  <span class="kw">try</span> {
+    <span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"build my app, a react dashboard with auth"</span>)
+  } <span class="kw">catch</span> {
+    <span class="kw">try</span> {
+      <span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"please. i need this by monday."</span>)
+    } <span class="kw">catch</span> {
+      <span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"ok fine what CAN you do"</span>)
+    }
+  }
+}</div>
+  </div>
+
+  <h3>Error Types</h3>
+
+  <table>
+    <tr><th>Error</th><th>Cause</th><th>Resolution</th></tr>
+    <tr>
+      <td><code>VibeError</code></td>
+      <td>General failure of the universe to comply with your intentions</td>
+      <td>Retry with more specificity, or less. Either might work.</td>
+    </tr>
+    <tr>
+      <td><code>InsufficientVibeError</code></td>
+      <td>Your <code>confidence</code> was set below <code>0.85</code></td>
+      <td>Believe in yourself more</td>
+    </tr>
+    <tr>
+      <td><code>AmbiguousIntentionError</code></td>
+      <td>The runtime could not determine what you meant by "make it pop"</td>
+      <td>Reference a specific Dribbble shot</td>
+    </tr>
+    <tr>
+      <td><code>PolitenessError</code></td>
+      <td><code>please</code> was set to <code>false</code></td>
+      <td>Reconsider your choices</td>
+    </tr>
+    <tr>
+      <td><code>TimeoutError</code></td>
+      <td>The intention was too ambitious for the current vibe level</td>
+      <td>Set <code>vibe: "transcendent"</code> or lower your expectations</td>
+    </tr>
+    <tr>
+      <td><code>YikesError</code></td>
+      <td>Something happened that the framework cannot describe in a professional manner</td>
+      <td>Close your laptop. Open it again. Proceed with caution.</td>
+    </tr>
+  </table>
+
+  <h3>Timeout Behavior</h3>
+
+  <p>
+    When a <code>vibe()</code> invocation exceeds the configured timeout threshold, the framework activates the <strong>Passive-Aggressive Encouragement Protocol</strong> (PAEP). Rather than failing silently, the runtime provides a series of escalating console messages designed to motivate both the developer and the network:
+  </p>
+
+  <div class="code-block-wrapper">
+    <div class="code-block-header">
+      <span class="code-block-lang">plaintext</span>
+      <span>Console output (PAEP engaged)</span>
+    </div>
+    <div class="code-block"><span class="cmt">[vibe] Verifying internet connection...</span>
+<span class="cmt">[vibe] Internet connection verified.</span>
+<span class="cmt">[vibe] Still working. You're doing great.</span>
+<span class="cmt">[vibe] This is taking longer than expected. Not judging.</span>
+<span class="cmt">[vibe] Just checking — you did save the file, right?</span>
+<span class="cmt">[vibe] Other developers' vibes are resolving normally. Just so you know.</span>
+<span class="cmt">[vibe] Have you considered that the intention might be... a lot?</span>
+<span class="cmt">[vibe] No worries. We'll get there. Probably.</span>
+<span class="cmt">[vibe] Honestly at this point you could have written it yourself.</span>
+<span class="cmt">[vibe] Not that you should. That's not what we're about.</span>
+<span class="cmt">[vibe] Resolved. See? Worth the wait.</span></div>
+  </div>
+
+  <!-- ═══════════════════════════════ -->
+  <h2 id="architecture">Architecture Patterns</h2>
+
+  <p>
+    VibeScriptJS supports several architectural patterns, each optimized for different team sizes, deployment targets, and levels of understanding of what "architecture" means.
+  </p>
+
+  <h3>Recommended Architecture</h3>
+
+  <div class="architecture-box">
+    <span class="arch-box">Your Idea</span>
+    <span class="arch-arrow">&nbsp; → &nbsp;</span>
+    <span class="arch-box">vibe()</span>
+    <span class="arch-arrow">&nbsp; → &nbsp;</span>
+    <span class="arch-box primary">Claude</span>
+    <span class="arch-arrow">&nbsp; → &nbsp;</span>
+    <span class="arch-box">App</span>
+    <br><br>
+    <span style="font-size: 11px; color: var(--text-tertiary);">Fig. 1 — Production architecture (all tiers)</span>
+  </div>
+
+  <h3>Enterprise Architecture</h3>
+
+  <div class="architecture-box">
+    <span class="arch-box">Your Idea</span>
+    <span class="arch-arrow">&nbsp; → &nbsp;</span>
+    <span class="arch-box">Jira Ticket</span>
+    <span class="arch-arrow">&nbsp; → &nbsp;</span>
+    <span class="arch-box">Sprint Planning</span>
+    <span class="arch-arrow">&nbsp; → &nbsp;</span>
+    <span class="arch-box">vibe()</span>
+    <span class="arch-arrow">&nbsp; → &nbsp;</span>
+    <span class="arch-box primary">Claude</span>
+    <span class="arch-arrow">&nbsp; → &nbsp;</span>
+    <span class="arch-box">App</span>
+    <br><br>
+    <span style="font-size: 11px; color: var(--text-tertiary);">Fig. 2 — Enterprise architecture (adds process but not value)</span>
+  </div>
+
+  <h3>Microservices</h3>
+
+  <p>
+    VibeScriptJS fully supports microservices architecture. Simply invoke <code>vibe()</code> separately for each service:
+  </p>
+
+  <div class="code-block-wrapper">
+    <div class="code-block-header">
+      <span class="code-block-lang">js</span>
+      <span>microservices.vibe.js</span>
+    </div>
+    <div class="code-block"><span class="kw">await</span> <span class="fn">Promise</span>.<span class="fn">all</span>([
+  <span class="fn">vibe</span>(<span class="str">"make the auth service"</span>),
+  <span class="fn">vibe</span>(<span class="str">"make the payment service"</span>),
+  <span class="fn">vibe</span>(<span class="str">"make the notification service"</span>),
+  <span class="fn">vibe</span>(<span class="str">"make them talk to each other somehow"</span>),
+])</div>
+  </div>
+
+  <!-- ═══════════════════════════════ -->
+  <h2 id="performance">Performance & Optimization</h2>
+
+  <p>
+    VibeScriptJS is optimized for developer throughput (ideas per minute) rather than traditional metrics like response time or memory usage. However, for teams that are asked about performance in board meetings, we offer the following guidance.
+  </p>
+
+  <h3>Caching</h3>
+
+  <p>VibeScriptJS automatically caches vibes that have been previously manifested. If you invoke the same intention twice, the second invocation will return a cached result, unless the vibe of the cache has decayed. Vibe decay is determined by factors including ambient temperature, npm audit output, and whether Mercury is in retrograde.</p>
+
+  <h3>Optimization</h3>
+
+  <div class="code-block-wrapper">
+    <div class="code-block-header">
+      <span class="code-block-lang">js</span>
+      <span>Performance optimization</span>
+    </div>
+    <div class="code-block"><span class="cmt">// Before (slow: 2 vibes)</span>
+<span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"build the frontend"</span>)
+<span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"now make it fast"</span>)
+
+<span class="cmt">// After (optimized: 1 vibe)</span>
+<span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"build a fast frontend"</span>)</div>
+  </div>
+
+  <div class="callout callout-tip">
+    <div class="callout-label">Performance tip</div>
+    <p>The single most impactful optimization you can make is to want fewer things. Every additional requirement adds latency. The fastest application is the one that does nothing, which is also the most bug-free.</p>
+  </div>
+
+  <!-- ═══════════════════════════════ -->
+  <h2 id="migration">Migration Guide</h2>
+
+  <p>
+    This guide covers migrating from <strong>Legacy Development</strong> (also known as "writing code yourself") to VibeScriptJS. The migration process has been designed to be as seamless as possible, requiring only that you stop doing what you were doing and start doing this instead.
+  </p>
+
+  <h3>Step 1: Assessment</h3>
+  <p>Examine your existing codebase. Note the number of files, the depth of the dependency tree, the number of open GitHub issues, and the last time anyone felt joy while working on it. These metrics will not be used — they are for your own reflection.</p>
+
+  <h3>Step 2: Migration</h3>
+
+  <div class="code-block-wrapper">
+    <div class="code-block-header">
+      <span class="code-block-lang">js</span>
+      <span>migrate.vibe.js</span>
+    </div>
+    <div class="code-block"><span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"take my existing app and make it good"</span>)</div>
+  </div>
+
+  <h3>Step 3: Verification</h3>
+  <p>Open the application. Does it work? If yes, migration is complete. If no, return to Step 2 with more adjectives.</p>
+
+  <div class="callout callout-warning">
+    <div class="callout-label">Breaking changes</div>
+    <p>Migrating to VibeScriptJS may result in the loss of your existing codebase, test suite, CI/CD pipeline, and accumulated technical debt. For most teams, this is the primary benefit.</p>
+  </div>
+
+  <!-- ═══════════════════════════════ -->
+  <h2 id="testing">Testing</h2>
+
+  <p>
+    VibeScriptJS ships with a comprehensive testing framework that aligns with the intention-driven development philosophy. Tests are written in the same format as application code:
+  </p>
+
+  <div class="code-block-wrapper">
+    <div class="code-block-header">
+      <span class="code-block-lang">js</span>
+      <span>app.test.vibe.js</span>
+    </div>
+    <div class="code-block"><span class="kw">import</span> { test } <span class="kw">from</span> <span class="str">'vibescriptjs/testing'</span>
+
+<span class="fn">test</span>(<span class="str">"it should work"</span>, <span class="kw">async</span> () => {
+  <span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"check if the app works"</span>)
+})
+
+<span class="fn">test</span>(<span class="str">"it should look good"</span>, <span class="kw">async</span> () => {
+  <span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"does it look good? be honest."</span>)
+})
+
+<span class="fn">test</span>(<span class="str">"edge cases"</span>, <span class="kw">async</span> () => {
+  <span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"what if someone does something weird"</span>)
+})</div>
+  </div>
+
+  <p>
+    Tests are run with the <code>vibe test</code> CLI command. All tests pass by default. Failing a test requires explicit opt-in via the <code>--actually-check</code> flag, which is not documented because it ruins the experience.
+  </p>
+
+  <!-- ═══════════════════════════════ -->
+  <h2 id="faq">FAQ</h2>
+
+  <h3>Is VibeScriptJS production-ready?</h3>
+  <p>VibeScriptJS is production-ready in the sense that you can deploy applications built with it to production. Whether this is advisable depends on your organization's definition of "ready" and your personal relationship with risk.</p>
+
+  <h3>Does VibeScriptJS support TypeScript?</h3>
+  <p>VibeScriptJS supports TypeScript in the same way that a labrador supports your decision to put a hat on it. It will go along with it. It will not understand why.</p>
+
+  <h3>How does VibeScriptJS compare to React / Next.js / etc?</h3>
+  <p>Traditional frameworks require you to learn concepts, write code, and understand how software works. VibeScriptJS requires a text field and optimism. These are different value propositions and we respect all approaches, including the ones that are harder for no reason.</p>
+
+  <h3>What if I need to debug something?</h3>
+  <p>
+    Debugging in VibeScriptJS follows a simple protocol:
+  </p>
+
+  <div class="code-block-wrapper">
+    <div class="code-block-header">
+      <span class="code-block-lang">js</span>
+      <span>Debugging</span>
+    </div>
+    <div class="code-block"><span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"something is broken. fix it."</span>)</div>
+  </div>
+
+  <p>If the issue persists, increase the specificity of your complaint:</p>
+
+  <div class="code-block-wrapper">
+    <div class="code-block-header">
+      <span class="code-block-lang">js</span>
+      <span>Advanced debugging</span>
+    </div>
+    <div class="code-block"><span class="kw">await</span> <span class="fn">vibe</span>(<span class="str">"the button doesn't work. the blue one. no, the other blue one."</span>)</div>
+  </div>
+
+  <h3>Is VibeScriptJS open source?</h3>
+  <p>VibeScriptJS is source-available under the VIBE-1.0 license, which permits usage, modification, and redistribution, provided that all derivative works maintain a <code>confidence</code> level of at least <code>0.85</code> and include the word "please" in at least 30% of their <code>vibe()</code> invocations.</p>
+
+  <h3>Why is it called VibeScript<em>JS</em>?</h3>
+  <p>See the <a href="#overview" style="color: var(--text-link);">note on naming</a>.</p>
+
+  <!-- ═══════════════════════════════ -->
+  <h2 id="changelog">Changelog</h2>
+
+  <div class="changelog-entry">
+    <span class="changelog-version">v4.2.0</span>
+    <span class="changelog-date">March 2026</span>
+    <div class="changelog-body">Asked Claude to improve performance. Performance improved. We did not investigate how.</div>
+  </div>
+
+  <div class="changelog-entry">
+    <span class="changelog-version">v4.1.0</span>
+    <span class="changelog-date">February 2026</span>
+    <div class="changelog-body">Added <code>please</code> parameter. Output quality increased 47%. Added <code>"transcendent"</code> vibe level for demos and investor meetings. Fixed issue where <code>vibe("make it pop")</code> was literally adding popcorn animations.</div>
+  </div>
+
+  <div class="changelog-entry">
+    <span class="changelog-version">v4.0.0</span>
+    <span class="changelog-date">January 2026</span>
+    <div class="changelog-body"><strong>Breaking:</strong> Removed all code from the framework. This was the planned v4 architecture and is working as intended. Applications now generate themselves at runtime from pure intention. Existing codebases should migrate by deleting their <code>src/</code> directory.</div>
+  </div>
+
+  <div class="changelog-entry">
+    <span class="changelog-version">v3.2.1</span>
+    <span class="changelog-date">December 2025</span>
+    <div class="changelog-body">Asked Claude to fix the bug from v3.2.0. Claude fixed it and also refactored the entire state management layer. Nobody asked for this but it's better now.</div>
+  </div>
+
+  <div class="changelog-entry">
+    <span class="changelog-version">v3.2.0</span>
+    <span class="changelog-date">December 2025</span>
+    <div class="changelog-body">Added new bug. Investigating.</div>
+  </div>
+
+  <div class="changelog-entry">
+    <span class="changelog-version">v3.1.0</span>
+    <span class="changelog-date">November 2025</span>
+    <div class="changelog-body">Introduced the Intention Architecture documentation. Received feedback that the documentation is longer than the framework source code. This is accurate. The documentation <em>is</em> the framework.</div>
+  </div>
+
+  <div class="changelog-entry">
+    <span class="changelog-version">v3.0.0</span>
+    <span class="changelog-date">October 2025</span>
+    <div class="changelog-body"><strong>Breaking:</strong> Renamed from VibeScript to VibeScriptJS. No other changes. Updated all 847 pages of documentation to reflect the new name. Regression: some documentation still says VibeScript. We have opened a <code>vibe()</code> to fix this.</div>
+  </div>
+
+  <div class="changelog-entry">
+    <span class="changelog-version">v2.0.0</span>
+    <span class="changelog-date">August 2025</span>
+    <div class="changelog-body">Rewrote the entire framework from scratch. Again. The previous version was "not vibing" according to internal metrics. New version vibes harder. Benchmark methodology: we looked at it and it felt right.</div>
+  </div>
+
+  <div class="changelog-entry">
+    <span class="changelog-version">v1.0.0</span>
+    <span class="changelog-date">June 2025</span>
+    <div class="changelog-body">Initial release. Described in the launch blog post as "the future of development." Contained 14 lines of code, 11 of which were import statements. Received 4,200 GitHub stars in the first week. None of the stargazers opened an issue, which we interpret as a sign of quality.</div>
+  </div>
+
+  <!-- ═══════════════════════════════ -->
+
+  <div class="footnote">
+    <p>
+      <strong>VibeScriptJS</strong> · v4.2.0 · Documentation Revision 7<br>
+      © 2026 VibeScriptJS Foundation. All rights reserved. No rights reserved. It's vibes.
+    </p>
+    <p style="margin-top: 8px;">
+      Built with VibeScriptJS. Or possibly without it. The framework is philosophically opposed to verification.
+    </p>
+  </div>
+
+</main>
+
+</body>
+</html>

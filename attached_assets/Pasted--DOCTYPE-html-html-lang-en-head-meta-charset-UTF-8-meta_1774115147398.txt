@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terminal Interface Guidelines — Pear Developer</title>
+<link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=SF+Pro+Text:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --apple-blue: #0071e3;
+    --apple-blue-hover: #0077ED;
+    --sidebar-bg: #f5f5f7;
+    --sidebar-active: #e8e8ed;
+    --body-bg: #ffffff;
+    --text-primary: #1d1d1f;
+    --text-secondary: #6e6e73;
+    --text-tertiary: #86868b;
+    --border: #d2d2d7;
+    --code-bg: #f5f5f7;
+    --callout-bg: #f0f7ff;
+    --callout-border: #0071e3;
+    --deprecated-bg: #fff8f0;
+    --deprecated-border: #bf5600;
+    --terminal-bg: #1e1e2e;
+    --terminal-border: #313244;
+    --terminal-green: #a6e3a1;
+    --terminal-blue: #89b4fa;
+    --terminal-red: #f38ba8;
+    --terminal-yellow: #f9e2af;
+    --terminal-mauve: #cba6f7;
+    --terminal-text: #cdd6f4;
+    --terminal-dim: #585b70;
+    --terminal-bar: #45475a;
+  }
+
+- { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+font-family: ‘SF Pro Text’, -apple-system, BlinkMacSystemFont, sans-serif;
+color: var(–text-primary);
+background: var(–body-bg);
+line-height: 1.52947;
+font-size: 15px;
+-webkit-font-smoothing: antialiased;
+}
+
+/* ── Top Nav ── */
+.topnav {
+position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+height: 52px;
+background: rgba(251,251,253,0.8);
+backdrop-filter: saturate(180%) blur(20px);
+-webkit-backdrop-filter: saturate(180%) blur(20px);
+border-bottom: 1px solid var(–border);
+display: flex; align-items: center; padding: 0 22px;
+gap: 20px;
+}
+.topnav-logo {
+display: flex; align-items: center; gap: 8px;
+font-family: ‘SF Pro Display’, sans-serif;
+font-weight: 600; font-size: 17px; color: var(–text-primary);
+text-decoration: none;
+}
+.topnav-logo svg { width: 18px; height: 22px; }
+.topnav-breadcrumb {
+font-size: 12px; color: var(–text-tertiary);
+display: flex; align-items: center; gap: 6px;
+}
+.topnav-breadcrumb span { color: var(–text-secondary); }
+
+/* ── Sidebar ── */
+.sidebar {
+position: fixed; top: 52px; left: 0; bottom: 0;
+width: 260px;
+background: var(–sidebar-bg);
+border-right: 1px solid var(–border);
+overflow-y: auto;
+padding: 16px 0;
+}
+.sidebar-section-title {
+font-size: 11px; font-weight: 600;
+color: var(–text-tertiary);
+text-transform: uppercase;
+letter-spacing: 0.5px;
+padding: 16px 20px 6px;
+}
+.sidebar a {
+display: block;
+padding: 6px 20px;
+font-size: 13px;
+color: var(–text-secondary);
+text-decoration: none;
+border-radius: 0;
+transition: background 0.15s;
+}
+.sidebar a:hover { background: var(–sidebar-active); }
+.sidebar a.active {
+color: var(–apple-blue);
+font-weight: 500;
+background: var(–sidebar-active);
+}
+
+/* ── Main Content ── */
+.main {
+margin-left: 260px;
+margin-top: 52px;
+max-width: 820px;
+padding: 48px 48px 120px;
+}
+
+.page-eyebrow {
+font-size: 13px; color: var(–text-tertiary);
+font-weight: 500; margin-bottom: 4px;
+text-transform: uppercase; letter-spacing: 0.3px;
+}
+.page-title {
+font-family: ‘SF Pro Display’, sans-serif;
+font-size: 40px; font-weight: 700;
+letter-spacing: -0.5px;
+line-height: 1.1;
+margin-bottom: 12px;
+}
+.page-subtitle {
+font-size: 19px;
+color: var(–text-secondary);
+font-weight: 300;
+line-height: 1.42;
+margin-bottom: 36px;
+max-width: 600px;
+}
+
+h2 {
+font-family: ‘SF Pro Display’, sans-serif;
+font-size: 28px; font-weight: 600;
+margin-top: 56px; margin-bottom: 16px;
+letter-spacing: -0.2px;
+padding-top: 24px;
+border-top: 1px solid var(–border);
+}
+h3 {
+font-family: ‘SF Pro Display’, sans-serif;
+font-size: 21px; font-weight: 600;
+margin-top: 36px; margin-bottom: 12px;
+}
+
+p { margin-bottom: 16px; }
+
+.callout {
+background: var(–callout-bg);
+border-left: 3px solid var(–callout-border);
+padding: 14px 18px;
+border-radius: 6px;
+margin: 24px 0;
+font-size: 14px;
+}
+.callout-label {
+font-weight: 600; color: var(–callout-border);
+font-size: 12px; text-transform: uppercase;
+letter-spacing: 0.3px; margin-bottom: 4px;
+}
+
+.deprecated-callout {
+background: var(–deprecated-bg);
+border-left: 3px solid var(–deprecated-border);
+padding: 14px 18px;
+border-radius: 6px;
+margin: 24px 0;
+font-size: 14px;
+}
+.deprecated-label {
+font-weight: 600; color: var(–deprecated-border);
+font-size: 12px; text-transform: uppercase;
+letter-spacing: 0.3px; margin-bottom: 4px;
+}
+
+code {
+font-family: ‘JetBrains Mono’, ‘SF Mono’, monospace;
+font-size: 13px;
+background: var(–code-bg);
+padding: 2px 6px;
+border-radius: 4px;
+color: #c41a16;
+}
+
+.code-block {
+background: var(–code-bg);
+border: 1px solid var(–border);
+border-radius: 10px;
+padding: 18px 20px;
+font-family: ‘JetBrains Mono’, ‘SF Mono’, monospace;
+font-size: 13px;
+line-height: 1.6;
+overflow-x: auto;
+margin: 20px 0;
+white-space: pre;
+}
+
+.figure {
+margin: 28px 0;
+border-radius: 12px;
+overflow: hidden;
+border: 1px solid var(–border);
+}
+.figure-label {
+display: flex; align-items: center; gap: 8px;
+padding: 10px 16px;
+background: var(–code-bg);
+border-bottom: 1px solid var(–border);
+font-size: 12px; font-weight: 500;
+color: var(–text-secondary);
+}
+.figure-label .badge {
+font-size: 10px;
+padding: 2px 8px;
+border-radius: 4px;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.3px;
+}
+.badge-correct { background: #d4edda; color: #155724; }
+.badge-incorrect { background: #f8d7da; color: #721c24; }
+.badge-catastrophic { background: #721c24; color: #fff; }
+
+/* ── Terminal Windows ── */
+.terminal {
+background: var(–terminal-bg);
+font-family: ‘JetBrains Mono’, ‘SF Mono’, monospace;
+font-size: 13px;
+line-height: 1.45;
+color: var(–terminal-text);
+padding: 0;
+position: relative;
+}
+.terminal-bar {
+background: var(–terminal-bar);
+padding: 8px 14px;
+display: flex; align-items: center; gap: 8px;
+font-size: 12px; color: var(–terminal-dim);
+}
+.terminal-dots {
+display: flex; gap: 6px;
+}
+.terminal-dots span {
+width: 12px; height: 12px; border-radius: 50%;
+}
+.terminal-dots .r { background: #f38ba8; }
+.terminal-dots .y { background: #f9e2af; }
+.terminal-dots .g { background: #a6e3a1; }
+.terminal-body {
+padding: 14px 16px;
+overflow-x: auto;
+white-space: pre;
+}
+.t-green { color: var(–terminal-green); }
+.t-blue { color: var(–terminal-blue); }
+.t-red { color: var(–terminal-red); }
+.t-yellow { color: var(–terminal-yellow); }
+.t-mauve { color: var(–terminal-mauve); }
+.t-dim { color: var(–terminal-dim); }
+.t-bold { font-weight: 600; }
+
+.dimension-tag {
+position: absolute;
+bottom: 8px; right: 12px;
+background: rgba(69,71,90,0.8);
+color: var(–terminal-dim);
+font-size: 10px;
+padding: 2px 8px;
+border-radius: 4px;
+}
+
+/* ── Inline Guidelines Table ── */
+.guideline-table {
+width: 100%;
+border-collapse: collapse;
+margin: 20px 0;
+font-size: 14px;
+}
+.guideline-table th {
+text-align: left;
+font-weight: 600;
+padding: 10px 14px;
+border-bottom: 2px solid var(–border);
+color: var(–text-secondary);
+font-size: 12px;
+text-transform: uppercase;
+letter-spacing: 0.3px;
+}
+.guideline-table td {
+padding: 10px 14px;
+border-bottom: 1px solid #eee;
+vertical-align: top;
+}
+.guideline-table td code {
+font-size: 12px;
+}
+
+.philosophy-block {
+font-family: ‘SF Pro Display’, sans-serif;
+font-size: 22px;
+font-weight: 300;
+line-height: 1.5;
+color: var(–text-secondary);
+margin: 32px 0;
+padding-left: 20px;
+border-left: 2px solid var(–border);
+font-style: italic;
+}
+
+.color-swatch-row {
+display: flex; gap: 3px; margin: 8px 0; flex-wrap: wrap;
+}
+.color-swatch {
+width: 24px; height: 24px;
+border-radius: 4px;
+display: inline-block;
+}
+
+hr.section-break {
+border: none;
+border-top: 1px solid var(–border);
+margin: 48px 0 0;
+}
+
+.footnote {
+font-size: 12px;
+color: var(–text-tertiary);
+margin-top: 48px;
+padding-top: 16px;
+border-top: 1px solid var(–border);
+line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+.sidebar { display: none; }
+.main { margin-left: 0; padding: 32px 20px 80px; }
+}
+</style>
+
+</head>
+<body>
+
+<!-- Top Navigation -->
+
+<nav class="topnav">
+  <a href="#" class="topnav-logo" style="gap: 6px;">
+    <span style="font-family: 'JetBrains Mono', 'SF Mono', monospace; font-size: 11px; line-height: 0.95; display: inline-flex; flex-direction: column; align-items: center; position: relative; top: 1px;"><span style="position: relative; left: 3px;">_</span><span>(</span><span>)</span></span>
+    Developer
+  </a>
+  <div class="topnav-breadcrumb">
+    Design &nbsp;›&nbsp; <span>Terminal Interface Guidelines</span>
+  </div>
+</nav>
+
+<!-- Sidebar -->
+
+<aside class="sidebar">
+  <div class="sidebar-section-title">Terminal Interface Guidelines</div>
+  <a href="#overview" class="active">Overview</a>
+  <a href="#foundations">Foundations</a>
+  <a href="#philosophy">Design Philosophy</a>
+  <a href="#typography">Typography</a>
+  <a href="#color">Color</a>
+  <a href="#layout">Layout &amp; Composition</a>
+  <a href="#interaction">Interaction Model</a>
+  <a href="#resizing">Dynamic Resizing</a>
+
+  <div class="sidebar-section-title">Components</div>
+  <a href="#borders">Borders &amp; Boxes</a>
+  <a href="#tables">Data Tables</a>
+  <a href="#modals">Modal Dialogs</a>
+  <a href="#progress">Progress Indicators</a>
+
+  <div class="sidebar-section-title">Appendix</div>
+  <a href="#known-issues">Known Behaviors</a>
+  <a href="#deprecated">Deprecated Paradigms</a>
+</aside>
+
+<!-- Main Content -->
+
+<main class="main">
+
+  <div class="page-eyebrow">Design</div>
+  <h1 class="page-title">Terminal Interface<br>Guidelines</h1>
+  <p class="page-subtitle">
+    Designing immersive, pixel-considered experiences within the profound constraint of a fixed-width character grid.
+  </p>
+
+  <div class="philosophy-block" id="overview">
+    "There is a profound, almost spiritual moment when you open a terminal for the first time and realize: this is how software was always meant to feel. No shadows. No border-radius. No design system maintained by a team of fourteen. Just you, a grid, and the courage to render a box using the pipe character."
+    <br><br>
+    — Jony Ive, if he had grown up running Arch Linux
+  </div>
+
+  <!-- ─────────────────────────────── -->
+
+  <h2 id="foundations">Foundations</h2>
+
+  <p>
+    The Terminal Interface Guidelines (TIG) represent an unwavering commitment to the belief that great design can happen anywhere — even in a medium where your most expressive visual tool is the Unicode box-drawing character <code>U+2502</code>.
+  </p>
+  <p>
+    A well-crafted TUI is not merely an interface. It is a <em>statement</em>. It tells the user: "I could have built this in SwiftUI. I chose not to. I chose <em>this</em>." That choice — that deliberate act of restraint — is what separates a terminal application from a mere command-line tool.
+  </p>
+
+  <div class="callout">
+    <div class="callout-label">Important</div>
+    All TUI applications submitted to the Terminal App Store must be tested at a minimum of seven (7) different terminal widths, including the width at which your carefully centered title shifts one column to the left and everything looks subtly wrong but you can't quite articulate why.
+  </div>
+
+  <!-- ─────────────────────────────── -->
+
+  <h2 id="philosophy">Design Philosophy</h2>
+
+  <h3>Intentional Constraint</h3>
+  <p>
+    Where UIKit offers you millions of colors, scalable vectors, and sub-pixel anti-aliasing, the terminal offers you a grid. A beautiful, unforgiving, fixed-width grid. Each cell is a commitment. Each character is a choice. When you place a <code>┌</code> in column 0, row 0, you are not simply drawing a corner — you are making a promise to the user that a <code>┐</code> will appear exactly where they expect it.
+  </p>
+  <p>
+    Sometimes that promise is broken. We'll get to that.
+  </p>
+
+  <h3>Immersion Through Limitation</h3>
+  <p>
+    A great terminal interface achieves what no graphical application can: the sensation that you are <em>inside</em> the computer. The user does not look <em>at</em> a TUI — they inhabit it. Every flickering cursor is a heartbeat. Every screen redraw is a breath. Every inexplicable rendering glitch after an <code>ssh</code> session is a gentle reminder of your own mortality.
+  </p>
+
+  <h3>The Mouse is a Crutch</h3>
+  <p>
+    The mouse was invented in 1964 by Douglas Engelbart, who could not have foreseen that sixty years later it would be used primarily to accidentally highlight three paragraphs in a terminal while trying to scroll. The TIG rejects the mouse not out of elitism, but out of <em>mercy</em>.
+  </p>
+  <p>
+    All navigation must be achievable through keyboard input alone. If a user reaches for their mouse, you have failed. If a user reaches for their mouse and it <em>works</em>, you have failed catastrophically, because now you have to support it forever.
+  </p>
+
+  <div class="callout">
+    <div class="callout-label">Design Principle</div>
+    Every interaction in your TUI should be discoverable through a system of keyboard shortcuts that the user will never memorize, printed in a help panel they will never open, toggled by pressing <code>?</code> — which they will discover by accident while typing a search query.
+  </div>
+
+  <!-- ─────────────────────────────── -->
+
+  <h2 id="typography">Typography</h2>
+
+  <h3>Font Selection</h3>
+  <p>
+    The terminal operates in a monospaced environment. This is not a limitation — it is a <em>liberation</em>. In the graphical world, designers agonize over kerning, tracking, and the existential weight of choosing between Helvetica Neue and SF Pro. In the terminal, every character occupies exactly one cell. The letter <code>W</code> and the letter <code>i</code> coexist as equals. This is perhaps the only truly egalitarian space in all of computing.
+  </p>
+
+  <table class="guideline-table">
+    <tr>
+      <th>Context</th>
+      <th>Recommended Font</th>
+      <th>Acceptable Alternative</th>
+    </tr>
+    <tr>
+      <td>General UI</td>
+      <td><code>JetBrains Mono</code></td>
+      <td><code>SF Mono</code>, if you're in the ecosystem</td>
+    </tr>
+    <tr>
+      <td>Nostalgic warmth</td>
+      <td><code>IBM Plex Mono</code></td>
+      <td><code>Courier New</code>, but only ironically</td>
+    </tr>
+    <tr>
+      <td>Asserting dominance</td>
+      <td><code>Fira Code</code> with ligatures</td>
+      <td>Any Nerd Font variant</td>
+    </tr>
+    <tr>
+      <td>Dashboard / Status</td>
+      <td><code>Iosevka</code></td>
+      <td><code>Hack</code>, reluctantly</td>
+    </tr>
+    <tr>
+      <td>README screenshots</td>
+      <td>Whichever one makes your TUI look best on a 16" MacBook Pro in a dark room, photographed slightly off-axis</td>
+      <td>—</td>
+    </tr>
+  </table>
+
+  <div class="deprecated-callout">
+    <div class="deprecated-label">Deprecated</div>
+    <strong>Proportional fonts in terminal emulators.</strong> Some terminal emulators now support variable-width fonts. This is technically possible in the same way that it is technically possible to eat soup with a fork. We ask that you do not.
+  </div>
+
+  <h3>Nerd Fonts &amp; Iconography</h3>
+  <p>
+    Nerd Font glyphs allow you to display icons, powerline symbols, and other visual flourishes within the character grid. Use them to convey meaning at a glance — or, more commonly, to render a row of inscrutable symbols in your status bar that you will explain to no one.
+  </p>
+  <p>
+    The user should never need to install a custom font to use your application. The user will always need to install a custom font to use your application. Include a <code>README</code> section titled "Why does everything look like rectangles?" and link to <code>nerdfonts.com</code>. This is the way.
+  </p>
+
+  <!-- ─────────────────────────────── -->
+
+  <h2 id="color">Color</h2>
+
+  <h3>The 256-Color Palette</h3>
+  <p>
+    The modern terminal supports 256 colors. Let that sink in. Two hundred and fifty-six. Where the Retina display offers you sixteen million, the terminal gives you exactly enough to create a gradient that is, objectively, mid — but in context feels like the Sistine Chapel ceiling.
+  </p>
+  <p>
+    Use color with intention. A carefully chosen <code>fg: 114</code> (a muted seafoam) communicates calm professionalism. An accidental <code>fg: 196</code> (pure red) communicates that your CI pipeline has opinions about your last commit. These are different experiences and should be designed accordingly.
+  </p>
+
+  <div class="color-swatch-row" style="margin: 16px 0;">
+    <span class="color-swatch" style="background:#000"></span>
+    <span class="color-swatch" style="background:#800000"></span>
+    <span class="color-swatch" style="background:#008000"></span>
+    <span class="color-swatch" style="background:#808000"></span>
+    <span class="color-swatch" style="background:#000080"></span>
+    <span class="color-swatch" style="background:#800080"></span>
+    <span class="color-swatch" style="background:#008080"></span>
+    <span class="color-swatch" style="background:#c0c0c0"></span>
+    <span class="color-swatch" style="background:#808080"></span>
+    <span class="color-swatch" style="background:#ff0000"></span>
+    <span class="color-swatch" style="background:#00ff00"></span>
+    <span class="color-swatch" style="background:#ffff00"></span>
+    <span class="color-swatch" style="background:#0000ff"></span>
+    <span class="color-swatch" style="background:#ff00ff"></span>
+    <span class="color-swatch" style="background:#00ffff"></span>
+    <span class="color-swatch" style="background:#fff"></span>
+  </div>
+  <p style="font-size: 13px; color: var(--text-tertiary); margin-top: -8px;">
+    Figure 1. The base 16 ANSI colors. Your user has remapped all of them. The green is now pink. You were not consulted.
+  </p>
+
+  <div class="callout">
+    <div class="callout-label">Note</div>
+    True color (24-bit) is now supported by most modern terminal emulators. Resist the urge. The fact that you <em>can</em> render a photorealistic sunset in your todo-list application does not mean you <em>should</em>. TIG-compliant applications should use no more than 12 colors total. Eight, if you want to be taken seriously on Hacker News.
+  </div>
+
+  <h3>Dark Mode</h3>
+  <p>
+    All TUI applications are dark mode. There is no light mode. If a user has configured their terminal with a white background, that is between them and God, and your application should make no attempt to accommodate their choices.
+  </p>
+
+  <!-- ─────────────────────────────── -->
+
+  <h2 id="layout">Layout &amp; Composition</h2>
+
+  <h3>The Sacred Grid</h3>
+  <p>
+    Every terminal interface is composed on a grid of fixed-width cells. This grid is your canvas, your constraint, and — when the user resizes their terminal mid-render — your enemy. Respect it. All elements must align to cell boundaries. Sub-cell positioning is not possible, has never been possible, and the fact that you briefly considered it means you should take a walk.
+  </p>
+
+  <h3>Pixel-Perfect Layout: A Complete Example</h3>
+  <p>
+    The following example demonstrates a TIG-compliant dashboard layout, rendered at the recommended minimum width of 80 columns. Note the precise alignment of borders, the considered use of whitespace, and the harmonious relationship between the sidebar navigation and content area.
+  </p>
+
+  <!-- CORRECT LAYOUT -->
+
+  <div class="figure">
+    <div class="figure-label">
+      <span class="badge badge-correct">✓ Correct</span>
+      Terminal: 80×24 — The intended experience
+    </div>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="terminal-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+        cloudctl — 80×24
+      </div>
+      <div class="terminal-body"><span class="t-dim">┌──────────────────────────────────────────────────────────────────────────────┐</span>
+<span class="t-dim">│</span> <span class="t-blue t-bold">☁  CloudCtl</span>                              <span class="t-dim">v2.4.1</span>    <span class="t-green">● Connected</span>    <span class="t-dim">12:04 PM</span> <span class="t-dim">│</span>
+<span class="t-dim">├──────────────┬───────────────────────────────────────────────────────────────┤</span>
+<span class="t-dim">│</span> <span class="t-mauve">▸ Dashboard</span>  <span class="t-dim">│</span>  <span class="t-bold">Cluster Overview</span>                                              <span class="t-dim">│</span>
+<span class="t-dim">│</span>   Services   <span class="t-dim">│</span>                                                              <span class="t-dim">│</span>
+<span class="t-dim">│</span>   Pods       <span class="t-dim">│</span>  <span class="t-green">Nodes:</span>   <span class="t-bold">3/3</span> healthy         <span class="t-green">████████████████</span> <span class="t-bold">100%</span>  <span class="t-dim">│</span>
+<span class="t-dim">│</span>   Nodes      <span class="t-dim">│</span>  <span class="t-yellow">Pods:</span>   <span class="t-bold">42/50</span> running        <span class="t-green">█████████████</span><span class="t-yellow">███</span> <span class="t-bold"> 84%</span>  <span class="t-dim">│</span>
+<span class="t-dim">│</span>   Config     <span class="t-dim">│</span>  <span class="t-blue">Memory:</span> <span class="t-bold">12.4/16</span> GB           <span class="t-green">████████████</span><span class="t-dim">████</span> <span class="t-bold"> 78%</span>  <span class="t-dim">│</span>
+<span class="t-dim">│</span>   Logs       <span class="t-dim">│</span>  <span class="t-red">CPU:</span>    <span class="t-bold">67%</span> avg              <span class="t-green">████████████</span><span class="t-dim">████</span> <span class="t-bold"> 67%</span>  <span class="t-dim">│</span>
+<span class="t-dim">│</span>              <span class="t-dim">│</span>                                                              <span class="t-dim">│</span>
+<span class="t-dim">│</span>              <span class="t-dim">│</span>  <span class="t-dim">─── Recent Events ───────────────────────────────</span>              <span class="t-dim">│</span>
+<span class="t-dim">│</span>              <span class="t-dim">│</span>  <span class="t-green">12:03</span>  Pod <span class="t-blue">web-frontend-7d4b</span> scaled to 3 replicas       <span class="t-dim">│</span>
+<span class="t-dim">│</span>              <span class="t-dim">│</span>  <span class="t-green">12:01</span>  Deployment <span class="t-blue">api-v2</span> rollout complete              <span class="t-dim">│</span>
+<span class="t-dim">│</span>              <span class="t-dim">│</span>  <span class="t-yellow">11:58</span>  Node <span class="t-yellow">worker-02</span> memory pressure warning         <span class="t-dim">│</span>
+<span class="t-dim">│</span>              <span class="t-dim">│</span>  <span class="t-green">11:55</span>  ConfigMap <span class="t-blue">nginx-conf</span> updated                    <span class="t-dim">│</span>
+<span class="t-dim">│</span>              <span class="t-dim">│</span>                                                              <span class="t-dim">│</span>
+<span class="t-dim">├──────────────┴───────────────────────────────────────────────────────────────┤</span>
+<span class="t-dim">│</span> <span class="t-dim">? Help  q Quit  / Search  ↑↓ Navigate  ⏎ Select  r Refresh              </span> <span class="t-dim">│</span>
+<span class="t-dim">└──────────────────────────────────────────────────────────────────────────────┘</span></div>
+      <div class="dimension-tag">80 × 24</div>
+    </div>
+  </div>
+
+  <p>
+    Beautiful. Every box-drawing character aligns. The progress bars terminate precisely at the right border. The status line breathes. You could frame this. Some people have.
+  </p>
+  <p>
+    Now observe what happens when the user exercises their <em>fundamental human right</em> to make the terminal three columns narrower:
+  </p>
+
+  <!-- BROKEN LAYOUT -->
+
+  <div class="figure">
+    <div class="figure-label">
+      <span class="badge badge-incorrect">✗ Incorrect</span>
+      Terminal: 77×24 — The user resized the window "a tiny bit"
+    </div>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="terminal-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+        cloudctl — 77×24
+      </div>
+      <div class="terminal-body"><span class="t-dim">┌──────────────────────────────────────────────────────────────────────────────┐</span>
+<span class="t-dim">│</span> <span class="t-blue t-bold">☁  CloudCtl</span>                              <span class="t-dim">v2.4.1</span>    <span class="t-green">● Connected</span>    <span class="t-dim">12:04</span>
+<span class="t-dim">PM</span> <span class="t-dim">│</span>
+<span class="t-dim">├──────────────┬────────────────────────────────────────────────────────────</span>
+<span class="t-dim">───┤</span>
+<span class="t-dim">│</span> <span class="t-mauve">▸ Dashboard</span>  <span class="t-dim">│</span>  <span class="t-bold">Cluster Overview</span>                                           <span class="t-dim">│</span>
+<span class="t-dim">│</span>   Services   <span class="t-dim">│</span>
+<span class="t-dim">│</span>   Pods       <span class="t-dim">│</span>  <span class="t-green">Nodes:</span>   <span class="t-bold">3/3</span> healthy         <span class="t-green">████████████████</span> <span class="t-bold">100%</span>
+<span class="t-dim">│</span>
+<span class="t-dim">│</span>   Nodes      <span class="t-dim">│</span>  <span class="t-yellow">Pods:</span>   <span class="t-bold">42/50</span> running        <span class="t-green">█████████████</span><span class="t-yellow">███</span> <span class="t-bold"> 84</span>
+<span class="t-red">%  │</span>
+<span class="t-dim">│</span>   Config     <span class="t-dim">│</span>  <span class="t-blue">Memory:</span> <span class="t-bold">12.4/16</span> GB           <span class="t-green">████████████</span><span class="t-dim">████</span> <span class="t-bold"> 7</span>
+<span class="t-red">8%  │</span>
+<span class="t-dim">│</span>   Logs       <span class="t-dim">│</span>  <span class="t-red">CPU:</span>    <span class="t-bold">67%</span> avg              <span class="t-green">████████████</span><span class="t-dim">████</span> <span class="t-bold"> 6</span>
+<span class="t-red">7%  │</span>
+<span class="t-dim">│</span>              <span class="t-dim">│</span>
+<span class="t-dim">│</span>              <span class="t-dim">│</span>  <span class="t-dim">─── Recent Events ─────────────────────────────</span>
+<span class="t-dim">──              │</span>
+<span class="t-dim">│</span>              <span class="t-dim">│</span>  <span class="t-green">12:03</span>  Pod <span class="t-blue">web-frontend-7d4b</span> scaled to 3 replic
+<span class="t-dim">as       │</span>
+<span class="t-dim">│</span>              <span class="t-dim">│</span>  <span class="t-green">12:01</span>  Deployment <span class="t-blue">api-v2</span> rollout complete
+              <span class="t-dim">│</span>
+<span class="t-dim">│</span>              <span class="t-dim">│</span>  <span class="t-yellow">11:58</span>  Node <span class="t-yellow">worker-02</span> memory pressure warni
+<span class="t-dim">ng         │</span>
+<span class="t-dim">│</span>              <span class="t-dim">│</span>  <span class="t-green">11:55</span>  ConfigMap <span class="t-blue">nginx-conf</span> updated
+                    <span class="t-dim">│</span>
+<span class="t-dim">│</span>              <span class="t-dim">│</span>
+<span class="t-dim">├──────────────┴────────────────────────────────────────────────────────────</span>
+<span class="t-dim">───┤</span>
+<span class="t-dim">│</span> <span class="t-dim">? Help  q Quit  / Search  ↑↓ Navigate  ⏎ Select  r Refresh</span>
+   <span class="t-dim">│</span>
+<span class="t-dim">└──────────────────────────────────────────────────────────────────────────────┘</span></div>
+      <div class="dimension-tag">77 × 24</div>
+    </div>
+  </div>
+
+  <p>
+    This is what the industry refers to as a "character-level reflow event." The user will refer to it as "broken." Both are correct. Note how <code>PM</code> has emigrated to its own line. Note how the percentage signs have developed a sense of independence. The bottom border, a stoic survivor, remains at its original 80-column width, now extending boldly into the void.
+  </p>
+
+  <!-- ─────────────────────────────── -->
+
+  <h2 id="borders">Borders &amp; Box Drawing</h2>
+
+  <h3>Character Selection</h3>
+  <p>
+    The Unicode box-drawing block (<code>U+2500</code>–<code>U+257F</code>) provides 128 characters for constructing borders. You will use approximately six of them. The remaining 122 exist to populate blog posts titled "You Won't Believe What Unicode Can Do."
+  </p>
+
+  <table class="guideline-table">
+    <tr><th>Style</th><th>Characters</th><th>Use Case</th></tr>
+    <tr>
+      <td>Light</td>
+      <td><code>┌ ─ ┐ │ └ ┘</code></td>
+      <td>Standard containers, the backbone of civilization</td>
+    </tr>
+    <tr>
+      <td>Heavy</td>
+      <td><code>┏ ━ ┓ ┃ ┗ ┛</code></td>
+      <td>Focus states, active selections, "look at this one"</td>
+    </tr>
+    <tr>
+      <td>Double</td>
+      <td><code>╔ ═ ╗ ║ ╚ ╝</code></td>
+      <td>Dialog boxes, modal confirmations, "are you <em>sure</em>"</td>
+    </tr>
+    <tr>
+      <td>Rounded</td>
+      <td><code>╭ ─ ╮ │ ╰ ╯</code></td>
+      <td>A gentler container. Use when your TUI is having a soft day.</td>
+    </tr>
+    <tr>
+      <td>ASCII fallback</td>
+      <td><code>+ - + | + +</code></td>
+      <td>SSH into a machine running <code>screen</code> inside <code>tmux</code> inside <code>mosh</code>. God help you.</td>
+    </tr>
+  </table>
+
+  <!-- ─────────────────────────────── -->
+
+  <h2 id="interaction">Interaction Model</h2>
+
+  <h3>Keyboard-First Navigation</h3>
+  <p>
+    TIG-compliant applications must support a minimum of three navigation paradigms simultaneously, ensuring that no single user can remember all of them:
+  </p>
+
+  <div class="code-block"><span class="t-dim">// Required keybindings for TIG compliance</span>
+
+<span class="t-green">Arrow keys</span>     → Navigation (obvious)
+<span class="t-green">hjkl</span>           → Navigation (vim users, who will email you if absent)
+<span class="t-green">Ctrl+N / Ctrl+P</span> → Navigation (emacs users, who will not email you
+but will write a 4,000-word blog post)
+<span class="t-green">Tab / Shift+Tab</span> → Focus cycling (everyone, reluctantly)
+<span class="t-green">g / G</span>           → Jump to top/bottom (vim users again, sorry)
+<span class="t-green">q</span>              → Quit (unless you’re in a text input, in which
+case you’ve just typed ‘q’ and must now undo it,
+which requires pressing ‘u’, which types ‘u’)</div>
+
+  <div class="callout">
+    <div class="callout-label">Design Principle</div>
+    The ideal TUI keybinding scheme should feel instantly familiar to users of vim, emacs, and readline, while being subtly incompatible with all three.
+  </div>
+
+  <!-- ─────────────────────────────── -->
+
+  <h2 id="resizing">Dynamic Resizing</h2>
+
+  <h3>The SIGWINCH Promise</h3>
+  <p>
+    When the user resizes their terminal, the operating system delivers a <code>SIGWINCH</code> signal to your process. This is the system's way of saying: "something has changed, and it is now your problem."
+  </p>
+  <p>
+    A TIG-compliant application must handle <code>SIGWINCH</code> gracefully. "Gracefully" is defined as: re-rendering the interface within 16 milliseconds while simultaneously recalculating the layout of every visible element, reflowing text, adjusting progress bar widths, repositioning the cursor, and suppressing the urge to simply call <code>exit(1)</code>.
+  </p>
+
+  <h3>Responsive Breakpoints</h3>
+
+  <table class="guideline-table">
+    <tr><th>Width</th><th>Classification</th><th>Guidance</th></tr>
+    <tr>
+      <td><code>≥ 120</code></td>
+      <td>Luxurious</td>
+      <td>Three-column layout. Show everything. You are wealthy in columns.</td>
+    </tr>
+    <tr>
+      <td><code>80–119</code></td>
+      <td>Standard</td>
+      <td>The canonical experience. Design here first.</td>
+    </tr>
+    <tr>
+      <td><code>60–79</code></td>
+      <td>Constrained</td>
+      <td>Collapse the sidebar. Truncate what you must. Mourn what is lost.</td>
+    </tr>
+    <tr>
+      <td><code>40–59</code></td>
+      <td>Hostile</td>
+      <td>Single-column survival mode. Abbreviate labels. Hide the progress bars. Pray.</td>
+    </tr>
+    <tr>
+      <td><code>&lt; 40</code></td>
+      <td>Philosophical</td>
+      <td>At this width, the question is no longer "how do I render my UI" but "what is a UI, really?" Display only the application name and a blinking cursor. The user will understand.</td>
+    </tr>
+  </table>
+
+  <p>
+    To illustrate the full spectrum, observe a TIG-compliant file manager adapting to a terminal that has been resized to the width of a smartphone held by someone with second thoughts:
+  </p>
+
+  <!-- CATASTROPHIC RESIZE -->
+
+  <div class="figure">
+    <div class="figure-label">
+      <span class="badge badge-catastrophic">☠ Catastrophic</span>
+      Terminal: 38×12 — The user split their terminal inside tmux inside a tiling WM
+    </div>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="terminal-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+        filectl — 38×12
+      </div>
+      <div class="terminal-body"><span class="t-dim">╭────────────────────────────────────╮</span>
+<span class="t-dim">│</span> <span class="t-blue t-bold">📁 Fi…</span>  <span class="t-dim">/hom</span>
+<span class="t-dim">│</span> <span class="t-dim">e/user/Documents/Projects/my-</span>
+<span class="t-dim">│</span> <span class="t-dim">really-long-project-name-tha</span>
+<span class="t-dim">│</span> <span class="t-dim">t-i-should-have-shortened</span>     <span class="t-dim">│</span>
+<span class="t-dim">├────────────────────────────────────┤</span>
+<span class="t-dim">│</span> <span class="t-green">▸</span> <span class="t-bold">nod</span> <span class="t-red">│</span> <span class="t-green">▸</span> <span class="t-bold">src</span> <span class="t-red">│</span> <span class="t-green">▸</span> <span class="t-bold">tes</span> <span class="t-red">│</span> <span class="t-green">▸</span> <span class="t-bold">.</span>
+<span class="t-dim">│</span> <span class="t-dim">e_mo</span>  <span class="t-dim">│   /</span>   <span class="t-dim">│</span>  <span class="t-dim">ts/</span>  <span class="t-dim">│</span> <span class="t-dim">gi</span>
+<span class="t-dim">│</span> <span class="t-dim">dule</span>  <span class="t-dim">│</span>       <span class="t-dim">│</span>       <span class="t-dim">│</span> <span class="t-dim">t/</span>
+<span class="t-dim">├────────────────────────────────────┤</span>
+<span class="t-dim">│</span> <span class="t-dim">q:Quit hjkl:Nav ⏎:Open ?:He</span>
+<span class="t-dim">╰────────────────────────────────────╯</span></div>
+      <div class="dimension-tag">38 × 12</div>
+    </div>
+  </div>
+
+  <p>
+    This is what we call a "character-level disagreement between intent and container." The directory name, once a clear identifier, now reads like a ransom note. The file columns have merged into a single, unified cry for help. The help bar has been truncated at <code>?:He</code>, which is the exact question the user is asking.
+  </p>
+  <p>
+    This is correct behavior.
+  </p>
+
+  <!-- ─────────────────────────────── -->
+
+  <h2 id="progress">Progress Indicators</h2>
+
+  <h3>The Art of the Progress Bar</h3>
+  <p>
+    A progress bar in a terminal is constructed from block characters of varying fullness: <code>█ ▓ ▒ ░</code>. This gives you four levels of visual density with which to communicate progress, or — in practice — three more than you need, because everyone just uses <code>█</code> and a space character.
+  </p>
+
+  <div class="figure">
+    <div class="figure-label">
+      <span class="badge badge-correct">✓ Correct</span>
+      Progress bar at 80 columns — a thing of beauty
+    </div>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="terminal-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+        install — 80×6
+      </div>
+      <div class="terminal-body">
+  <span class="t-bold">Installing dependencies...</span>
+
+<span class="t-blue">react</span>          <span class="t-green">████████████████████████████████████████████</span><span class="t-dim">░░░░░</span>  <span class="t-bold">89%</span>
+<span class="t-blue">typescript</span>      <span class="t-green">███████████████████████████████████████</span><span class="t-dim">░░░░░░░░░░</span>  <span class="t-bold">76%</span>
+<span class="t-blue">left-pad</span>        <span class="t-green">█████████████████████████████████████████████████</span> <span class="t-bold">100%</span></div>
+</div>
+
+  </div>
+
+  <div class="figure">
+    <div class="figure-label">
+      <span class="badge badge-incorrect">✗ Incorrect</span>
+      Same progress bar, 74 columns — the percentages have fled
+    </div>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="terminal-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+        install — 74×6
+      </div>
+      <div class="terminal-body">
+  <span class="t-bold">Installing dependencies...</span>
+
+<span class="t-blue">react</span>          <span class="t-green">████████████████████████████████████████████</span><span class="t-dim">░░░░░</span>  <span class="t-bold">89</span>
+<span class="t-bold">%</span>
+<span class="t-blue">typescript</span>      <span class="t-green">███████████████████████████████████████</span><span class="t-dim">░░░░░░░░░░</span>  <span class="t-bold">7</span>
+<span class="t-bold">6%</span>
+<span class="t-blue">left-pad</span>        <span class="t-green">█████████████████████████████████████████████████</span> <span class="t-bold">1</span>
+<span class="t-bold">00%</span></div>
+</div>
+
+  </div>
+
+  <p>
+    The percentage signs have been separated from their numbers. <code>react</code> is reported as <code>89</code>-newline-<code>%</code>. TypeScript is <code>7</code>-newline-<code>6%</code>. Somewhere, in a parallel universe, these are valid numbers. In this universe, your user has filed a bug report titled "my install is 7-6% complete???"
+  </p>
+
+  <!-- ─────────────────────────────── -->
+
+  <h2 id="modals">Modal Dialogs</h2>
+
+  <p>
+    A modal dialog in a TUI is achieved by rendering a second box on top of the first box. This is the terminal equivalent of a <code>UIAlertController</code>, if the <code>UIAlertController</code> was drawn by hand using typographic characters and could be defeated by resizing the window.
+  </p>
+
+  <div class="figure">
+    <div class="figure-label">
+      <span class="badge badge-correct">✓ Correct</span>
+      A perfectly centered confirmation dialog
+    </div>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="terminal-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+        app — 60×14
+      </div>
+      <div class="terminal-body"><span class="t-dim">┌──────────────────────────────────────────────────────────┐</span>
+<span class="t-dim">│</span>  <span class="t-bold">My Documents</span>                          <span class="t-dim">3 items</span>         <span class="t-dim">│</span>
+<span class="t-dim">│</span>                                                          <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">  ┌──────────────────────────────────┐</span>                <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">  │</span>                                  <span class="t-dim">│</span>                <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">  │</span>  <span class="t-red t-bold">⚠ Delete 3 files?</span>              <span class="t-dim">│</span>                <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">  │</span>                                  <span class="t-dim">│</span>                <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">  │</span>  This cannot be undone.          <span class="t-dim">│</span>                <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">  │</span>                                  <span class="t-dim">│</span>                <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">  │</span>    <span class="t-red">[Delete]</span>     <span class="t-dim">[Cancel]</span>       <span class="t-dim">│</span>                <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">  │</span>                                  <span class="t-dim">│</span>                <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">  └──────────────────────────────────┘</span>                <span class="t-dim">│</span>
+<span class="t-dim">│</span>                                                          <span class="t-dim">│</span>
+<span class="t-dim">└──────────────────────────────────────────────────────────┘</span></div>
+    </div>
+  </div>
+
+  <div class="figure">
+    <div class="figure-label">
+      <span class="badge badge-incorrect">✗ Incorrect</span>
+      The same dialog, after the user made the terminal 5 columns wider and the centering math broke
+    </div>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="terminal-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+        app — 65×14
+      </div>
+      <div class="terminal-body"><span class="t-dim">┌───────────────────────────────────────────────────────────────┐</span>
+<span class="t-dim">│</span>  <span class="t-bold">My Documents</span>                               <span class="t-dim">3 items</span>         <span class="t-dim">│</span>
+<span class="t-dim">│</span>                                                               <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">  ┌──────────────────────────────────┐</span>                     <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">  │</span>                                  <span class="t-dim">│</span>                     <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">  │</span>  <span class="t-red t-bold">⚠ Delete 3 files?</span>              <span class="t-dim">│</span>                     <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">  │</span>                                  <span class="t-dim">│</span>                     <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">  │</span>  This cannot be undone.          <span class="t-dim">│</span>                     <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">  │</span>                                  <span class="t-dim">│</span>                     <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">  │</span>    <span class="t-red">[Delete]</span>     <span class="t-dim">[Cancel]</span>       <span class="t-dim">│</span>                     <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">  │</span>                                  <span class="t-dim">│</span>                     <span class="t-dim">│</span>
+<span class="t-dim">│</span>  <span class="t-dim">  └──────────────────────────────────┘</span>                     <span class="t-dim">│</span>
+<span class="t-dim">│</span>                                                               <span class="t-dim">│</span>
+<span class="t-dim">└───────────────────────────────────────────────────────────────┘</span></div>
+    </div>
+  </div>
+
+  <p>
+    The outer container has dutifully expanded to accommodate the new width. The inner dialog has not. It sits there, pinned to the left, like a painting that was centered above the fireplace before someone extended the mantle. The asymmetry is not a bug — it is a <em>conversation</em> between your layout engine and the void.
+  </p>
+
+  <!-- ─────────────────────────────── -->
+
+  <h2 id="known-issues">Known Behaviors</h2>
+
+  <p>
+    The TIG recognizes certain persistent behaviors that exist across all terminal applications. These are not bugs. They are <em>characteristics</em>.
+  </p>
+
+  <table class="guideline-table">
+    <tr><th>Behavior</th><th>Classification</th><th>Resolution</th></tr>
+    <tr>
+      <td>Box-drawing characters render as <code>?</code> in certain locales</td>
+      <td>Environmental</td>
+      <td>Tell the user to set <code>LANG=en_US.UTF-8</code>. They will ask why. You will say "locale." They will nod, understanding nothing. Both of you will move on.</td>
+    </tr>
+    <tr>
+      <td>Emoji occupy two cells in some terminals and one cell in others</td>
+      <td>Ontological</td>
+      <td>Do not use emoji in your TUI. If you must use emoji, test on every terminal emulator. If you test on every terminal emulator, you will discover that each one is wrong in a different, creative, and irreconcilable way. Do not use emoji in your TUI.</td>
+    </tr>
+    <tr>
+      <td>Colors look completely different on every machine</td>
+      <td>Spiritual</td>
+      <td>Accept that your carefully chosen palette of muted pastels will render as <em>neon clown vomit</em> on any machine running a "Gruvbox" variant. Design for intent, not outcome. This is also good life advice.</td>
+    </tr>
+    <tr>
+      <td>The cursor disappears during rapid redraws</td>
+      <td>Temporal</td>
+      <td>The cursor exists in a quantum state. It is both blinking and not blinking. Do not observe it directly. It will return when it is ready.</td>
+    </tr>
+    <tr>
+      <td>Scrollback buffer contains ghosts of previous layouts</td>
+      <td>Haunted</td>
+      <td>If the user scrolls up in their terminal, they will encounter the tattered remains of previous render frames. These are load-bearing artifacts and should not be cleaned up, as doing so may anger whatever spirit inhabits your alternate screen buffer.</td>
+    </tr>
+  </table>
+
+  <!-- ─────────────────────────────── -->
+
+  <h2 id="deprecated">Deprecated Paradigms</h2>
+
+  <div class="deprecated-callout">
+    <div class="deprecated-label">Deprecated in TIG 2.0</div>
+    <strong>Mouse support.</strong> Click handling was introduced as an experimental feature in TIG 1.2. It has been deprecated because it works. Specifically, it works <em>just well enough</em> that users expect it to work everywhere, including in nested scroll regions, which it does not. The resulting support burden has been classified as "unsustainable" and "genuinely haunting."
+  </div>
+
+  <div class="deprecated-callout">
+    <div class="deprecated-label">Deprecated in TIG 2.0</div>
+    <strong>Inline images (iTerm2/Sixel).</strong> Some terminal emulators support rendering images inline. This is impressive, unnecessary, and will break in <code>tmux</code>. If the user wanted to see images, they would not be in a terminal. Respect their choices.
+  </div>
+
+  <div class="deprecated-callout">
+    <div class="deprecated-label">Deprecated in TIG 1.5</div>
+    <strong>The <code>clear</code> command.</strong> Calling <code>clear</code> to reset the screen is the TUI equivalent of flipping the table when you lose at chess. Use the alternate screen buffer (<code>\e[?1049h</code>) like a civilized person.
+  </div>
+
+  <div class="deprecated-callout">
+    <div class="deprecated-label">Removed</div>
+    <strong>Asking the user their terminal width.</strong> Your application must detect the terminal width. Displaying a prompt that reads <code>"How wide is your terminal? [80]:"</code> is an admission of defeat and will result in your application being removed from the Terminal App Store and your commit history being audited.
+  </div>
+
+  <!-- ─────────────────────────────── -->
+
+  <div class="philosophy-block" style="margin-top: 64px;">
+    "We believe the terminal is not a step backward. It is a step <em>inward</em>. Toward the machine. Toward the craft. Toward a world where the only thing between the user and their data is a monospaced font and the unwavering belief that <code>U+2502</code> is all you will ever need."
+    <br><br>
+    — Terminal Interface Guidelines, 80 Pixel Dr, 2026
+  </div>
+
+  <div class="footnote">
+    <p>
+      <strong>Terminal Interface Guidelines</strong> · Revision 2.0.1 · March 2026<br>
+      © 2026 Pear Inc. All rights reserved. 80 Pixel Dr, Cupertino-ish, CA. Rendered in a terminal at 80 columns. Do not resize this page.
+    </p>
+    <p style="margin-top: 8px;">
+      <em>Filed under: Documentation › Design › Things We Made At 2 AM</em>
+    </p>
+  </div>
+
+</main>
+
+</body>
+</html>

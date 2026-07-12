@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orbly — Issues</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0d0d; --bg-s: #161616; --bg-h: #1c1c1c; --bg-a: #222;
+  --bdr: #2a2a2a; --bdr-l: #1f1f1f;
+  --t: #eee; --t2: #888; --t3: #555; --t4: #3a3a3a;
+  --acc: #5e6ad2; --acc-s: rgba(94,106,210,0.12);
+  --urg: #e5484d; --hi: #e5934b; --md: #d4a72c; --lo: #6e7781; --no: #444; --done: #46a758;
+  --sw: 220px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--t);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow:hidden;height:100vh}
+
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(–sw);background:var(–bg);border-right:1px solid var(–bdr);display:flex;flex-direction:column;padding:12px 8px;overflow-y:auto;z-index:10}
+.sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:var(–bdr);border-radius:2px}
+.sb{display:flex;align-items:center;gap:8px;padding:6px 8px;margin-bottom:16px;font-weight:600;font-size:14px}
+.bi{width:22px;height:22px;background:linear-gradient(135deg,#5e6ad2,#8b5cf6);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.ss{margin-bottom:16px}
+.sl{font-size:11px;font-weight:600;color:var(–t3);text-transform:uppercase;letter-spacing:.5px;padding:0 8px;margin-bottom:4px}
+.si{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;color:var(–t2);cursor:pointer;font-size:13px;transition:all .1s}
+.si:hover{background:var(–bg-h);color:var(–t)}.si.act{background:var(–acc-s);color:var(–t)}
+.si .ic{font-size:15px;width:18px;text-align:center;flex-shrink:0}
+.si .ct{margin-left:auto;font-size:11px;color:var(–t3);font-family:‘JetBrains Mono’,monospace}
+.si.sk{color:var(–t4);text-decoration:line-through}.si.sk .ic{opacity:.3}
+.si.gh{opacity:.35}
+.su{margin-top:auto;display:flex;align-items:center;gap:8px;padding:8px;border-top:1px solid var(–bdr)}
+.ua{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;background:#46a758}
+
+.main{margin-left:var(–sw);height:100vh;display:flex;flex-direction:column}
+.hdr{display:flex;align-items:center;padding:12px 20px;border-bottom:1px solid var(–bdr);gap:12px;flex-shrink:0}
+.hb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(–t2)}.hb .sp{color:var(–t3)}.hb .cu{color:var(–t);font-weight:500}
+.hr{margin-left:auto;display:flex;align-items:center;gap:8px}
+.btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:5px;border:1px solid var(–bdr);background:0;color:var(–t2);font-size:12px;font-weight:500;cursor:pointer;font-family:‘Inter’,sans-serif}
+.btn:hover{background:var(–bg-h);color:var(–t)}
+.vt{display:flex;border:1px solid var(–bdr);border-radius:5px;overflow:hidden}
+.vt div{padding:5px 12px;font-size:12px;font-weight:500;color:var(–t2);cursor:pointer;border-right:1px solid var(–bdr)}
+.vt div:last-child{border-right:0}.vt div.a{background:var(–bg-a);color:var(–t)}
+
+.cy{display:flex;align-items:center;padding:10px 20px;border-bottom:1px solid var(–bdr);gap:12px;flex-shrink:0}
+.cn{font-size:14px;font-weight:600}
+.cm{font-size:12px;color:var(–t3);display:flex;align-items:center;gap:12px}
+.ov{font-size:10px;font-weight:600;background:rgba(229,72,77,.15);color:var(–urg);padding:2px 8px;border-radius:3px;text-transform:uppercase;letter-spacing:.3px}
+.cb{width:120px;height:4px;background:var(–bdr);border-radius:2px;overflow:hidden;display:flex}
+.cf{height:100%}.cs{font-size:12px;color:var(–t3)}
+
+.iss{flex:1;overflow-y:auto}.iss::-webkit-scrollbar{width:6px}.iss::-webkit-scrollbar-thumb{background:var(–bdr);border-radius:3px}
+.sg{border-bottom:1px solid var(–bdr-l)}
+.sh{display:flex;align-items:center;gap:8px;padding:8px 20px;font-size:12px;font-weight:600;color:var(–t2);cursor:pointer;position:sticky;top:0;background:var(–bg);z-index:2}
+.sd{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sc{font-weight:400;color:var(–t3);font-family:‘JetBrains Mono’,monospace;font-size:11px}
+
+.row{display:flex;align-items:center;padding:6px 20px;gap:10px;cursor:pointer;transition:background .08s}
+.row:hover{background:var(–bg-h)}
+.ip{width:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.pb{width:3px;border-radius:1px}
+.pu{height:12px;background:var(–urg);box-shadow:0 0 6px rgba(229,72,77,.4)}
+.ph{height:10px;background:var(–hi)}.pm{height:8px;background:var(–md)}.pl{height:6px;background:var(–lo)}.pn{height:4px;background:var(–no)}
+.rid{font-family:‘JetBrains Mono’,monospace;font-size:11px;color:var(–t3);width:56px;flex-shrink:0}
+.rt{flex:1;font-size:13px;color:var(–t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rt.st{color:var(–t2)}.rt.dd{color:var(–t3);text-decoration:line-through}
+.rls{display:flex;gap:4px;flex-shrink:0;flex-wrap:nowrap}
+.rl{font-size:10px;font-weight:500;padding:2px 7px;border-radius:3px;white-space:nowrap}
+.lp{background:rgba(229,72,77,.12);color:#e5484d}
+.lr{background:rgba(94,106,210,.12);color:#7c8aec}
+.ld{background:rgba(228,169,44,.12);color:#d4a72c}
+.lu{background:rgba(229,72,77,.2);color:#f27474;border:1px solid rgba(229,72,77,.3)}
+.lb{background:rgba(229,72,77,.1);color:#e5484d}
+.lds{background:rgba(171,120,234,.12);color:#b07ce8}
+.lbg{background:rgba(229,72,77,.1);color:#e5484d}
+.ll{background:rgba(100,100,100,.15);color:#777}
+.lm{background:rgba(229,72,77,.2);color:#ff6b6b;border:1px solid rgba(229,72,77,.25);font-weight:600}
+.li{background:rgba(46,167,85,.1);color:#46a758}
+.lq{background:rgba(94,106,210,.08);color:#888}
+.ls{background:rgba(228,169,44,.15);color:#d4a72c;border:1px solid rgba(228,169,44,.2)}
+.lh{background:rgba(171,120,234,.12);color:#b07ce8}
+.lo2{background:rgba(94,106,210,.1);color:#8b9cf6}
+.lp1{background:rgba(229,72,77,.15);color:#e5484d;font-weight:600}
+.lmo{background:rgba(46,167,85,.1);color:#46a758}
+.lon{background:rgba(94,106,210,.08);color:#5e6ad2}
+.lsc{background:rgba(171,120,234,.08);color:#a78bfa}
+
+.ra{width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff}
+.ap{background:#46a758}.ak{background:#5e6ad2}.aj{background:#e5934b;opacity:.35}.am{background:#e5484d}.ad{background:#555;opacity:.25;border:1px dashed #666}.an{background:0;border:1px dashed var(–t3)}
+.rdt{font-size:11px;color:var(–t3);font-family:‘JetBrains Mono’,monospace;width:64px;text-align:right;flex-shrink:0}
+.do{color:var(–urg)}.ds{color:var(–t4)}
+
+.oly{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:15;display:none}.oly.sh{display:block}
+.dtl{position:fixed;top:0;right:-500px;bottom:0;width:500px;background:var(–bg-s);border-left:1px solid var(–bdr);z-index:20;transition:right .2s ease;overflow-y:auto}
+.dtl.op{right:0}
+.dh{display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(–bdr)}
+.dx{background:0;border:0;color:var(–t2);font-size:18px;cursor:pointer;padding:4px;border-radius:4px}.dx:hover{background:var(–bg-h)}
+.di{font-family:‘JetBrains Mono’,monospace;font-size:12px;color:var(–t3)}
+.dbd{padding:20px}
+.dtit{font-size:18px;font-weight:600;margin-bottom:16px;line-height:1.4}
+.dmt{display:grid;grid-template-columns:100px 1fr;gap:8px 12px;font-size:13px;margin-bottom:20px}
+.dml{color:var(–t3)}.dmv{color:var(–t2)}
+.dds{font-size:14px;line-height:1.7;color:var(–t2);border-top:1px solid var(–bdr);padding-top:16px}
+.dds p{margin-bottom:12px}
+.dds ul{margin:8px 0;padding-left:18px}
+.dds li{margin-bottom:4px}
+.c{margin-top:16px;padding:12px 14px;background:var(–bg);border:1px solid var(–bdr);border-radius:6px;font-size:13px}
+.ca{font-weight:600;color:var(–t);font-size:12px;margin-bottom:4px}
+.cd{font-size:11px;color:var(–t4);margin-left:8px;font-weight:400}
+.cb2{color:var(–t2)}.ce{font-size:20px;margin-top:6px}
+
+@media(max-width:768px){.sidebar{display:none}.main{margin-left:0}}
+</style>
+
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb"><span class="bi">O</span> Orbly</div>
+  <div class="ss">
+    <div class="si"><span class="ic">🔍</span> Search</div>
+    <div class="si"><span class="ic">📥</span> Inbox <span class="ct" style="color:var(--urg)">47</span></div>
+    <div class="si"><span class="ic">📊</span> My Issues <span class="ct">23</span></div>
+  </div>
+  <div class="ss">
+    <div class="sl">Workspace</div>
+    <div class="si act"><span class="ic">📋</span> Active Cycle</div>
+    <div class="si"><span class="ic">📦</span> Backlog <span class="ct" style="color:var(--hi)">347</span></div>
+    <div class="si"><span class="ic">🗺️</span> Roadmap <span class="ct" style="color:var(--t4)">lol</span></div>
+    <div class="si"><span class="ic">📈</span> Analytics</div>
+  </div>
+  <div class="ss">
+    <div class="sl">Epics</div>
+    <div class="si sk"><span class="ic">◆</span> Platform v1 (Abandoned)</div>
+    <div class="si sk"><span class="ic">◆</span> AI Pivot (Abandoned)</div>
+    <div class="si sk"><span class="ic">◆</span> "Social-First" (Abandoned)</div>
+    <div class="si" style="color:var(--urg)"><span class="ic">◆</span> Marcus's Vision™</div>
+    <div class="si" style="color:var(--t3)"><span class="ic" style="opacity:.4">◆</span> Refactor v3 (In Progress?)</div>
+  </div>
+  <div class="ss">
+    <div class="sl">Team</div>
+    <div class="si"><span class="ic">🟢</span> Priya <span class="ct">8</span></div>
+    <div class="si"><span class="ic">🟡</span> Kevin <span class="ct">19</span></div>
+    <div class="si"><span class="ic" style="opacity:.3">⚫</span> Jake <span class="ct" style="color:var(--t4)">11</span></div>
+    <div class="si"><span class="ic">🔴</span> Marcus (CTO) <span class="ct">6</span></div>
+    <div class="si gh"><span class="ic">⚫</span> Darian (Former) <span class="ct">11</span></div>
+  </div>
+  <div class="su">
+    <div class="ua">P</div>
+    <div><div style="font-size:12px;font-weight:500">Priya Sharma</div><div style="font-size:11px;color:var(--t3)">the one who ships</div></div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="hdr">
+    <div class="hb">Orbly <span class="sp">/</span> <span class="cu">Active Cycle</span></div>
+    <div class="hr">
+      <div class="vt"><div class="a">List</div><div>Board</div><div>Timeline</div></div>
+      <button class="btn">⚙ Filter</button>
+      <button class="btn">↗ Sort</button>
+    </div>
+  </div>
+
+  <div class="cy">
+    <div class="cn">Cycle 43: Marcus's Vision</div>
+    <div class="cm"><span>Mar 10 – Mar 24</span><span class="ov">2 days overdue</span></div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <div class="cb"><div class="cf" style="width:6%;background:var(--done)"></div><div class="cf" style="width:4%;background:var(--hi)"></div><div class="cf" style="width:18%;background:var(--acc)"></div></div>
+      <span class="cs">2 / 31</span>
+    </div>
+  </div>
+
+  <div class="iss">
+
+```
+<!-- ═══ IN PROGRESS ═══ -->
+<div class="sg">
+  <div class="sh"><span class="sd" style="background:var(--acc)"></span>In Progress<span class="sc">14</span></div>
+
+  <div class="row" onclick="od('401')"><div class="ip"><div class="pb pu"></div></div><span class="rid">ORB-401</span><span class="rt">[URGENT] Complete pivot to "conversational commerce" platform</span><div class="rls"><span class="rl lm">Marcus</span><span class="rl lp">pivot-v4</span></div><div class="ra ak">K</div><span class="rdt do">Mar 17</span></div>
+
+  <div class="row" onclick="od('399')"><div class="ip"><div class="pb pu"></div></div><span class="rid">ORB-399</span><span class="rt">[URGENT] Actually, scrap that — pivot to developer tools instead</span><div class="rls"><span class="rl lm">Marcus</span><span class="rl lp">pivot-v4</span></div><div class="ra ak">K</div><span class="rdt do">Mar 14</span></div>
+
+  <div class="row" onclick="od('392')"><div class="ip"><div class="pb ph"></div></div><span class="rid">ORB-392</span><span class="rt">SPIKE: Determine if Jake is still employed here</span><div class="rls"><span class="rl ls">spike</span><span class="rl lh">people-ops</span></div><div class="ra ap">P</div><span class="rdt">Mar 12</span></div>
+
+  <div class="row"><div class="ip"><div class="pb ph"></div></div><span class="rid">ORB-312</span><span class="rt st">Refactor auth module to new architecture (v3)</span><div class="rls"><span class="rl lr">refactor-v3</span><span class="rl ld">tech-debt</span></div><div class="ra ak">K</div><span class="rdt ds">Jan 8</span></div>
+
+  <div class="row"><div class="ip"><div class="pb ph"></div></div><span class="rid">ORB-278</span><span class="rt st">Migrate DB to new schema (blocked by ORB-277, blocked by ORB-201)</span><div class="rls"><span class="rl lb">blocked</span><span class="rl lr">refactor-v3</span></div><div class="ra ad">D</div><span class="rdt ds">Nov 3</span></div>
+
+  <div class="row" onclick="od('388')"><div class="ip"><div class="pb pm"></div></div><span class="rid">ORB-388</span><span class="rt">SPIKE: Does Jake's laptop even connect to our VPN anymore</span><div class="rls"><span class="rl ls">spike</span><span class="rl lo2">infra</span></div><div class="ra ap">P</div><span class="rdt">Mar 11</span></div>
+
+  <div class="row"><div class="ip"><div class="pb pm"></div></div><span class="rid">ORB-345</span><span class="rt st">Determine what the product actually is (for landing page)</span><div class="rls"><span class="rl lq">question</span><span class="rl lb">blocked</span></div><div class="ra ap">P</div><span class="rdt ds">Feb 2</span></div>
+
+  <div class="row"><div class="ip"><div class="pb pm"></div></div><span class="rid">ORB-389</span><span class="rt">Build landing page for new positioning (which positioning?)</span><div class="rls"><span class="rl lds">design</span><span class="rl lb">blocked</span></div><div class="ra ap">P</div><span class="rdt">Mar 20</span></div>
+
+  <div class="row" onclick="od('406')"><div class="ip"><div class="pb pm"></div></div><span class="rid">ORB-406</span><span class="rt">Research if Jake has updated his LinkedIn to "Open to Work"</span><div class="rls"><span class="rl ls">spike</span><span class="rl lh">people-ops</span></div><div class="ra ak">K</div><span class="rdt">Mar 19</span></div>
+
+  <div class="row"><div class="ip"><div class="pb pl"></div></div><span class="rid">ORB-298</span><span class="rt st">Set up monitoring for production (which production?)</span><div class="rls"><span class="rl li">infra</span><span class="rl lq">question</span></div><div class="ra ad">D</div><span class="rdt ds">Dec 1</span></div>
+
+  <div class="row"><div class="ip"><div class="pb pl"></div></div><span class="rid">ORB-394</span><span class="rt st">Write documentation (haha)</span><div class="rls"><span class="rl ld">tech-debt</span></div><div class="ra an"></div><span class="rdt ds">Jan 15</span></div>
+
+  <div class="row"><div class="ip"><div class="pb pl"></div></div><span class="rid">ORB-367</span><span class="rt st">Fix login bug from pivot v2 (does anyone still use this login?)</span><div class="rls"><span class="rl lbg">bug</span><span class="rl ll">legacy</span></div><div class="ra aj">J</div><span class="rdt ds">Nov 14</span></div>
+
+  <div class="row"><div class="ip"><div class="pb pn"></div></div><span class="rid">ORB-287</span><span class="rt st">Remove Darian's AWS credentials (seriously, someone do this)</span><div class="rls"><span class="rl lp1">P0</span><span class="rl li">infra</span></div><div class="ra ad">D</div><span class="rdt ds">Nov 9</span></div>
+
+  <div class="row"><div class="ip"><div class="pb pn"></div></div><span class="rid">ORB-341</span><span class="rt st">Update dependencies (last updated: never)</span><div class="rls"><span class="rl ld">tech-debt</span></div><div class="ra aj">J</div><span class="rdt ds">Oct 22</span></div>
+</div>
+
+<!-- ═══ TODO ═══ -->
+<div class="sg">
+  <div class="sh"><span class="sd" style="background:var(--t2)"></span>Todo<span class="sc">9</span></div>
+
+  <div class="row" onclick="od('410')"><div class="ip"><div class="pb pu"></div></div><span class="rid">ORB-410</span><span class="rt">[URGENT] Marcus needs a demo for investor meeting TOMORROW</span><div class="rls"><span class="rl lm">Marcus</span><span class="rl lp1">P0</span></div><div class="ra ap">P</div><span class="rdt do">Mar 22</span></div>
+
+  <div class="row"><div class="ip"><div class="pb ph"></div></div><span class="rid">ORB-408</span><span class="rt">Figure out which AWS account is running $4,200/mo in unused EC2 instances</span><div class="rls"><span class="rl li">infra</span><span class="rl lp1">P0</span></div><div class="ra an"></div><span class="rdt do">Mar 15</span></div>
+
+  <div class="row" onclick="od('411')"><div class="ip"><div class="pb ph"></div></div><span class="rid">ORB-411</span><span class="rt">SPIKE: Determine if Jake deserves respect as a professional</span><div class="rls"><span class="rl ls">spike</span><span class="rl lh">people-ops</span><span class="rl lq">question</span></div><div class="ra am">M</div><span class="rdt">Mar 21</span></div>
+
+  <div class="row"><div class="ip"><div class="pb pm"></div></div><span class="rid">ORB-412</span><span class="rt">Subtask: Collect evidence of Jake's contributions (if any exist)</span><div class="rls"><span class="rl ls">spike</span><span class="rl lh">people-ops</span></div><div class="ra ak">K</div><span class="rdt">Mar 22</span></div>
+
+  <div class="row"><div class="ip"><div class="pb pm"></div></div><span class="rid">ORB-403</span><span class="rt">Create onboarding doc for "whatever we are now"</span><div class="rls"><span class="rl lon">onboarding</span></div><div class="ra an"></div><span class="rdt">Mar 22</span></div>
+
+  <div class="row"><div class="ip"><div class="pb pm"></div></div><span class="rid">ORB-404</span><span class="rt">Update company LinkedIn to reflect current pivot (which one)</span><div class="rls"><span class="rl lq">question</span></div><div class="ra an"></div><span class="rdt">Mar 22</span></div>
+
+  <div class="row"><div class="ip"><div class="pb pl"></div></div><span class="rid">ORB-405</span><span class="rt">Investigate why Slack #general has been muted by entire team</span><div class="rls"><span class="rl lmo">morale</span></div><div class="ra an"></div><span class="rdt">Mar 22</span></div>
+
+  <div class="row"><div class="ip"><div class="pb pl"></div></div><span class="rid">ORB-398</span><span class="rt">Plan team offsite to "rebuild trust" and "align on vision" (Marcus's words)</span><div class="rls"><span class="rl lmo">morale</span><span class="rl lm">Marcus</span></div><div class="ra an"></div><span class="rdt">Mar 24</span></div>
+
+  <div class="row"><div class="ip"><div class="pb pn"></div></div><span class="rid">ORB-407</span><span class="rt">Consider adding tests (carry-over from Cycle 12)</span><div class="rls"><span class="rl ld">tech-debt</span><span class="rl ll">legacy</span></div><div class="ra an"></div><span class="rdt ds">Jul 2024</span></div>
+</div>
+
+<!-- ═══ BACKLOG ═══ -->
+<div class="sg">
+  <div class="sh"><span class="sd" style="background:var(--t3)"></span>Backlog<span class="sc">347</span><span style="font-size:11px;color:var(--t4);font-weight:400;margin-left:4px">(showing 6 of 347)</span></div>
+
+  <div class="row"><div class="ip"><div class="pb pn"></div></div><span class="rid">ORB-002</span><span class="rt st">Build core product</span><div class="rls"><span class="rl lsc">scope-tbd</span></div><div class="ra an"></div><span class="rdt ds">Mar 2024</span></div>
+  <div class="row"><div class="ip"><div class="pb pn"></div></div><span class="rid">ORB-047</span><span class="rt st">Define product-market fit</span><div class="rls"><span class="rl lq">question</span></div><div class="ra ad">D</div><span class="rdt ds">May 2024</span></div>
+  <div class="row"><div class="ip"><div class="pb pn"></div></div><span class="rid">ORB-134</span><span class="rt st">Resolve disagreement re: whether we are B2B or B2C</span><div class="rls"><span class="rl lq">question</span><span class="rl lb">blocked</span></div><div class="ra ad">D</div><span class="rdt ds">Aug 2024</span></div>
+  <div class="row"><div class="ip"><div class="pb pn"></div></div><span class="rid">ORB-089</span><span class="rt st">Address Jake's PR from June (14 comments, 0 approvals, no resolution)</span><div class="rls"><span class="rl ld">tech-debt</span></div><div class="ra aj">J</div><span class="rdt ds">Jun 2024</span></div>
+  <div class="row"><div class="ip"><div class="pb pn"></div></div><span class="rid">ORB-023</span><span class="rt st">Jake's onboarding tasks (never completed, unclear if onboarding ended)</span><div class="rls"><span class="rl lon">onboarding</span></div><div class="ra aj">J</div><span class="rdt ds">Apr 2024</span></div>
+  <div class="row"><div class="ip"><div class="pb pn"></div></div><span class="rid">ORB-001</span><span class="rt st">Choose company name (revisit?)</span><div class="rls"><span class="rl lsc">scope-tbd</span></div><div class="ra ad">D</div><span class="rdt ds">Feb 2024</span></div>
+</div>
+
+<!-- ═══ DONE ═══ -->
+<div class="sg">
+  <div class="sh"><span class="sd" style="background:var(--done)"></span>Done<span class="sc">2</span></div>
+  <div class="row"><div class="ip"><div class="pb pl"></div></div><span class="rid">ORB-390</span><span class="rt">Update Slack status to reflect current pivot</span><div class="rls"><span class="rl lmo">morale</span></div><div class="ra ap">P</div><span class="rdt">Mar 13</span></div>
+  <div class="row"><div class="ip"><div class="pb pl"></div></div><span class="rid">ORB-396</span><span class="rt">Order new laptop stickers that don't say our old name</span><div class="rls"><span class="rl lmo">morale</span></div><div class="ra ap">P</div><span class="rdt">Mar 18</span></div>
+</div>
+
+<!-- ═══ CANCELLED ═══ -->
+<div class="sg">
+  <div class="sh"><span class="sd" style="background:var(--urg)"></span>Cancelled<span class="sc">6</span></div>
+  <div class="row"><div class="ip"><div class="pb pn"></div></div><span class="rid">ORB-301</span><span class="rt dd">Ship MVP to actual customers</span><div class="rls"><span class="rl lp">pivot-v3</span></div><div class="ra ad">D</div><span class="rdt ds">Dec 15</span></div>
+  <div class="row"><div class="ip"><div class="pb pn"></div></div><span class="rid">ORB-256</span><span class="rt dd">Launch AI agent marketplace (pivot v2)</span><div class="rls"><span class="rl lp">pivot-v2</span></div><div class="ra ad">D</div><span class="rdt ds">Oct 1</span></div>
+  <div class="row"><div class="ip"><div class="pb pn"></div></div><span class="rid">ORB-188</span><span class="rt dd">Launch social-first collaboration tool (pivot v1)</span><div class="rls"><span class="rl lp">pivot-v1</span></div><div class="ra ad">D</div><span class="rdt ds">Aug 19</span></div>
+  <div class="row" onclick="od('375')"><div class="ip"><div class="pb pn"></div></div><span class="rid">ORB-375</span><span class="rt dd">SPIKE: Determine if Jake adds value to the organization</span><div class="rls"><span class="rl ls">spike</span><span class="rl lh">people-ops</span></div><div class="ra am">M</div><span class="rdt ds">Feb 20</span></div>
+  <div class="row" onclick="od('376')"><div class="ip"><div class="pb pn"></div></div><span class="rid">ORB-376</span><span class="rt dd">Follow-up: Jake value assessment (inconclusive — Jake "in a meeting")</span><div class="rls"><span class="rl ls">spike</span><span class="rl lh">people-ops</span></div><div class="ra am">M</div><span class="rdt ds">Feb 27</span></div>
+  <div class="row" onclick="od('377')"><div class="ip"><div class="pb pn"></div></div><span class="rid">ORB-377</span><span class="rt dd">Determine what meeting Jake was in (he is on no calendars)</span><div class="rls"><span class="rl ls">spike</span><span class="rl lh">people-ops</span></div><div class="ra ak">K</div><span class="rdt ds">Mar 3</span></div>
+</div>
+```
+
+  </div>
+</div>
+
+<!-- Detail Panel -->
+
+<div class="oly" id="oly" onclick="cd()"></div>
+<div class="dtl" id="dtl">
+  <div class="dh"><button class="dx" onclick="cd()">✕</button><span class="di" id="d-id"></span></div>
+  <div class="dbd" id="d-body"></div>
+</div>
+
+<script>
+const D={
+'401':{t:'[URGENT] Complete pivot to "conversational commerce" platform',m:[['Status','In Progress (since Mar 12)'],['Priority','🔴 Urgent'],['Assignee','Kevin Chen'],['Labels','Marcus · pivot-v4'],['Created','Mar 12 by Marcus Webb (CTO)'],['Blocked by','ORB-399 (which contradicts this ticket)']],
+b:`<p>We need to pivot the entire platform to conversational commerce. I saw a demo at a dinner last week and this is clearly where the market is heading. Drop everything.</p><p>Requirements TBD. I'll send a voice memo. Kevin — prototype by Wednesday?</p>
+<div class="c"><div class="ca">Kevin Chen <span class="cd">Mar 12</span></div><div class="cb2">Marcus, this contradicts ORB-399 which you created 2 hours later asking me to pivot to developer tools. Which one?</div></div>
+<div class="c"><div class="ca">Marcus Webb <span class="cd">Mar 13</span></div><div class="cb2">Both. We can explore both simultaneously. That's what agile means.</div></div>
+<div class="c"><div class="ca">Kevin Chen <span class="cd">Mar 13</span></div><div class="cb2">That is not what agile means.</div></div>
+<div class="c"><div class="ca">Marcus Webb <span class="cd">Mar 13</span></div><div class="cb2">Let's take this offline.</div></div>
+<div class="c"><div class="ca">Priya Sharma <span class="cd">Mar 14</span></div><div class="cb2">"Taking it offline" is how we got to Cycle 43 with 2 tickets completed. Both of which were sticker orders.</div></div>`},
+
+'399':{t:'Actually, scrap that — pivot to developer tools instead',m:[['Status','In Progress'],['Priority','🔴 Urgent'],['Assignee','Kevin Chen'],['Labels','Marcus · pivot-v4'],['Created','Mar 12 by Marcus Webb (CTO)'],['Blocks','ORB-401 (which this contradicts)']],
+b:`<p>Forget conversational commerce. I just got off a call with our lead investor and the real opportunity is developer tools. Think "Linear meets Figma meets... something with AI."</p><p>Kevin, technical spec by EOD? I know I asked for the conversational commerce prototype an hour ago but this is higher priority.</p>
+<div class="c"><div class="ca">Kevin Chen <span class="cd">Mar 12</span></div><div class="cb2">Marcus, are you closing ORB-401?</div></div>
+<div class="c"><div class="ca">Marcus Webb <span class="cd">Mar 12</span></div><div class="cb2">No, keep that open too. Optionality.</div></div>
+<div class="c"><div class="ca">Kevin Chen <span class="cd">Mar 12</span></div><div class="cb2">👍</div><div class="ce">😐</div></div>`},
+
+'392':{t:'SPIKE: Determine if Jake is still employed here',m:[['Status','In Progress'],['Priority','🟠 High'],['Assignee','Priya Sharma'],['Labels','spike · people-ops'],['Created','Mar 12 by Priya Sharma'],['Related','ORB-388, ORB-406, ORB-411, ORB-375, ORB-376, ORB-377']],
+b:`<p>Jake has not committed code since November. His Slack status has been "🏔️ deep focus" for 4 months. He appears on the org chart but not in Zoom, standups, sprint reviews, or the office.</p><p>His tickets have been "In Progress" since Q3 2024. When mentioned in Slack, he reacts with 👀 within 3–7 business days but does not reply.</p>
+<p><strong>Acceptance Criteria:</strong></p><ul><li>Confirm Jake's employment status with HR (if we have HR)</li><li>Confirm Jake's VPN last-connected date</li><li>Determine if Jake is, in a general sense, "around"</li></ul>
+<div class="c"><div class="ca">Kevin Chen <span class="cd">Mar 13</span></div><div class="cb2">I saw Jake's Slack go green for 11 minutes last Tuesday. He reacted to the lunch channel with 🍕 but did not respond to my DM.</div></div>
+<div class="c"><div class="ca">Marcus Webb <span class="cd">Mar 14</span></div><div class="cb2">Who is Jake?</div></div>
+<div class="c"><div class="ca">Priya Sharma <span class="cd">Mar 14</span></div><div class="cb2">Marcus, Jake reports to you.</div></div>
+<div class="c"><div class="ca">Marcus Webb <span class="cd">Mar 14</span></div><div class="cb2">Let's take this offline.</div></div>
+<div class="c"><div class="ca">Priya Sharma <span class="cd">Mar 14</span></div><div class="cb2">Marcus, that is the third time this week you've said "let's take this offline" about Jake. At what point do we take it online. In a formal sense.</div></div>`},
+
+'388':{t:"SPIKE: Does Jake's laptop even connect to our VPN anymore",m:[['Status','In Progress'],['Priority','🟡 Medium'],['Assignee','Priya Sharma'],['Labels','spike · infra'],['Created','Mar 11 by Priya Sharma'],['Related','ORB-392, ORB-411']],
+b:`<p>Sub-investigation of ORB-392. Checking VPN logs for Jake's device.</p>
+<p><strong>Update (Mar 14):</strong> Jake's laptop last connected to VPN on December 2, 2025. However, it appears connected to what our network admin describes as "an extremely powerful home network, possibly a gaming setup." We cannot confirm Jake is using the laptop for work purposes.</p>
+<p><strong>Update (Mar 18):</strong> Jake's laptop hostname has been changed from "ORBLY-JAKE-MBP" to "JAKE-PERSONAL-DO-NOT-TOUCH." Noting this for the file.</p>
+<p><strong>Update (Mar 21):</strong> Jake's laptop briefly appeared on the VPN at 2:47 AM EST for approximately 90 seconds. During this window, a single git pull was executed on the main branch. No commits were made. The pull was from a repository that was archived 6 months ago. We are unsure what to make of this.</p>`},
+
+'406':{t:'Research if Jake has updated his LinkedIn to "Open to Work"',m:[['Status','In Progress'],['Priority','🟡 Medium'],['Assignee','Kevin Chen'],['Labels','spike · people-ops'],['Created','Mar 19 by Marcus Webb (CTO)'],['Related','ORB-411, ORB-392']],
+b:`<p>Before we proceed with ORB-411 I need someone to check if Jake has the "Open to Work" banner on LinkedIn. This will inform our approach.</p>
+<div class="c"><div class="ca">Kevin Chen <span class="cd">Mar 19</span></div><div class="cb2">Marcus, I am a backend engineer. This is not a backend engineering task.</div></div>
+<div class="c"><div class="ca">Marcus Webb <span class="cd">Mar 19</span></div><div class="cb2">Consider it a cross-functional growth opportunity.</div></div>
+<div class="c"><div class="ca">Kevin Chen <span class="cd">Mar 20</span></div><div class="cb2">Fine. He does not have the banner. His headline says "Building the future of [COMPANY NAME TBD]." That's a direct quote. The brackets are his.</div></div>
+<div class="c"><div class="ca">Priya Sharma <span class="cd">Mar 20</span></div><div class="cb2">That's actually kind of on-brand for us.</div></div>`},
+
+'410':{t:'[URGENT] Marcus needs a demo for investor meeting TOMORROW',m:[['Status','Todo'],['Priority','🔴 Urgent'],['Assignee','Priya Sharma'],['Labels','Marcus · P0'],['Created','Mar 22 by Marcus Webb (CTO)'],['Due','Mar 23 (tomorrow)']],
+b:`<p>Need a working demo of "the platform" for a meeting with Sequoia tomorrow at 2pm. Doesn't need to be perfect, just needs to show our vision. And work. And look like we have product-market fit.</p><p>Can be any of the pivots — whatever's closest to working.</p>
+<div class="c"><div class="ca">Priya Sharma <span class="cd">Mar 22</span></div><div class="cb2">Marcus, none of the pivots are close to working. That is the defining characteristic of all four pivots.</div></div>
+<div class="c"><div class="ca">Marcus Webb <span class="cd">Mar 22</span></div><div class="cb2">Can we stitch something together? Like a Franken-demo?</div></div>
+<div class="c"><div class="ca">Priya Sharma <span class="cd">Mar 22</span></div><div class="cb2">You want me to combine the social-first UI, the AI agent backend, and the conversational commerce prototype into a coherent demo by tomorrow.</div></div>
+<div class="c"><div class="ca">Marcus Webb <span class="cd">Mar 22</span></div><div class="cb2">Yes! That's the energy I love. That's the Orbly spirit.</div></div>
+<div class="c"><div class="ca">Kevin Chen <span class="cd">Mar 22</span></div><div class="cb2">Priya, if you need me I'll be updating my LinkedIn.</div></div>`},
+
+'411':{t:'SPIKE: Determine if Jake deserves respect as a professional',m:[['Status','Todo'],['Priority','🟠 High'],['Assignee','Marcus Webb (CTO)'],['Labels','spike · people-ops · question'],['Created','Mar 21 by Marcus Webb (CTO)'],['Related','ORB-375, ORB-376, ORB-377, ORB-392, ORB-412']],
+b:`<p>Following the inconclusive results of ORB-375, ORB-376, and ORB-377, we are reopening the Jake question with a broader scope. Previous investigations focused on whether Jake "adds value" — this was too narrow. The real question is whether Jake, as a professional, has earned the team's respect through his actions, output, or at minimum, his presence.</p>
+<p><strong>Methodology:</strong> To be determined. Kevin has been asked to collect evidence of Jake's contributions (ORB-412). Priya has suggested we "just talk to Jake directly," which was considered and rejected as too confrontational.</p>
+<div class="c"><div class="ca">Priya Sharma <span class="cd">Mar 21</span></div><div class="cb2">Marcus, I want to flag that this ticket's title might be an HR issue. Maybe we could rephrase it?</div></div>
+<div class="c"><div class="ca">Marcus Webb <span class="cd">Mar 21</span></div><div class="cb2">Good point. How about "SPIKE: Evaluate Jake's alignment with team values"?</div></div>
+<div class="c"><div class="ca">Priya Sharma <span class="cd">Mar 21</span></div><div class="cb2">That's the same thing with more words.</div></div>
+<div class="c"><div class="ca">Marcus Webb <span class="cd">Mar 21</span></div><div class="cb2">Let's take this offline.</div></div>
+<div class="c"><div class="ca">Kevin Chen <span class="cd">Mar 21</span></div><div class="cb2">If we took everything offline that Marcus wants to take offline, we would have no tickets.</div></div>
+<div class="c"><div class="ca">Jake Torres <span class="cd">Mar 22</span></div><div class="cb2">👀</div></div>`},
+
+'375':{t:'SPIKE: Determine if Jake adds value to the organization',m:[['Status','Cancelled'],['Priority','None'],['Assignee','Marcus Webb (CTO)'],['Labels','spike · people-ops'],['Created','Feb 20 by Marcus Webb'],['Cancelled','Feb 27 — Inconclusive']],
+b:`<p>Initial investigation into Jake's organizational impact. Cancelled after one week due to inability to locate Jake for a conversation.</p>
+<div class="c"><div class="ca">Marcus Webb <span class="cd">Feb 22</span></div><div class="cb2">Has anyone seen Jake this week?</div></div>
+<div class="c"><div class="ca">Kevin Chen <span class="cd">Feb 23</span></div><div class="cb2">He was in the #random channel at 1am posting a Spotify link.</div></div>
+<div class="c"><div class="ca">Priya Sharma <span class="cd">Feb 25</span></div><div class="cb2">I scheduled a 1:1 with Jake. He accepted, then did not join. His Slack went to 🏔️ deep focus at the scheduled time.</div></div>`},
+
+'376':{t:'Follow-up: Jake value assessment (inconclusive — Jake "in a meeting")',m:[['Status','Cancelled'],['Priority','None'],['Assignee','Marcus Webb'],['Labels','spike · people-ops'],['Created','Feb 27 by Marcus Webb'],['Cancelled','Mar 3 — Escalated to ORB-377']],
+b:`<p>Second attempt to assess Jake's contributions. Marcus DM'd Jake directly. Jake responded 4 days later saying he was "in a meeting." Investigation pivoted to determining what meeting.</p>
+<div class="c"><div class="ca">Marcus Webb <span class="cd">Feb 27</span></div><div class="cb2">Jake, do you have 15 minutes this week to chat about your current workload?</div></div>
+<div class="c"><div class="ca">Jake Torres <span class="cd">Mar 3</span></div><div class="cb2">Hey sorry just seeing this, was in a meeting. This week is tight but let me circle back.</div></div>
+<div class="c"><div class="ca">Priya Sharma <span class="cd">Mar 3</span></div><div class="cb2">Jake has no meetings on his calendar. I have checked.</div></div>`},
+
+'377':{t:'Determine what meeting Jake was in (he is on no calendars)',m:[['Status','Cancelled'],['Priority','None'],['Assignee','Kevin Chen'],['Labels','spike · people-ops'],['Created','Mar 3 by Priya Sharma'],['Cancelled','Mar 8 — Remains a mystery']],
+b:`<p>Following ORB-376, Jake claimed to be "in a meeting." Jake does not appear on any shared calendar. Jake's Google Calendar, when accessed by admin, shows no events since January 14.</p>
+<p>January 14's event was titled "Jake / Jake — sync" and was a 1:1 meeting with himself. Duration: 3 hours.</p>
+<div class="c"><div class="ca">Kevin Chen <span class="cd">Mar 4</span></div><div class="cb2">I checked the Zoom admin panel. Jake's last Zoom meeting was in December. He logged into Zoom on Feb 28 but immediately logged out. Total session: 4 seconds.</div></div>
+<div class="c"><div class="ca">Priya Sharma <span class="cd">Mar 5</span></div><div class="cb2">At this point I feel like we're building a true crime podcast about Jake's calendar.</div></div>
+<div class="c"><div class="ca">Kevin Chen <span class="cd">Mar 7</span></div><div class="cb2">I would listen to that podcast.</div></div>
+<div class="c"><div class="ca">Marcus Webb <span class="cd">Mar 8</span></div><div class="cb2">Closing this ticket. We'll address the Jake situation holistically in ORB-411.</div></div>
+<div class="c"><div class="ca">Kevin Chen <span class="cd">Mar 8</span></div><div class="cb2">"Holistically." Sure.</div></div>`}
+};
+
+function od(id){
+  const d=D[id];if(!d)return;
+  document.getElementById('d-id').textContent='ORB-'+id;
+  let h='<div class="dtit">'+d.t+'</div><div class="dmt">';
+  d.m.forEach(r=>{h+='<div class="dml">'+r[0]+'</div><div class="dmv">'+r[1]+'</div>'});
+  h+='</div><div class="dds">'+d.b+'</div>';
+  document.getElementById('d-body').innerHTML=h;
+  document.getElementById('dtl').classList.add('op');
+  document.getElementById('oly').classList.add('sh');
+}
+function cd(){
+  document.getElementById('dtl').classList.remove('op');
+  document.getElementById('oly').classList.remove('sh');
+}
+</script>
+
+</body>
+</html>

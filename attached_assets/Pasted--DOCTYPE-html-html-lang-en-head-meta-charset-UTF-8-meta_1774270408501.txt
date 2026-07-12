@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glean In: How to LOOK Like You Work Smarter, Not Harder</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,600;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #faf7f2;
+  --paper: #fffdf9;
+  --text: #1a1a1a;
+  --text-light: #5a5a5a;
+  --text-muted: #999;
+  --accent: #c0392b;
+  --accent-soft: #f0e0dd;
+  --gold: #b8860b;
+  --border: #e8e2d8;
+  --chapter-bg: #f5f1eb;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Source Serif 4',Georgia,serif;background:var(--cream);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* ── Cover ── */
+.cover{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#1a1a2e 0%,#16213e 100%);padding:40px 20px;position:relative;overflow:hidden}
+.cover::before{content:’’;position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(192,57,43,0.08),transparent 70%)}
+.cover-book{max-width:420px;width:100%;aspect-ratio:3/4.2;background:linear-gradient(135deg,#f7f3ee 0%,#ede8e0 100%);border-radius:4px 16px 16px 4px;box-shadow:inset -2px 0 8px rgba(0,0,0,0.06),-30px 30px 60px rgba(0,0,0,0.4),0 0 0 1px rgba(0,0,0,0.05);padding:48px 40px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+.cover-book::before{content:’’;position:absolute;left:0;top:0;bottom:0;width:20px;background:linear-gradient(90deg,rgba(0,0,0,0.08),transparent);border-radius:4px 0 0 4px}
+.cover-book::after{content:’’;position:absolute;left:18px;top:0;bottom:0;width:1px;background:rgba(0,0,0,0.06)}
+.cover-bestseller{font-family:‘Inter’,sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(–gold);margin-bottom:24px;text-align:center}
+.cover-title{font-family:‘Playfair Display’,serif;font-size:44px;font-weight:900;line-height:1.05;text-align:center;margin-bottom:8px;color:var(–text);letter-spacing:-1px}
+.cover-title em{font-style:italic;color:var(–accent)}
+.cover-subtitle{font-family:‘Source Serif 4’,serif;font-size:17px;font-weight:300;text-align:center;color:var(–text-light);line-height:1.5;margin-bottom:32px;font-style:italic}
+.cover-author{font-family:‘Inter’,sans-serif;font-size:13px;font-weight:600;text-align:center;color:var(–text);letter-spacing:1px;text-transform:uppercase}
+.cover-tagline{font-family:‘Inter’,sans-serif;font-size:10px;text-align:center;color:var(–text-muted);margin-top:4px;letter-spacing:0.5px}
+.cover-cta{position:absolute;bottom:-60px;left:50%;transform:translateX(-50%);width:auto}
+.cover-bottom{text-align:center;margin-top:40px}
+.cover-btn{display:inline-block;padding:14px 40px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:‘Inter’,sans-serif;font-size:14px;font-weight:500;border-radius:8px;cursor:pointer;transition:all 0.2s;text-decoration:none;letter-spacing:0.3px;backdrop-filter:blur(4px)}
+.cover-btn:hover{background:rgba(255,255,255,0.14);border-color:rgba(255,255,255,0.25)}
+.cover-praise{margin-top:20px;font-family:‘Source Serif 4’,serif;font-size:13px;color:rgba(255,255,255,0.35);font-style:italic;text-align:center;max-width:360px;margin-left:auto;margin-right:auto;line-height:1.6}
+
+/* ── Reader Shell ── */
+.reader{display:none;min-height:100vh;background:var(–cream)}
+.reader.active{display:block}
+.reader-nav{position:fixed;top:0;left:0;right:0;height:52px;background:rgba(250,247,242,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(–border);display:flex;align-items:center;padding:0 24px;z-index:50}
+.reader-nav-title{font-family:‘Playfair Display’,serif;font-size:15px;font-weight:700;color:var(–text)}
+.reader-nav-chapter{font-family:‘Source Serif 4’,serif;font-size:13px;color:var(–text-muted);margin-left:16px}
+.reader-nav-right{margin-left:auto;display:flex;gap:8px}
+.nav-btn{padding:6px 14px;border-radius:6px;border:1px solid var(–border);background:var(–paper);font-family:‘Inter’,sans-serif;font-size:12px;font-weight:500;color:var(–text-light);cursor:pointer;transition:all 0.15s}
+.nav-btn:hover{background:var(–cream);border-color:#ccc}
+.nav-btn:disabled{opacity:0.3;cursor:default}
+
+/* ── Chapter Navigation ── */
+.toc{position:fixed;top:52px;left:0;bottom:0;width:260px;background:var(–paper);border-right:1px solid var(–border);padding:24px 0;overflow-y:auto;z-index:40}
+.toc::-webkit-scrollbar{width:4px}.toc::-webkit-scrollbar-thumb{background:#ddd;border-radius:2px}
+.toc-label{font-family:‘Inter’,sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(–text-muted);padding:0 20px;margin-bottom:12px}
+.toc-item{display:block;padding:8px 20px;font-family:‘Source Serif 4’,serif;font-size:14px;color:var(–text-light);cursor:pointer;transition:all 0.12s;border-left:3px solid transparent;text-decoration:none}
+.toc-item:hover{background:var(–chapter-bg);color:var(–text)}
+.toc-item.active{color:var(–accent);border-left-color:var(–accent);background:var(–accent-soft);font-weight:600}
+.toc-item .ch-num{font-family:‘Inter’,sans-serif;font-size:10px;color:var(–text-muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:2px}
+
+/* ── Chapter Content ── */
+.chapter-area{margin-left:260px;margin-top:52px;padding:48px 64px 120px;max-width:calc(260px + 720px)}
+
+.ch-number{font-family:‘Inter’,sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(–accent);margin-bottom:8px}
+.ch-title{font-family:‘Playfair Display’,serif;font-size:36px;font-weight:800;line-height:1.15;margin-bottom:8px;letter-spacing:-0.5px}
+.ch-epigraph{font-family:‘Source Serif 4’,serif;font-size:15px;font-style:italic;color:var(–text-light);margin-bottom:40px;padding-left:20px;border-left:2px solid var(–border);line-height:1.7}
+.ch-epigraph cite{display:block;font-size:13px;font-style:normal;color:var(–text-muted);margin-top:6px}
+
+.chapter{display:none}
+.chapter.active{display:block}
+
+p{font-size:17px;line-height:1.8;margin-bottom:20px;color:#2a2a2a;max-width:600px}
+p.first-para::first-letter{font-family:‘Playfair Display’,serif;font-size:56px;font-weight:900;float:left;line-height:0.8;margin-right:8px;margin-top:6px;color:var(–accent)}
+
+.pullquote{margin:36px 0;padding:24px 28px;font-family:‘Playfair Display’,serif;font-size:24px;font-weight:600;font-style:italic;line-height:1.4;color:var(–text);border-left:3px solid var(–accent);max-width:560px;letter-spacing:-0.2px}
+
+h3{font-family:‘Playfair Display’,serif;font-size:22px;font-weight:700;margin-top:40px;margin-bottom:16px;letter-spacing:-0.2px}
+h4{font-family:‘Inter’,sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-top:32px;margin-bottom:12px;color:var(–text-light)}
+
+ul,ol{margin-bottom:20px;padding-left:24px;max-width:600px}
+li{font-size:16px;line-height:1.7;margin-bottom:8px;color:#2a2a2a}
+
+.sidebar-note{margin:28px 0;padding:20px 24px;background:var(–chapter-bg);border-radius:8px;font-size:14px;color:var(–text-light);line-height:1.7;max-width:560px;border:1px solid var(–border)}
+.sidebar-note strong{color:var(–text);display:block;margin-bottom:4px;font-family:‘Inter’,sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:0.5px}
+
+.code-example{margin:20px 0 28px;padding:16px 20px;background:#1a1a2e;border-radius:8px;font-family:‘JetBrains Mono’,monospace;font-size:13px;line-height:1.6;color:#e2e8f0;overflow-x:auto;white-space:pre;max-width:580px}
+.ce-cmt{color:#64748b;font-style:italic}
+.ce-str{color:#a6e3a1}
+.ce-fn{color:#89b4fa}
+.ce-kw{color:#cba6f7}
+
+/* ── Meeting Simulator ── */
+.sim-container{margin:32px 0;max-width:580px;border:1px solid var(–border);border-radius:12px;overflow:hidden;background:var(–paper);box-shadow:0 4px 20px rgba(0,0,0,0.06)}
+.sim-header{padding:12px 16px;background:#1a1a2e;color:#fff;font-family:‘Inter’,sans-serif;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.sim-header .sim-dot{width:8px;height:8px;border-radius:50%;background:#e5484d;animation:pulse-dot 2s infinite}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:0.4}}
+.sim-body{padding:20px}
+.sim-question{font-family:‘Source Serif 4’,serif;font-size:16px;color:var(–text);margin-bottom:16px;line-height:1.6}
+.sim-question .speaker{font-family:‘Inter’,sans-serif;font-size:12px;font-weight:600;color:var(–accent);display:block;margin-bottom:4px}
+.sim-search-box{display:flex;gap:8px;margin-bottom:16px}
+.sim-input{flex:1;padding:10px 14px;border:1px solid var(–border);border-radius:8px;font-family:‘Inter’,sans-serif;font-size:14px;outline:none;transition:border-color 0.15s;background:var(–cream)}
+.sim-input:focus{border-color:var(–accent)}
+.sim-input::placeholder{color:#bbb}
+.sim-search-btn{padding:10px 20px;background:linear-gradient(135deg,#5e6ad2,#7c5cfc);color:#fff;border:none;border-radius:8px;font-family:‘Inter’,sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:opacity 0.15s;white-space:nowrap}
+.sim-search-btn:hover{opacity:0.9}
+.sim-result{display:none;padding:14px 16px;background:var(–chapter-bg);border-radius:8px;border:1px solid var(–border);font-size:14px;line-height:1.6}
+.sim-result.show{display:block}
+.sim-result .result-label{font-family:‘Inter’,sans-serif;font-size:11px;font-weight:600;color:#5e6ad2;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.sim-result .result-label .sparkle{font-size:14px}
+.sim-result .result-body{color:var(–text-light)}
+.sim-result .result-source{font-size:12px;color:var(–text-muted);margin-top:8px;font-family:‘Inter’,sans-serif}
+.sim-timer{font-family:‘JetBrains Mono’,monospace;font-size:24px;font-weight:700;color:var(–accent);text-align:center;margin:12px 0;display:none}
+.sim-timer.show{display:block}
+.sim-status{font-family:‘Inter’,sans-serif;font-size:13px;text-align:center;color:var(–text-muted);margin-top:12px;display:none}
+.sim-status.show{display:block}
+
+/* ── Author Bio ── */
+.author-section{margin-top:64px;padding-top:40px;border-top:1px solid var(–border)}
+.author-card{display:flex;gap:24px;align-items:flex-start;max-width:560px}
+.author-photo{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#e8e2d8,#d4cec4);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0}
+.author-name{font-family:‘Playfair Display’,serif;font-size:18px;font-weight:700;margin-bottom:4px}
+.author-title{font-family:‘Inter’,sans-serif;font-size:12px;color:var(–text-muted);margin-bottom:8px}
+.author-bio{font-size:14px;line-height:1.7;color:var(–text-light)}
+
+/* ── Footer ── */
+.book-footer{margin-top:60px;padding:24px 0;border-top:1px solid var(–border);font-family:‘Inter’,sans-serif;font-size:12px;color:var(–text-muted);line-height:1.7}
+
+@media(max-width:768px){
+.toc{display:none}
+.chapter-area{margin-left:0;padding:32px 20px 80px}
+.cover-book{padding:32px 24px}
+.cover-title{font-size:32px}
+}
+</style>
+
+</head>
+<body>
+
+<!-- ═══════════ COVER ═══════════ -->
+
+<section class="cover" id="cover">
+  <div style="display:flex;flex-direction:column;align-items:center">
+    <div class="cover-book">
+      <div class="cover-bestseller">#1 New York Times Bestseller *</div>
+      <div class="cover-title">Glean <em>In</em></div>
+      <div class="cover-subtitle">How to LOOK Like You Work<br>Smarter, Not Harder</div>
+      <div class="cover-author">Cheryl Standberg</div>
+      <div class="cover-tagline">Former VP of Vibes, Alphabet Adjacent</div>
+    </div>
+    <div class="cover-bottom">
+      <a class="cover-btn" href="#" onclick="startReading(event)">Start Reading →</a>
+      <div class="cover-praise">"A masterclass in strategic disengagement. I highlighted every page, which is the most work I've done this quarter." — Tech Twitter</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ READER ═══════════ -->
+
+<div class="reader" id="reader">
+  <nav class="reader-nav">
+    <span class="reader-nav-title">Glean In</span>
+    <span class="reader-nav-chapter" id="nav-chapter">Introduction</span>
+    <div class="reader-nav-right">
+      <button class="nav-btn" id="prev-btn" onclick="prevChapter()" disabled>← Prev</button>
+      <button class="nav-btn" id="next-btn" onclick="nextChapter()">Next →</button>
+    </div>
+  </nav>
+
+  <aside class="toc">
+    <div class="toc-label">Contents</div>
+    <a class="toc-item active" onclick="goTo(0)"><span class="ch-num">Introduction</span>The Promise</a>
+    <a class="toc-item" onclick="goTo(1)"><span class="ch-num">Chapter 1</span>The Art of the Strategic Nod</a>
+    <a class="toc-item" onclick="goTo(2)"><span class="ch-num">Chapter 2</span>The Eleven-Second Recovery</a>
+    <a class="toc-item" onclick="goTo(3)"><span class="ch-num">Chapter 3</span>Resting Meeting Face</a>
+    <a class="toc-item" onclick="goTo(4)"><span class="ch-num">Chapter 4</span>The Mute Button Is Your Co-Founder</a>
+    <a class="toc-item" onclick="goTo(5)"><span class="ch-num">Chapter 5</span>Prompt Engineering Your Performance Review</a>
+    <a class="toc-item" onclick="goTo(6)"><span class="ch-num">Chapter 6</span>Try It: The Meeting Simulator</a>
+    <a class="toc-item" onclick="goTo(7)"><span class="ch-num">About the Author</span></a>
+  </aside>
+
+  <div class="chapter-area">
+
+```
+<!-- ── INTRODUCTION ── -->
+<div class="chapter active" id="ch-0">
+  <div class="ch-number">Introduction</div>
+  <div class="ch-title">The Promise</div>
+  <div class="ch-epigraph">
+    "The most dangerous phrase in the language is 'we've always done it this way.' The second most dangerous is 'can you repeat the question?'"
+    <cite>— Cheryl Standberg, internal all-hands, 2023</cite>
+  </div>
+
+  <p class="first-para">When I was asked to leave my last company — or, as I prefer to phrase it, when I <em>leaned out</em> — I had a revelation. For fifteen years, I had operated under the assumption that career success required knowing things, doing things, and occasionally producing things. I had sat in meetings and <em>paid attention</em>. I had read the pre-read. I had, God help me, taken notes.</p>
+
+  <p>I was doing it all wrong.</p>
+
+  <p>The most successful people in every room I'd ever been in shared a common trait: they weren't listening. They were <em>performing</em> listening. There is a difference, and that difference is the subject of this book.</p>
+
+  <div class="pullquote">"Knowledge is power. But the appearance of knowledge is the same power with none of the reading."</div>
+
+  <p>Today, we live in an unprecedented era. For the first time in human history, you can be asked a direct question about a quarterly revenue target, have no idea what the number is, type five words into a search bar, and produce a confident answer before the awkward silence reaches its third second. The tools exist. The infrastructure is in place. All that remains is the <em>technique</em>.</p>
+
+  <p>This book will teach you that technique.</p>
+
+  <p>It will teach you how to nod at a frequency that conveys engagement. How to unmute at precisely the right moment. How to say "that's a great question" in a way that buys you eleven seconds — exactly enough time to search, scan, synthesize, and deliver an answer that sounds like you've been thinking about it for weeks.</p>
+
+  <p>You have not been thinking about it for weeks. You have been thinking about whether to get a second monitor or an ultrawide. But no one will know that. Not if you <em>Glean In</em>.</p>
+
+  <div class="sidebar-note">
+    <strong>A Note on the Title</strong>
+    Some readers have noted that this book's title is similar to another well-known work about women in the workplace. This is a coincidence. That book was about working harder. This book is about appearing to work harder, which research shows produces identical career outcomes with significantly less effort and cortisol.
+  </div>
+</div>
+
+<!-- ── CHAPTER 1 ── -->
+<div class="chapter" id="ch-1">
+  <div class="ch-number">Chapter One</div>
+  <div class="ch-title">The Art of the Strategic Nod</div>
+  <div class="ch-epigraph">
+    "I don't know half of you half as well as I should like; and I like less than half of you half as well as you deserve."
+    <cite>— Bilbo Baggins, but also every VP at a company retreat</cite>
+  </div>
+
+  <p class="first-para">The nod is the most powerful non-verbal tool in the modern professional's arsenal. A well-timed nod communicates agreement, understanding, intellectual engagement, and — most importantly — the impression that you were not, moments ago, reading a group thread about whether the office kombucha has been giving people headaches.</p>
+
+  <p>But not all nods are created equal. A nod that is too fast signals anxiety. A nod that is too slow signals that you are falling asleep, which you might be. The optimal nod frequency, which I have determined through extensive observation of executives at companies I cannot name due to NDAs I did not read, is <strong>one nod per 4.7 seconds</strong>.</p>
+
+  <div class="pullquote">"The strategic nod is not a lie. It is a <em>gesture of aspirational alignment</em>."</div>
+
+  <h3>The Nod Taxonomy</h3>
+
+  <p>Through years of field research conducted during meetings I was not paying attention to, I have identified four distinct nod types, each suited to a specific professional context:</p>
+
+  <h4>1. The Affirmation Nod</h4>
+  <p>Tempo: moderate. Amplitude: small. Use when someone is saying something that sounds important but you arrived late and don't have context. Pair with a slight narrowing of the eyes, as though you are evaluating the merit of what was said. You are not evaluating anything. You are thinking about lunch.</p>
+
+  <h4>2. The "I Was Just About to Say That" Nod</h4>
+  <p>Tempo: quick, two-beat. Amplitude: medium. Deploy when a colleague makes a point and you want to signal that you independently arrived at the same conclusion. You did not. You were on your phone. But the nod creates a post-hoc narrative of parallel thinking, which is indistinguishable from actual parallel thinking.</p>
+
+  <h4>3. The Slow Wisdom Nod</h4>
+  <p>Tempo: glacial. Amplitude: deep. Reserved for moments when a senior executive says something vague and philosophical. The Slow Wisdom Nod communicates: "I have absorbed not only what you said, but what you <em>meant</em>, and possibly what you intended to mean but couldn't articulate because even you aren't sure what the strategy is."</p>
+
+  <h4>4. The Recovery Nod</h4>
+  <p>Tempo: immediate, single beat. Amplitude: sharp. This is the emergency nod — deployed the instant you realize someone has said your name and you have no idea what they were talking about. The Recovery Nod buys you between 1.5 and 3 seconds. In the Glean In framework, this is enough time to type two keywords and scan a result. We will cover this in Chapter 2.</p>
+</div>
+
+<!-- ── CHAPTER 2 ── -->
+<div class="chapter" id="ch-2">
+  <div class="ch-number">Chapter Two</div>
+  <div class="ch-title">The Eleven-Second Recovery</div>
+  <div class="ch-epigraph">
+    "Between stimulus and response there is a space. In that space is our freedom — and a really good enterprise search tool."
+    <cite>— Viktor Frankl (adapted for the modern workplace)</cite>
+  </div>
+
+  <p class="first-para">There is a moment that every professional has experienced. You are in a meeting. You have not been listening. Someone says your name, followed by "what do you think?" The room turns to you. The silence begins.</p>
+
+  <p>In 2019, this was a career-ending moment. In 2026, it is a <strong>search query</strong>.</p>
+
+  <p>I call this the <strong>Eleven-Second Recovery</strong> — the window of time between being asked a question you cannot answer and delivering a response that sounds like you prepared for it. Eleven seconds is the average socially acceptable silence before a pause becomes an Event. It is also, not coincidentally, the average time to type a query, receive a result from your company's AI-powered knowledge tool, and extract the one sentence you need.</p>
+
+  <div class="pullquote">"The difference between 'I don't know' and 'that's a great question — let me frame it this way' is approximately 11 seconds and a keyboard shortcut."</div>
+
+  <h3>The Recovery Protocol</h3>
+
+  <p>The Eleven-Second Recovery is a four-phase operation. Each phase has been optimized through extensive practice during meetings I was nominally attending.</p>
+
+  <h4>Phase 1: The Stall (Seconds 0–3)</h4>
+  <p>Begin with a verbal cushion. The following phrases are not content — they are <em>temporal scaffolding</em>, designed to create the appearance of thought while your hands move to the keyboard:</p>
+  <ul>
+    <li>"That's a great question." (Universal. Works everywhere. Means nothing.)</li>
+    <li>"I've been thinking about this a lot, actually." (You have not.)</li>
+    <li>"It depends on how we define [repeat their last word]." (Buys 4 seconds.)</li>
+    <li>"Can I share my screen for a second?" (Nuclear option. Buys 15 seconds but raises the stakes enormously.)</li>
+  </ul>
+
+  <h4>Phase 2: The Query (Seconds 3–5)</h4>
+  <p>While your verbal cushion is still inflating, your fingers execute the search. The key here is <em>keyword extraction</em>. You do not need to understand the question. You need to identify the two or three nouns the questioner emphasized. "What's our <em>retention</em> rate for <em>enterprise</em> customers this <em>quarter</em>?" → type: <code>retention enterprise Q1</code>. That is enough.</p>
+
+  <h4>Phase 3: The Scan (Seconds 5–9)</h4>
+  <p>Your AI-powered knowledge tool returns a result. Do not read the entire result. Read the first sentence, identify one number or one proper noun, and file it. You now have a <strong>fact</strong>. A single fact is enough to construct an entire response, because in a meeting, confidence outweighs comprehensiveness by a factor of ten.</p>
+
+  <h4>Phase 4: The Delivery (Seconds 9–11)</h4>
+  <p>You now combine the stall phrase, the single fact, and a concluding opinion that is impossible to disagree with. Example:</p>
+
+  <p><em>"That's a great question. So last I checked, enterprise retention was sitting at around 94%, which is strong but not where we want it. I think the real question is whether we're measuring the right thing."</em></p>
+
+  <p>You have just delivered an answer that sounds informed, nuanced, and forward-thinking. The 94% came from a search result you read half a second ago. "Whether we're measuring the right thing" is a statement that has never been wrong in any meeting in the history of business.</p>
+
+  <div class="sidebar-note">
+    <strong>Advanced Technique: The Redirect</strong>
+    If your search returns nothing useful, deploy the Redirect: "I actually want to flip that question — [name of person across the table], what's your read on this?" You have now transformed your ignorance into facilitation, which is a leadership quality.
+  </div>
+</div>
+
+<!-- ── CHAPTER 3 ── -->
+<div class="chapter" id="ch-3">
+  <div class="ch-number">Chapter Three</div>
+  <div class="ch-title">Resting Meeting Face</div>
+  <div class="ch-epigraph">
+    "The face is a picture of the mind with the eyes as its interpreter. But the mind is on Instagram, so the face must freelance."
+    <cite>— Cicero (paraphrased for Zoom)</cite>
+  </div>
+
+  <p class="first-para">Your face is a billboard. In every meeting, whether in-person or virtual, it is broadcasting a message to the room. The question is not whether people are reading your face — they are. The question is whether your face is telling the truth.</p>
+
+  <p>It should not be.</p>
+
+  <p>Resting Meeting Face (RMF) is the art of maintaining a facial expression that communicates "I am deeply engaged with the current discussion" while your internal monologue is devoted to something else entirely. RMF is not a deception. It is a <em>courtesy</em> — a gift you give to the presenter, who does not want to see what you're actually thinking, which is that this meeting should have been an email.</p>
+
+  <div class="pullquote">"Every meeting is a performance. Resting Meeting Face is your costume."</div>
+
+  <h3>The RMF Spectrum</h3>
+
+  <p>RMF exists on a spectrum from "Active Listening" to "Astral Projection." The optimal zone is what I call <strong>Engaged Neutral</strong> — an expression that conveys interest without committing to any specific opinion, thereby protecting you from being asked to elaborate.</p>
+
+  <p>The key components of Engaged Neutral:</p>
+  <ul>
+    <li><strong>Eyebrows:</strong> Slightly raised. Not so much that you look surprised; just enough that you look like you're processing information.</li>
+    <li><strong>Mouth:</strong> Closed, with corners turned up approximately 2mm. This is not a smile. It is the muscular precursor to a smile — a signal that you <em>could</em> smile if what was being said warranted it.</li>
+    <li><strong>Eyes:</strong> Directed at the speaker, or — on Zoom — directed at the green camera light, which gives the appearance of eye contact without requiring you to look at anyone's face, which is a relief.</li>
+    <li><strong>Occasional micro-expressions:</strong> Every 30–45 seconds, allow one (1) micro-expression to cross your face. A slight furrow of the brow. A barely perceptible tilt of the head. These artifacts of "thought" are picked up subconsciously by others and interpreted as evidence of intellectual engagement. They are not. They are muscle memory.</li>
+  </ul>
+
+  <div class="sidebar-note">
+    <strong>The Zoom Advantage</strong>
+    On video calls, you only need to manage from the collarbones up. Your lower half is free. Many of my most productive Glean In sessions have occurred while I was on an exercise bike, making lunch, or standing in line at Whole Foods. The camera is a frame. Everything outside the frame is your life.
+  </div>
+</div>
+
+<!-- ── CHAPTER 4 ── -->
+<div class="chapter" id="ch-4">
+  <div class="ch-number">Chapter Four</div>
+  <div class="ch-title">The Mute Button Is Your Co-Founder</div>
+  <div class="ch-epigraph">
+    "Speech is silver. Silence is golden. Mute is platinum."
+    <cite>— Ancient proverb (updated for the remote era)</cite>
+  </div>
+
+  <p class="first-para">If the Strategic Nod is your sword, the mute button is your shield. In the remote-first workplace, the mute button is the single most important piece of technology between you and the exposure of the fact that you are currently watching your dog destroy a throw pillow.</p>
+
+  <p>But the mute button is more than a defense mechanism. Used skillfully, it is a <em>strategic instrument</em> — one that can be deployed offensively to create the impression of thoughtful restraint.</p>
+
+  <p>Consider: when you are on mute and someone asks the room a question, there is a natural 2–3 second delay before anyone expects you to respond, because everyone assumes you are unmuting. This is the <strong>Mute Tax</strong> — a socially accepted grace period that exists in no other professional context. In an in-person meeting, a 3-second silence after a direct question is uncomfortable. On Zoom, it is just "unmuting."</p>
+
+  <div class="pullquote">"Nobody has ever been fired for being on mute. Being on mute is the closest the professional world has come to a consequence-free environment."</div>
+
+  <h3>The Mute Lifecycle</h3>
+
+  <p>Every mute/unmute cycle follows a predictable rhythm that, once mastered, creates an aura of control:</p>
+
+  <ol>
+    <li><strong>Default state: muted.</strong> You are always muted. Being unmuted is a <em>choice</em> — a deliberate act of participation that signals to the room: "I have something worth saying." The fact that what you have to say came from a search result 4 seconds ago is irrelevant.</li>
+    <li><strong>The deliberate unmute.</strong> When you're ready to speak, unmute with a brief <em>click</em> that is audible to the room. This click is the equivalent of clearing your throat in a boardroom. It commands attention.</li>
+    <li><strong>The contribution.</strong> Speak. Be concise. One sentence of insight sourced from your knowledge tool, wrapped in two sentences of framing that make it sound like a considered opinion.</li>
+    <li><strong>The return to mute.</strong> Immediately re-mute after speaking. This is the power move. It says: "I have made my contribution. I have nothing more to add. I am returning to a state of reflective observation." You are returning to a state of checking your phone.</li>
+  </ol>
+</div>
+
+<!-- ── CHAPTER 5 ── -->
+<div class="chapter" id="ch-5">
+  <div class="ch-number">Chapter Five</div>
+  <div class="ch-title">Prompt Engineering Your Performance Review</div>
+  <div class="ch-epigraph">
+    "We are what we repeatedly do. Or, more accurately, we are what we repeatedly claim to have done in a shared Google Doc once per quarter."
+    <cite>— Aristotle (performance review season)</cite>
+  </div>
+
+  <p class="first-para">Performance reviews are the ultimate test of the Glean In practitioner. They require you to produce a written narrative of your accomplishments — a genre of fiction that demands both specificity and grandeur. You must describe things you did, the impact they had, and how they align with company values that you learned the names of approximately forty-five seconds before opening the form.</p>
+
+  <p>Fortunately, AI was designed for exactly this task.</p>
+
+  <div class="pullquote">"A performance review is not a record of what you did. It is a record of what you can convince a language model you did."</div>
+
+  <h3>The Self-Review Pipeline</h3>
+
+  <p>Step 1: Search your company knowledge base for any document, Slack message, or commit that contains your name. This is your <strong>evidence corpus</strong>. It does not matter whether you were the primary contributor, a secondary reviewer, or simply CC'd on a thread. In the context of a performance review, presence is indistinguishable from contribution.</p>
+
+  <p>Step 2: Feed each artifact to your AI tool with the prompt: <em>"Describe this work as though I was the driving force behind it, using language appropriate for a senior-level impact narrative."</em></p>
+
+  <p>Step 3: Combine the outputs. Remove any phrases that sound too confident (reviewers are suspicious of specificity) and add qualifiers like "cross-functional alignment" and "drove consensus." These phrases mean nothing but are valued at approximately $15,000 per year in compensation adjustments.</p>
+
+  <div class="code-example"><span class="ce-cmt">// The modern performance review workflow</span>
+```
+
+<span class="ce-kw">const</span> evidence = <span class="ce-kw">await</span> <span class="ce-fn">glean</span>.<span class="ce-fn">search</span>(<span class="ce-str">“my name + shipped OR launched OR delivered”</span>)
+
+<span class="ce-kw">const</span> narrative = <span class="ce-kw">await</span> <span class="ce-fn">ai</span>.<span class="ce-fn">generate</span>(<span class="ce-str">`Transform these artifacts into a compelling impact narrative. Tone: humble but undeniably impressive. Include at least one metric I can't be held to. Mention cross-functional collaboration twice.`</span>)
+
+<span class="ce-kw">await</span> <span class="ce-fn">performanceReview</span>.<span class="ce-fn">submit</span>(narrative)
+<span class="ce-cmt">// Rating received: “Exceeds Expectations”</span>
+<span class="ce-cmt">// Time spent actually working: unclear</span></div>
+
+```
+  <div class="sidebar-note">
+    <strong>Pro Tip: The Reverse Attribution</strong>
+    If a project you were barely involved in succeeded, mention it in your review as context for your "broader impact." If it failed, it does not appear in your search results because you were never in the relevant Slack channel. This is not dishonesty. This is <em>curation</em>.
+  </div>
+</div>
+
+<!-- ── CHAPTER 6: SIMULATOR ── -->
+<div class="chapter" id="ch-6">
+  <div class="ch-number">Chapter Six</div>
+  <div class="ch-title">Try It: The Meeting Simulator</div>
+  <div class="ch-epigraph">
+    "Theory without practice is empty. Practice without theory is blind. This is a book that provides both, while requiring neither."
+    <cite>— Cheryl Standberg, TED Talk (rejected)</cite>
+  </div>
+
+  <p class="first-para">You've learned the theory. Now let's practice. Below is a live simulation of the Eleven-Second Recovery. A colleague will ask you a question — the kind you'd hear in a meeting you weren't paying attention to. Your job: search for the answer before the silence gets awkward.</p>
+
+  <p>Click <strong>"Uh oh, I wasn't listening"</strong> to begin. The clock starts immediately. You have eleven seconds.</p>
+
+  <div class="sim-container" id="sim">
+    <div class="sim-header">
+      <span class="sim-dot"></span>
+      Meeting in Progress — Q1 Business Review
+    </div>
+    <div class="sim-body">
+      <div class="sim-question" id="sim-q">
+        <span class="speaker">Rachel (VP of Product):</span>
+        <span id="sim-q-text">Press the button to start. Something terrible is about to happen to you in a meeting.</span>
+      </div>
+      <div class="sim-timer" id="sim-timer">11.0</div>
+      <div class="sim-search-box">
+        <input class="sim-input" id="sim-input" type="text" placeholder="🔍  Search your company knowledge base..." disabled>
+        <button class="sim-search-btn" id="sim-search" onclick="simSearch()" disabled>Glean In</button>
+      </div>
+      <div class="sim-result" id="sim-result">
+        <div class="result-label"><span class="sparkle">✨</span> AI-Powered Answer</div>
+        <div class="result-body" id="sim-answer"></div>
+        <div class="result-source" id="sim-source"></div>
+      </div>
+      <div class="sim-status" id="sim-status"></div>
+      <div style="text-align:center;margin-top:16px">
+        <button class="nav-btn" id="sim-start" onclick="simStart()" style="background:var(--accent);color:#fff;border-color:var(--accent);padding:8px 20px;font-size:13px">Uh oh, I wasn't listening</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── ABOUT AUTHOR ── -->
+<div class="chapter" id="ch-7">
+  <div class="ch-number">About the Author</div>
+  <div class="ch-title">Cheryl Standberg</div>
+
+  <div class="author-section" style="border:none;padding-top:0;margin-top:0">
+    <div class="author-card">
+      <div class="author-photo">👩‍💼</div>
+      <div>
+        <div class="author-name">Cheryl Standberg</div>
+        <div class="author-title">Former VP of Vibes · Alphabet Adjacent · Board Member, Several Things</div>
+        <p class="author-bio">Cheryl Standberg is a leadership strategist, keynote speaker, and recovering executive. Over her 15-year career in Silicon Valley, she held senior roles at companies whose names she is contractually prohibited from mentioning but which you would recognize from the side of a shuttle bus on the 101.</p>
+        <p class="author-bio">She is best known for coining the phrase "strategic disengagement" during a board meeting she was not paying attention to, and for her viral LinkedIn post "I Got Fired and It Was the Best Thing That Ever Happened to My Personal Brand," which received 47,000 reactions, mostly from people who had also been fired.</p>
+        <p class="author-bio">Cheryl holds an MBA from Stanford, a certificate in Mindful Leadership from a weekend retreat she does not remember the name of, and a personal record of 11 consecutive meetings in which she was not asked a single question, which she considers her greatest professional achievement.</p>
+        <p class="author-bio">She currently advises early-stage startups on "presence strategy" and is working on her second book, <em>Lean Back: A Guide to Doing Less While Being Perceived as Doing More</em>.</p>
+        <p class="author-bio">She lives in Atherton with her two children, both of whom are better at Slack than she is.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="book-footer">
+    <p><strong>Glean In: How to LOOK Like You Work Smarter, Not Harder</strong></p>
+    <p>© 2026 Cheryl Standberg. Published by Pivot Press, a division of Nothing Ventures.</p>
+    <p>* The #1 New York Times Bestseller claim is based on a methodology developed by the author and not endorsed by the New York Times, any bookstore, or anyone with access to actual sales data.</p>
+    <p style="margin-top:8px">Cover design by someone the author found on Fiverr and described as "my creative partner."</p>
+    <p style="margin-top:8px;font-style:italic;color:#bbb">This book was written, researched, and fact-checked using the techniques described within it. Accuracy is therefore aspirational.</p>
+  </div>
+</div>
+```
+
+  </div><!-- /chapter-area -->
+</div><!-- /reader -->
+
+<script>
+let currentCh = 0;
+const totalCh = 8;
+const chNames = ['Introduction','Chapter 1','Chapter 2','Chapter 3','Chapter 4','Chapter 5','Chapter 6','About the Author'];
+
+function startReading(e) {
+  e.preventDefault();
+  document.getElementById('cover').style.display = 'none';
+  document.getElementById('reader').classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function goTo(i) {
+  document.querySelectorAll('.chapter').forEach((c,idx) => {
+    c.classList.toggle('active', idx === i);
+  });
+  document.querySelectorAll('.toc-item').forEach((t,idx) => {
+    t.classList.toggle('active', idx === i);
+  });
+  currentCh = i;
+  document.getElementById('nav-chapter').textContent = chNames[i];
+  document.getElementById('prev-btn').disabled = i === 0;
+  document.getElementById('next-btn').disabled = i === totalCh - 1;
+  document.querySelector('.chapter-area').scrollTo(0,0);
+  window.scrollTo(0,0);
+}
+
+function nextChapter() { if (currentCh < totalCh - 1) goTo(currentCh + 1); }
+function prevChapter() { if (currentCh > 0) goTo(currentCh - 1); }
+
+// ── Meeting Simulator ──
+const scenarios = [
+  {
+    q: "So based on what we discussed last week about the enterprise pipeline — what's your take on whether we should accelerate the rollout to APAC, or wait for the localization work to finish?",
+    answer: "According to last week's pipeline review, APAC enterprise deals are up 23% QoQ but the localization backlog has 14 open tickets, 3 of which are blockers. The consensus from the APAC team is that a partial rollout to English-speaking markets (AU, SG, IN) could proceed while localization continues for JP and KR.",
+    source: "Source: #enterprise-pipeline Slack channel, Mar 18 · APAC Expansion Planning Doc v3",
+    stall: "That's a really important question, and I think it depends on how we define 'ready'..."
+  },
+  {
+    q: "Hey, quick one — do you remember what we landed on for the pricing change? I know there was a whole thread about it but I can't find it. What's the new enterprise tier going to look like?",
+    answer: "The pricing committee approved a new Enterprise tier at $89/seat/mo (up from $65) with a bundled SSO + audit log add-on. Legacy customers get 12-month price protection. The change goes live April 1. Finance flagged a potential 8% churn risk on the mid-market segment.",
+    source: "Source: Pricing Committee Decision Doc · #pricing-changes Slack thread, Mar 12",
+    stall: "Yeah, great question — I was just looking at this actually..."
+  },
+  {
+    q: "I want to circle back to what Marcus presented yesterday about the new OKRs. Specifically — do you think the activation target is realistic given where we are with onboarding?",
+    answer: "Marcus set the Q2 activation target at 40% (up from 31% actual in Q1). The onboarding team's retrospective identified three friction points in the current flow, with a redesigned wizard in dev targeting a 15% improvement. Current run rate suggests 35% is achievable without the wizard; 42% with it if shipped by mid-April.",
+    source: "Source: Q2 OKR Planning Deck, Slide 14 · Onboarding Retro Notes, Mar 19",
+    stall: "So I've been noodling on this since yesterday's presentation, and I think the nuance here is..."
+  }
+];
+
+let simTimer = null;
+let simTime = 11.0;
+let simActive = false;
+let simScenario = null;
+
+function simStart() {
+  simScenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+  document.getElementById('sim-q-text').textContent = simScenario.q;
+  document.getElementById('sim-input').disabled = false;
+  document.getElementById('sim-input').value = '';
+  document.getElementById('sim-input').focus();
+  document.getElementById('sim-search').disabled = false;
+  document.getElementById('sim-result').classList.remove('show');
+  document.getElementById('sim-status').classList.remove('show');
+  document.getElementById('sim-start').textContent = 'Try another question';
+
+  simTime = 11.0;
+  simActive = true;
+  const timerEl = document.getElementById('sim-timer');
+  timerEl.classList.add('show');
+  timerEl.style.color = 'var(--accent)';
+
+  clearInterval(simTimer);
+  simTimer = setInterval(() => {
+    simTime -= 0.1;
+    if (simTime <= 0) {
+      simTime = 0;
+      clearInterval(simTimer);
+      simActive = false;
+      timerEl.textContent = '0.0';
+      timerEl.style.color = 'var(--urg, #e5484d)';
+      document.getElementById('sim-status').textContent = '😬 The silence has become a presence in the room. Rachel is looking at you. Everyone is looking at you. You say "sorry, I was on mute" even though this is an in-person meeting.';
+      document.getElementById('sim-status').classList.add('show');
+    } else {
+      timerEl.textContent = simTime.toFixed(1);
+      if (simTime < 4) timerEl.style.color = '#e5484d';
+      else if (simTime < 7) timerEl.style.color = '#e5934b';
+    }
+  }, 100);
+}
+
+function simSearch() {
+  if (!simScenario) return;
+  clearInterval(simTimer);
+  simActive = false;
+
+  const elapsed = (11.0 - simTime).toFixed(1);
+  document.getElementById('sim-answer').textContent = simScenario.answer;
+  document.getElementById('sim-source').textContent = simScenario.source;
+  document.getElementById('sim-result').classList.add('show');
+
+  let msg = '';
+  if (simTime > 7) {
+    msg = `⚡ ${elapsed} seconds. Incredible. You answered before the silence even formed. Rachel thinks you prepared for this. You did not. This is the Glean In way.`;
+  } else if (simTime > 4) {
+    msg = `✅ ${elapsed} seconds. Well within the recovery window. You stalled with "${simScenario.stall}" and delivered the answer like you'd been thinking about it all morning. Textbook.`;
+  } else if (simTime > 0) {
+    msg = `😅 ${elapsed} seconds. Cutting it close. The pause was noticeable. Rachel raised an eyebrow. But you delivered, and in the grand ledger of meeting performance, a late answer beats no answer by a wide margin.`;
+  } else {
+    msg = `💀 Too late. The silence won. But you now have the answer for the follow-up email, which — let's be honest — is where decisions actually get made anyway.`;
+  }
+  document.getElementById('sim-status').textContent = msg;
+  document.getElementById('sim-status').classList.add('show');
+}
+
+// Allow Enter key in search
+document.getElementById('sim-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') simSearch();
+});
+</script>
+
+</body>
+</html>

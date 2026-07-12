@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mean Vibe Time: Optimal Prompt Throughput for N Startups with a Single API Key</title>
+<link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;0,700;1,400&family=STIX+Two+Math&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --text: #1a1a1a;
+  --text-2: #444;
+  --text-3: #777;
+  --bg: #fff;
+  --border: #ddd;
+  --blue: #1a5276;
+  --code-bg: #f5f5f0;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'STIX Two Text', 'Times New Roman', Times, serif;
+  color: var(--text);
+  background: var(--bg);
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-font-smoothing: auto;
+}
+
+.paper {
+max-width: 680px;
+margin: 0 auto;
+padding: 48px 40px 80px;
+}
+
+/* ── Header ── */
+.paper-badge {
+font-family: ‘Inter’, sans-serif;
+font-size: 10px;
+font-weight: 700;
+text-transform: uppercase;
+letter-spacing: 2px;
+color: #fff;
+background: var(–blue);
+display: inline-block;
+padding: 3px 12px;
+border-radius: 2px;
+margin-bottom: 20px;
+}
+
+.paper-title {
+font-size: 28px;
+font-weight: 700;
+line-height: 1.25;
+margin-bottom: 12px;
+letter-spacing: -0.3px;
+}
+
+.paper-authors {
+font-size: 15px;
+color: var(–text-2);
+margin-bottom: 4px;
+}
+.paper-affiliation {
+font-size: 13px;
+color: var(–text-3);
+font-style: italic;
+margin-bottom: 24px;
+}
+
+/* ── Abstract ── */
+.abstract {
+margin: 0 0 32px;
+padding: 20px 24px;
+background: #f8f7f4;
+border: 1px solid #e8e6e0;
+border-radius: 4px;
+}
+.abstract-label {
+font-size: 14px;
+font-weight: 700;
+text-transform: uppercase;
+letter-spacing: 1px;
+margin-bottom: 8px;
+}
+.abstract p {
+font-size: 15px;
+line-height: 1.7;
+color: var(–text-2);
+}
+
+/* ── Body ── */
+p { margin-bottom: 16px; }
+h2 {
+font-size: 20px;
+font-weight: 700;
+margin-top: 36px;
+margin-bottom: 14px;
+counter-increment: section;
+}
+h2::before {
+content: counter(section) “. “;
+color: var(–text-3);
+}
+body { counter-reset: section; }
+h3 {
+font-size: 17px;
+font-weight: 700;
+margin-top: 24px;
+margin-bottom: 10px;
+font-style: italic;
+}
+
+a { color: var(–blue); }
+
+/* ── Math blocks ── */
+.math-block {
+margin: 24px 0;
+padding: 20px 24px;
+background: var(–code-bg);
+border: 1px solid #e0dfd8;
+border-radius: 4px;
+text-align: center;
+font-family: ‘STIX Two Math’, ‘STIX Two Text’, ‘Times New Roman’, serif;
+font-size: 19px;
+line-height: 2;
+overflow-x: auto;
+}
+.math-block .eq-label {
+float: right;
+font-size: 14px;
+color: var(–text-3);
+font-family: ‘STIX Two Text’, serif;
+}
+
+/* inline math */
+.m {
+font-family: ‘STIX Two Math’, ‘STIX Two Text’, ‘Times New Roman’, serif;
+font-style: italic;
+letter-spacing: 0.5px;
+}
+
+/* ── Variables table ── */
+table {
+width: 100%;
+border-collapse: collapse;
+margin: 20px 0;
+font-size: 15px;
+}
+th {
+text-align: left;
+font-weight: 700;
+padding: 8px 12px;
+border-bottom: 2px solid var(–text);
+font-size: 13px;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+}
+td {
+padding: 8px 12px;
+border-bottom: 1px solid var(–border);
+vertical-align: top;
+}
+td:first-child {
+font-family: ‘STIX Two Math’, serif;
+font-style: italic;
+font-size: 17px;
+width: 60px;
+}
+
+/* ── Figure ── */
+.figure {
+margin: 28px 0;
+text-align: center;
+}
+.figure-box {
+display: inline-block;
+padding: 24px 32px;
+background: var(–code-bg);
+border: 1px solid #e0dfd8;
+border-radius: 4px;
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 12px;
+line-height: 1.8;
+text-align: left;
+color: var(–text-2);
+}
+.figure-caption {
+font-size: 13px;
+color: var(–text-3);
+margin-top: 8px;
+font-style: italic;
+}
+.figure-caption strong {
+font-style: normal;
+color: var(–text-2);
+}
+
+/* ── Code ── */
+code {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 0.82em;
+background: var(–code-bg);
+padding: 2px 6px;
+border-radius: 3px;
+}
+
+/* ── Footnotes ── */
+.footnote {
+font-size: 13px;
+color: var(–text-3);
+border-top: 1px solid var(–border);
+margin-top: 8px;
+padding-top: 6px;
+line-height: 1.6;
+}
+sup { font-size: 11px; color: var(–text-3); }
+
+/* ── References ── */
+.references {
+margin-top: 36px;
+padding-top: 16px;
+border-top: 2px solid var(–text);
+}
+.references h2::before { content: “”; }
+.ref-entry {
+font-size: 14px;
+color: var(–text-2);
+margin-bottom: 8px;
+padding-left: 28px;
+text-indent: -28px;
+line-height: 1.6;
+}
+.ref-num { color: var(–text-3); }
+
+/* ── Theorem / Result boxes ── */
+.theorem {
+margin: 24px 0;
+padding: 16px 20px;
+border: 2px solid var(–text);
+border-radius: 4px;
+}
+.theorem-label {
+font-weight: 700;
+font-size: 15px;
+margin-bottom: 6px;
+}
+.theorem p { margin-bottom: 0; }
+
+.corollary {
+margin: 20px 0;
+padding: 14px 20px;
+border-left: 4px solid var(–blue);
+background: #f0f4f8;
+border-radius: 0 4px 4px 0;
+}
+.corollary-label {
+font-weight: 700;
+font-size: 14px;
+color: var(–blue);
+margin-bottom: 4px;
+}
+
+/* ── Whiteboard SVG ── */
+.whiteboard {
+margin: 28px 0;
+text-align: center;
+}
+.whiteboard svg {
+max-width: 100%;
+height: auto;
+}
+.whiteboard-caption {
+font-size: 13px;
+color: var(–text-3);
+margin-top: 8px;
+font-style: italic;
+}
+
+@media (max-width: 720px) {
+.paper { padding: 24px 16px 60px; }
+.paper-title { font-size: 22px; }
+.math-block { font-size: 16px; padding: 16px; }
+}
+</style>
+
+</head>
+<body>
+
+<div class="paper">
+
+<div class="paper-badge">Preprint · TechCrunch Disrupt 2026</div>
+
+<h1 class="paper-title">Mean Vibe Time: Optimal Prompt Throughput for <em>N</em> Startups with a Single API Key</h1>
+
+<div class="paper-authors">
+  Bryce Tokenwindow<sup>1</sup>, Jayden Contextlength<sup>1</sup>, Grayson Temperatureknob<sup>2</sup>, and Preston Overfit<sup>1</sup>
+</div>
+<div class="paper-affiliation">
+  <sup>1</sup>Department of Vibe Engineering, Stanford Adjacent University<br>
+  <sup>2</sup>Institute for Applied Prompting, Y Combinator Research (Batch W26, Day 3 of 3-month program)
+</div>
+
+<!-- ═══ ABSTRACT ═══ -->
+
+<div class="abstract">
+  <div class="abstract-label">Abstract</div>
+  <p>We present a formal analysis of the following problem: given a room of <span class="m">N</span> = 800 founders at TechCrunch Disrupt, each of whom needs a working MVP by demo day, and a single Claude API key with a rate limit of <span class="m">R</span> requests per minute, what is the minimum time required to ship all 800 MVPs? We derive a closed-form solution, identify a critical bottleneck in the naive approach, and propose a novel optimization — <strong>Middle-Out Prompting™</strong> — that reduces mean vibe time by 94.2%. Our key insight is that the 800 MVPs are, upon rigorous analysis, the same MVP. We formalize this as the <strong>Startup Isomorphism Theorem</strong> and discuss its implications for the field.</p>
+</div>
+
+<!-- ═══ 1. INTRODUCTION ═══ -->
+
+<h2>Introduction</h2>
+
+<p>The 2026 TechCrunch Disrupt audience consists of approximately <span class="m">N</span> = 800 early-stage founders, each of whom will present a live demo in 72 hours. Of these 800 founders, internal surveys indicate that:</p>
+
+<ul style="margin-bottom:16px;padding-left:24px">
+  <li>94% do not have a working product</li>
+  <li>83% plan to build their product entirely with AI assistance</li>
+  <li>67% are sharing a single Claude API key that was posted in a Y Combinator Slack channel</li>
+  <li>100% have described their startup as "<span class="m">X</span> but for <span class="m">Y</span>" where <span class="m">X</span> ∈ {Uber, Airbnb, Stripe} and <span class="m">Y</span> is a noun</li>
+</ul>
+
+<p>The question we address in this paper is: <strong>is it physically possible to ship 800 MVPs in 72 hours using a single API key?</strong> And if so, what is the optimal strategy?</p>
+
+<p>We begin with the naive approach, identify its failure mode, and arrive at a result that is both mathematically rigorous and deeply upsetting to anyone who has ever written code by hand.</p>
+
+<!-- ═══ 2. THE NAIVE MODEL ═══ -->
+
+<h2>The Naive Model</h2>
+
+<p>Let each MVP require a sequence of <span class="m">P</span> prompts to generate. Based on empirical observation of vibe coders at Disrupt 2025, we establish the following baseline values:</p>
+
+<table>
+  <tr><th>Variable</th><th>Symbol</th><th>Value</th><th>Notes</th></tr>
+  <tr><td>N</td><td>Founders</td><td>800</td><td>Each needs one MVP</td></tr>
+  <tr><td>P</td><td>Prompts per MVP</td><td>47</td><td>Empirically observed mean<sup>1</sup></td></tr>
+  <tr><td>T<sub>p</sub></td><td>Time per prompt</td><td>8.3s</td><td>Median response latency, Claude Sonnet tier</td></tr>
+  <tr><td>T<sub>h</sub></td><td>Human review time</td><td>0.4s</td><td>Time between receiving output and pressing Enter again</td></tr>
+  <tr><td>R</td><td>Rate limit</td><td>60 req/min</td><td>Standard tier API key</td></tr>
+  <tr><td>D</td><td>Deploy time</td><td>12s</td><td>Time to push to Vercel</td></tr>
+</table>
+
+<div class="footnote"><sup>1</sup> 47 is the mean. The distribution is bimodal: 12 prompts for founders who have a clear idea, and 340+ for founders whose first prompt is "make me a startup." We model the mean for simplicity.</div>
+
+<p>In the naive (sequential) approach, the total time to ship all 800 MVPs is:</p>
+
+<div class="math-block">
+  <span class="eq-label">(1)</span>
+  T<sub>total</sub> = N × (P × (T<sub>p</sub> + T<sub>h</sub>) + D)
+</div>
+
+<p>Substituting our empirical values:</p>
+
+<div class="math-block">
+  <span class="eq-label">(2)</span>
+  T<sub>total</sub> = 800 × (47 × (8.3 + 0.4) + 12) = 800 × (408.9 + 12) = 800 × 420.9s
+</div>
+
+<div class="math-block">
+  <span class="eq-label">(3)</span>
+  T<sub>total</sub> = 336,720s ≈ <strong>93.5 hours</strong>
+</div>
+
+<p>This exceeds the 72-hour window by 29.8%. The naive approach fails. Not everyone gets an MVP. Approximately 174 founders will arrive at demo day with nothing but a landing page and a waitlist, which, to be fair, is also a viable demo strategy at Disrupt.</p>
+
+<p>However, this model assumes sequential processing. In practice, the API key supports concurrent requests. Can we parallelize?</p>
+
+<!-- ═══ 3. THE PARALLELISM TRAP ═══ -->
+
+<h2>The Parallelism Trap</h2>
+
+<p>The obvious optimization is to run multiple founders' prompts concurrently. If we can process <span class="m">k</span> founders simultaneously, the total time becomes:</p>
+
+<div class="math-block">
+  <span class="eq-label">(4)</span>
+  T<sub>parallel</sub> = (N / k) × (P × (T<sub>p</sub> + T<sub>h</sub>) + D)
+</div>
+
+<p>To fit within 72 hours (259,200s):</p>
+
+<div class="math-block">
+  <span class="eq-label">(5)</span>
+  k ≥ N × (P × (T<sub>p</sub> + T<sub>h</sub>) + D) / 259,200 = 336,720 / 259,200 ≈ 1.30
+</div>
+
+<p>We need <span class="m">k</span> ≥ 2. Just two concurrent sessions. This seems trivial — until we account for the rate limit.</p>
+
+<p>At 60 requests per minute, total capacity is 60 × 60 × 72 = <strong>259,200 requests</strong> over 72 hours. Total prompts needed: 800 × 47 = <strong>37,600 prompts</strong>. We are well within the rate limit. The problem is not throughput. The problem is something else entirely.</p>
+
+<!-- ═══ 4. THE CONTEXT WINDOW BOTTLENECK ═══ -->
+
+<h2>The Context Window Bottleneck</h2>
+
+<p>Each MVP session requires the AI to maintain a conversation context that grows with each prompt. By prompt 30, the context window contains approximately 45,000 tokens of accumulated code, instructions, corrections, and the phrase "no, not like that, like how I described it before" (avg. 12 tokens per occurrence, occurring 8.7 times per session).</p>
+
+<p>The critical insight: <strong>as context grows, response quality degrades</strong>. We model this as the Vibe Decay Function:</p>
+
+<div class="math-block">
+  <span class="eq-label">(6)</span>
+  Q(p) = Q<sub>0</sub> × e<sup>−λp</sup>
+</div>
+
+<p>where <span class="m">Q<sub>0</sub></span> is initial response quality, <span class="m">p</span> is the prompt number, and <span class="m">λ</span> is the decay constant, empirically measured at <span class="m">λ</span> = 0.031 for Claude Sonnet on a React + Tailwind task.</p>
+
+<p>At prompt 47 (the average session length), quality has decayed to:</p>
+
+<div class="math-block">
+  <span class="eq-label">(7)</span>
+  Q(47) = Q<sub>0</sub> × e<sup>−0.031 × 47</sup> = Q<sub>0</sub> × 0.233
+</div>
+
+<p>The AI is operating at 23.3% of its initial quality by the end of the session. This means the last 15 prompts of every MVP session are, statistically, making the codebase <em>worse</em>. The developer doesn't know this because they are not reading the output. But the math is clear: <strong>there exists an optimal prompt number <span class="m">p*</span> beyond which additional prompts have negative expected value.</strong></p>
+
+<p>We calculate <span class="m">p*</span> by finding the prompt at which <span class="m">Q(p)</span> falls below the <em>Minimum Viable Quality</em> threshold — the point at which the code is just functional enough to survive a 3-minute demo without crashing:</p>
+
+<div class="math-block">
+  <span class="eq-label">(8)</span>
+  Q(p*) = Q<sub>MVQ</sub> &nbsp;⟹&nbsp; p* = −ln(Q<sub>MVQ</sub> / Q<sub>0</sub>) / λ = −ln(0.40) / 0.031 ≈ <strong>29.5 prompts</strong>
+</div>
+
+<p>The optimal MVP is built in <strong>30 prompts, not 47</strong>. The additional 17 prompts are not just wasted — they are destructive. They introduce bugs, rename variables to things the developer didn't ask for, and add a dark mode that no one requested but that the AI felt strongly about.</p>
+
+<!-- ═══ 5. THE INSIGHT ═══ -->
+
+<h2>The Middle-Out Insight</h2>
+
+<p>So far we have established that each MVP requires 30 useful prompts. 800 MVPs × 30 prompts = 24,000 prompts. At 8.7 seconds per prompt with parallelism <span class="m">k</span> = 2, this is feasible in approximately 29 hours. Problem solved.</p>
+
+<p>Except it isn't. Because during our analysis, we made a discovery that renders the entire optimization unnecessary.</p>
+
+<p>We examined the 800 startup applications from Disrupt 2026 and classified each MVP by its core architecture. The results:</p>
+
+<table>
+  <tr><th>Architecture</th><th>Count</th><th>% of Total</th></tr>
+  <tr><td>React + Tailwind + Supabase CRUD app</td><td>312</td><td>39.0%</td></tr>
+  <tr><td>React + Tailwind + Firebase CRUD app</td><td>208</td><td>26.0%</td></tr>
+  <tr><td>React + Tailwind + Supabase CRUD app + Stripe</td><td>147</td><td>18.4%</td></tr>
+  <tr><td>React + Tailwind + a chatbot that wraps Claude</td><td>104</td><td>13.0%</td></tr>
+  <tr><td>Something genuinely novel</td><td>29</td><td>3.6%</td></tr>
+</table>
+
+<p>96.4% of the MVPs are the same application with different color schemes, logos, and the word "AI" in the tagline.</p>
+
+<p>This leads us to the central result of this paper:</p>
+
+<div class="theorem">
+  <div class="theorem-label">Theorem 1 (Startup Isomorphism Theorem)</div>
+  <p>For any two startups <span class="m">S<sub>i</sub></span> and <span class="m">S<sub>j</sub></span> presenting at TechCrunch Disrupt, the probability that their MVPs are architecturally identical approaches 1 as the number of startups increases:</p>
+  <div class="math-block" style="border:none;background:transparent;padding:8px 0;margin:8px 0">
+    lim<sub>N→∞</sub> P(MVP<sub>i</sub> ≅ MVP<sub>j</sub>) = 1 − ε
+  </div>
+  <p>where <span class="m">ε</span> represents the 3.6% of founders who had an original idea, and approaches 0 as VC funding increases and due diligence decreases.</p>
+</div>
+
+<div class="corollary">
+  <div class="corollary-label">Corollary 1.1</div>
+  <p>You do not need to build 800 MVPs. You need to build <strong>4 MVPs</strong> and change the <code>--primary-color</code> CSS variable 800 times.</p>
+</div>
+
+<p>The optimization is not in the prompting strategy, the parallelism, or the context window management. The optimization is the recognition that <strong>the entire startup landscape has converged on approximately four products</strong>, and the only differentiator is branding, which takes 1 prompt, not 30.</p>
+
+<!-- ═══ 6. REVISED MODEL ═══ -->
+
+<h2>Revised Model: The Middle-Out Architecture</h2>
+
+<p>We propose <strong>Middle-Out Prompting™</strong>: instead of building 800 MVPs from scratch, build 4 template MVPs (the "middle"), then fork outward to 800 branded instances:</p>
+
+<div class="figure">
+  <div class="figure-box" style="text-align:center">
+NAIVE APPROACH (Sequential):
+┌────┐ ┌────┐ ┌────┐ ┌────┐       ┌────┐
+│ S₁ │ │ S₂ │ │ S₃ │ │ S₄ │  ...  │S₈₀₀│
+│30p │ │30p │ │30p │ │30p │       │30p │
+└────┘ └────┘ └────┘ └────┘       └────┘
+Total prompts: 24,000
+
+MIDDLE-OUT APPROACH:
+┌── S₁  (1p: change colors + logo)
+┌─────┐   ├── S₂  (1p)
+│ T₁  │───├── S₃  (1p)
+│ 30p │   ├── …
+└─────┘   └── S₃₁₂ (1p)
+┌── S₃₁₃ (1p)
+┌─────┐   ├── S₃₁₄ (1p)
+│ T₂  │───├── …
+│ 30p │   └── S₅₂₀ (1p)
+└─────┘
+┌─────┐   ┌── …
+│ T₃  │───└── S₆₆₇ (1p)
+│ 30p │
+└─────┘
+┌─────┐   ┌── …
+│ T₄  │───└── S₈₀₀ (1p)
+│ 30p │
+└─────┘
+Total prompts: 4×30 + 800×1 = <strong>920</strong>
+
+  </div>
+  <div class="figure-caption"><strong>Fig. 1</strong> — Naive vs. Middle-Out prompting architecture. The Middle-Out approach reduces total prompts from 24,000 to 920, a 96.2% reduction, by exploiting the Startup Isomorphism Theorem.</div>
+</div>
+
+<p>Total time under the Middle-Out model:</p>
+
+<div class="math-block">
+  <span class="eq-label">(9)</span>
+  T<sub>MO</sub> = 4 × (30 × 8.7s) + 800 × (1 × 8.7s) + 800 × 12s
+</div>
+
+<div class="math-block">
+  <span class="eq-label">(10)</span>
+  T<sub>MO</sub> = 1,044 + 6,960 + 9,600 = 17,604s ≈ <strong>4.9 hours</strong>
+</div>
+
+<p>4.9 hours. Down from 93.5 hours. A <strong>94.8% reduction in Mean Vibe Time</strong>.</p>
+
+<p>All 800 founders get a working MVP. All 800 MVPs can survive a 3-minute demo. All 800 MVPs are, under the hood, four applications wearing different hats. No one in the audience will notice, because the judges are VCs, and VCs evaluate traction, not architecture.</p>
+
+<!-- ═══ 7. LIMITATIONS ═══ -->
+
+<h2>Discussion and Limitations</h2>
+
+<p>Our analysis assumes that the 29 genuinely novel startups (3.6%) can be excluded from the optimization. We acknowledge this is unfair to those founders, who had original ideas and wrote real code. We have not optimized for them because they are statistical outliers and because, historically, they do not win TechCrunch Disrupt. The winner is always the CRUD app with the best pitch.</p>
+
+<p>Additionally, our Vibe Decay Function (Eq. 6) was calibrated on Claude Sonnet. Preliminary measurements on GPT-4o suggest a higher decay constant (<span class="m">λ</span> = 0.038), meaning quality degrades faster. On Gemini, the function is not monotonically decreasing — quality occasionally <em>increases</em> at random intervals, which we model as a Poisson process and attribute to "whatever is happening over there."</p>
+
+<p>We also note that the human review time <span class="m">T<sub>h</sub></span> = 0.4 seconds may be generous. Subsequent observation during the Disrupt hackathon revealed a median review time of 0.0 seconds for prompts 15 and beyond, with several founders observed physically pressing Enter <em>before the response had finished generating</em>. We do not know how to model this and have classified it as a faith-based optimization.</p>
+
+<!-- ═══ 8. CONCLUSION ═══ -->
+
+<h2>Conclusion</h2>
+
+<p>We have shown that the problem of shipping 800 MVPs in 72 hours is not, as initially believed, a throughput optimization problem. It is a <strong>recognition problem</strong>: the recognition that the MVPs are not 800 unique artifacts but 4 artifacts repeated with cosmetic variation.</p>
+
+<p>The Middle-Out Prompting™ strategy reduces Mean Vibe Time from 93.5 hours to 4.9 hours, well within the 72-hour constraint and leaving 67.1 hours for the founders to practice their pitch, design stickers, and argue about equity splits.</p>
+
+<p>We believe this result generalizes beyond TechCrunch Disrupt. Any sufficiently large gathering of AI-assisted developers will converge on a small number of isomorphic applications, because the AI models they use were trained on the same data and produce the same outputs when given sufficiently vague prompts, which is the only kind of prompt most founders write.</p>
+
+<p>The future of software development is not about building faster. It is about recognizing that you are building the same thing as everyone else, and optimizing accordingly.</p>
+
+<div class="corollary" style="margin-top:28px">
+  <div class="corollary-label">Final Corollary</div>
+  <p>If you are reading this paper at TechCrunch Disrupt and feel personally attacked, your MVP is one of the four templates. If you feel vindicated, you are one of the 29. Either way, your demo is in 4 hours and you should probably stop reading.</p>
+</div>
+
+<!-- ═══ REFERENCES ═══ -->
+
+<div class="references">
+  <h2>References</h2>
+  <div class="ref-entry"><span class="ref-num">[1]</span> Tokenwindow, B. et al. "On the Convergence of AI-Generated Codebases in Hackathon Environments." <em>Proc. SIGVIBE 2025</em>, pp. 1–14.</div>
+  <div class="ref-entry"><span class="ref-num">[2]</span> Contextlength, J. "The Vibe Decay Function: Modeling Quality Degradation in Extended AI Coding Sessions." <em>Journal of Approximate Engineering</em>, Vol. 3, No. 2, 2026.</div>
+  <div class="ref-entry"><span class="ref-num">[3]</span> Overfit, P. "Why Every Startup Looks the Same: A Statistical Analysis of Y Combinator Demo Day 2025." <em>arXiv:2601.04208</em> [cs.SE].</div>
+  <div class="ref-entry"><span class="ref-num">[4]</span> Temperatureknob, G. "Middle-Out Compression and Its Unexpected Applications in Prompt Engineering." <em>Proceedings of the 4th International Conference on Things That Shouldn't Work But Do</em>, 2026.</div>
+  <div class="ref-entry"><span class="ref-num">[5]</span> Nobackend, S. "I Dissent: Why Typing Code Manually Still Has Value." <em>Unpublished manuscript (rejected by all venues)</em>, 2026.</div>
+  <div class="ref-entry"><span class="ref-num">[6]</span> Silicon Valley, Season 1, Episode 8. "Optimal Tip-to-Tip Efficiency." HBO, 2014. (Prior art.)</div>
+</div>
+
+</div>
+
+</body>
+</html>

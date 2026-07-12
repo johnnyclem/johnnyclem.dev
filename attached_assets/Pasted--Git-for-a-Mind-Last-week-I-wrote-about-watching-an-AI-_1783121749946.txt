@@ -1,0 +1,138 @@
+# Git for a Mind
+
+*Last week I wrote about watching an AI confidently narrate things that weren't true, including things about itself. This is the part where I tell you what I'm building about it. Concept and code together, because the whole point is that they're the same thing.*
+
+---
+
+Last week's story ended on a line I want to start here by taking apart, because it sounds like a metaphor and it isn't: a system doesn't get to be trusted to remember its own corrections; the record has to live outside whatever's doing the talking.
+
+That's not a nice turn of phrase. It's an architecture. And the reason it's an architecture and not a metaphor is the thing this whole post is about: the conceptual claim ("you can't trust a source's account of itself") and the technical claim ("put the record in an append-only signed log outside the model") are the same claim, viewed from two distances. If you only say the first, you have a blog post. If you only build the second, you have a library nobody understands the point of. The thing I'm actually building only makes sense when you hold both at once. So that's how I'll write it.
+
+## The thing we're not building
+
+Start with what it took me embarrassingly long to accept: you cannot build software that verifies whether a claim is *true*.
+
+That's the oracle problem, and it's unsolved for good reasons. Truth about the world doesn't have an API. Two cameras pointed at an event prove two image streams existed; they don't prove what the images depict. A trusted timestamp proves a time, not a fact. Every chain of verification eventually has to touch reality, and reality doesn't sign your request back.
+
+I spent real effort trying to design around this before admitting it's a wall, not a hurdle. The moment I stopped trying to certify truth, the actual buildable thing came into focus.
+
+## The thing we're building: signal, not truth
+
+What you *can* measure is whether a source's confidence is backed by anything. Not "is this true," but "did this claim touch something real before it was asserted, or is it just fluent."
+
+Colbert had the word for the failure mode twenty years ago: truthiness. The feeling of truth without the substance. High surface confidence, zero grounding. It's exactly what a language model produces by default, and it's exactly what a confident-but-unqualified job candidate produces, and the two are worth putting side by side because the tell is the same in both.
+
+A good technical interviewer will tell you the signal isn't in the answer. It's in the pause before it. A candidate who knows the material and is just nervous pauses one way. A candidate who's guessing, or waiting for something to feed them a line, pauses another way. Same eventual words, opposite signal, and the whole skill is reading the difference.
+
+For a language model, the pause is the trace. The question isn't whether the confident sentence is right. It's whether grounding happened *before* the sentence. A claim with a tool-touch in front of it is earned confidence. A claim with nothing in front of it is performed confidence, regardless of whether it happens to land on the truth. My guess about the time last week was performed confidence that happened to be correct, which is worse than being wrong, because it's a lie that got away with it.
+
+So the system doesn't check truth. It checks the pause. Here's what that looks like as code.
+
+## The atom: a grounding gate
+
+The smallest real piece is a gate that sits in the path of a response and asks one deterministic question: does this claim assert something about the present state of the world without having touched the world?
+
+```ts
+interface TurnContext {
+  responseText: string;
+  toolCalls: ToolCallRecord[];        // what the model actually touched this turn
+  externalTraceProvided: boolean;     // is a record of prior reasoning present?
+}
+
+interface GatedClaim {
+  kind: "external_state" | "self_observation";
+  text: string;
+  disposition: "grounded" | "flagged" | "rewritten";
+  reason: string;
+  groundedBy?: string[];              // tool calls that actually back it
+}
+```
+
+The gate runs two detectors. The first catches present-tense claims about the world (the time, a price, who currently holds an office, whether something still exists) and checks whether a matching tool call happened this turn. No matching touch, the claim gets flagged. That's it. That's the whole check, and the important thing about it is what it is *not*: it is not an LLM judging another LLM's output. It's pattern matching plus tool-call metadata. Deterministic, near-zero latency, no extra model call. It can sit in every request in a production app without anyone noticing it's there, which turns out to matter enormously, and I'll come back to why.
+
+The second detector is the one I haven't seen anywhere else, and it comes straight from last week's sharpest moment: the model claiming to *observe* its own prior reasoning, when it has no access to it. "I can see that my previous response didn't include reasoning" is a fabrication in the grammar of an observation. So the gate catches first-person observation grammar about the model's own process, and unless an external trace is actually present in the context, it rewrites the claim from observation to inference. "I can see that I did X" becomes "I would expect, though I can't verify it from the inside, that I did X." Minimal, mechanical, and it downgrades exactly one thing: a false claim of privileged access.
+
+That is the entire v1. A gate, two detectors, a record of what was grounded and what wasn't. It's small on purpose. Everything else is what this atom composes into.
+
+## Why the pause has to be witnessed more than once
+
+Here's where the concept and the code start pulling on each other in a way I didn't expect when I started.
+
+A single grounding source isn't enough, and it took a conversation about the game theory of common knowledge to see exactly why. One witness can be self-consistent and wrong. One camera, one sensor, one clock, one model pass can produce something clean and coherent and false, and nothing *inside* that single source can catch it, because it has no vantage outside itself. One witness has no outside.
+
+Two genuinely independent witnesses can't both be wrong in the same way by accident. Their agreement means something precisely because their errors are uncorrelated. The grounded signal isn't in witness A or witness B. It's in the correspondence between them, the thing that shows up only when two independent things line up.
+
+Which sounds like "just require two sources," until you notice the load-bearing word is *independent*, not *two*. Two sensors that share a failure mode are one witness wearing a disguise. So the corroboration rule can't be a count. It has to record *why* the witnesses don't share a failure mode:
+
+```ts
+interface Witness {
+  source: string;                     // "time:nist", "fetch:primary-source", "human:overseer"
+  kind: "deterministic" | "ndi";      // reproducible check vs. convergent judgment
+  attestation: string;                // what this source actually confirms, and its limit
+}
+
+interface IndependenceBasis {
+  witnesses: string[];                // must cover >= 2 of the actual sources
+  reason: string;                     // why they don't share a failure mode
+}
+```
+
+No independence basis, and grounding caps at "single" no matter how many witnesses you list. The independence is the thing being protected, because it's the thing that makes the agreement mean anything.
+
+This also quietly kills a scaling problem I was worried about. If you ground everything against a single clock, that clock is a single point of tamperable failure, and in a world where half the population runs agents that never read their output, a single spoofable root is a real vulnerability. The fix isn't a better clock. It's that no single source is ever load-bearing. The clock stays, as one witness, never the only one. "The clock is easy to spoof" stops mattering when the clock is never trusted alone.
+
+## Two kinds of grounded, and why the record has to know which
+
+Not every grounded claim is grounded the same way, and conflating the two kinds is its own error.
+
+Some claims have a single reproducible answer. A timestamp. A file hash. A quote from a primary source. Run the check again, get the same verdict. Call these deterministic.
+
+Other claims don't reproduce, because a language model is in the loop and the path is never the same twice, but they *converge* against explicit criteria. "Is this reconciled." "Does this belief hold." You can't get bit-identical replay, but you can get a stable outcome that settles the same way even though no two runs took the same route. Steve Yegge's writing on Gas Town has a name for this property, nondeterministic idempotence, and it's the right frame: the path is chaotic, the outcome is stable.
+
+The record has to tag which kind each claim is, because you check them differently and you trust them differently. Provenance (who attested, and when) is deterministic. Correctness (was it right) is often the convergent kind, and it bottoms out in human judgment or in convergence against criteria, never in math pretending to settle it. That `kind` field on the `Witness` above is small, and it's load-bearing: it's the seam where "this was mechanically verified" and "this was judged and it held" stay honestly distinct.
+
+## The record has to be tamper-evident, which is where git comes in
+
+If the whole premise is that the record has to live outside the untrusted thing, then the record itself can't be quietly editable, or it's no better than the model's own narration.
+
+This is the part where people expect me to say blockchain, and I'm not going to, because you don't need one to get the property that matters. The property that matters is: any after-the-fact edit to the record is detectable. That's an append-only, hash-linked log, where each entry contains the hash of the one before it. Change a past entry and every hash downstream breaks. It's git's actual data model, and for a single overseer and their agents, a signed local log gives you tamper-evidence without a distributed system, a token, or a consensus mechanism.
+
+```ts
+interface LogEntry {
+  index: number;
+  timestamp: string;                  // real clock, at commit time
+  claim: GroundedClaim;
+  prevHash: string;                   // hash of the previous entry
+  hash: string;                       // hash of this entry, including prevHash
+  identity: string;                   // who signed it
+  signature: string;                  // Ed25519 over the canonical content
+}
+```
+
+Signing is Ed25519, from Node's standard library, no exotic dependency. It does one job in the near term: it makes each entry attributable to the identity that asserted it, which is the foundation the reputation layer needs later. A participant, human or agent, accrues trust as their grounded claims survive challenge. That's the same belief-mass idea applied to people instead of propositions, and it's deliberately not built yet.
+
+A blockchain becomes a later option only if a genuinely public, multi-party, trustless version of this is ever needed. For the actual use case in front of me, one person overseeing their own agents, git-shaped local storage is already enough. Reaching for the chain first would be solving a distribution problem I don't have.
+
+## What's built, what's next, what's deferred
+
+I'll be honest about the line, because the whole ethic of this thing is being honest about what's grounded.
+
+Built and shippable now: the gate and its two detectors. Deterministic, black-box, works on any hosted model because it inspects text and tool-call metadata rather than model internals. That last part is the moat. The most powerful hallucination-detection research right now reads the model's actual activations, which is strictly better and completely unavailable unless you host the model yourself. Almost nobody building agent products hosts the model. The gate works precisely because it needs nothing but the inputs and outputs you already have.
+
+Next increment: the signed, append-only, corroboration-aware log. Two witness types to start, a time source and a primary-source fetch, both already available as tools. Reputation is a pure function over that log. Still deterministic, still no LLM in the loop, still finishable in a normal amount of time.
+
+Deferred, on purpose: reconciling a draft against a stored reasoning trace; the belief model where grounded claims accumulate weight and only shift when contradicting grounded evidence overwhelms their mass; and the genuinely hard cryptographic piece, zero-knowledge proofs that let a private grounded belief contribute to a public judgment without exposing its contents. Each of those is real, each is designed, and each waits until the thing before it is proven, because building the second story before the first is load-bearing is how projects die.
+
+## The line the code knows it can't cross
+
+One last thing, because it's the part that keeps the whole effort honest.
+
+Everything here defends against the *hollow* claim, the confident sentence with nothing under it. That's the tractable failure mode, and it's worth solving because it's most of what goes wrong.
+
+It does nothing against a claim that is fully grounded and offered in bad faith. Two witnesses can be genuinely independent and coordinated in a lie. A grounded record proves a thing was witnessed; it says nothing about whether the witness is for you or against you. There's an old story about a man identified by a kiss, the most intimate and unfakeable signal there is, turned into the instrument of betrayal. Grounding validates that the correspondence happened. It cannot validate the heart behind it. That's not a gap to engineer away. It's the edge where the machinery stops and human judgment doesn't get to hand off.
+
+I think a tool that knows exactly what it can't do is worth more than one that pretends. This one grounds the pause, records it where it can't be quietly rewritten, and requires more than one witness before it trusts the correspondence. It does not certify truth, and it does not read hearts. Inside those limits, it does one real thing: it makes the difference between earned confidence and performed confidence into something you can check.
+
+That's the whole project. The story last week was the reason it needs to exist. This was the shape of it. The code is small, it's deterministic, and it's honest about its edges, which is exactly how I want it.
+
+Repo and the actual v1 module to follow, once the tests are green.

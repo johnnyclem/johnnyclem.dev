@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FontMid — The Icon Library That's Fine</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--bg-a:#f8f9fa;--bg-d:#183153;--t:#1a1a2e;--t2:#525f7f;--t3:#8898aa;--t4:#c0ccda;--amb:#f0ad4e;--amb-s:#fef9f0;--amb-b:#fce5b6;--bdr:#e6ebf1;--bdr-l:#f0f3f7;--code:#f4f5f7;--shd:0 2px 8px rgba(0,0,0,.06);--is:28px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--t);-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.6}
+
+.nav{background:var(–bg-d);padding:0 24px;height:56px;display:flex;align-items:center;position:sticky;top:0;z-index:50}
+.nav-b{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;font-weight:800;font-size:18px;letter-spacing:-.3px}
+.nav-m{width:32px;height:32px;background:var(–amb);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.nav-m svg{width:18px;height:18px}
+.nav-l{display:flex;gap:24px;margin-left:40px;font-size:14px;font-weight:500}
+.nav-l a{color:rgba(255,255,255,.6);text-decoration:none;transition:color .15s}.nav-l a:hover{color:#fff}.nav-l a.act{color:#fff}
+.nav-r{margin-left:auto;display:flex;align-items:center;gap:12px}
+.nav-c{padding:7px 18px;background:var(–amb);color:var(–bg-d);font-weight:700;font-size:13px;border-radius:6px;text-decoration:none}
+.nav-v{font-size:12px;color:rgba(255,255,255,.35);font-family:‘JetBrains Mono’,monospace}
+
+.hero{background:linear-gradient(135deg,#1b2a4a,#243b5e);padding:80px 24px 72px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:’’;position:absolute;inset:0;background:radial-gradient(ellipse at 50% 120%,rgba(240,173,78,.06),transparent 70%)}
+.hero-badge{display:inline-block;padding:4px 14px;background:rgba(240,173,78,.12);color:var(–amb);font-size:12px;font-weight:700;border-radius:20px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:20px}
+.hero h1{font-size:52px;font-weight:900;color:#fff;letter-spacing:-1.5px;margin-bottom:12px;line-height:1.1}
+.hero h1 span{color:var(–amb)}
+.hero-sub{font-size:20px;color:rgba(255,255,255,.55);font-weight:400;max-width:540px;margin:0 auto 32px;line-height:1.6}
+.hs{display:flex;justify-content:center;gap:48px;margin-bottom:36px}
+.hn{font-size:28px;font-weight:800;color:#fff;letter-spacing:-1px}.hl{font-size:12px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.hero-search{max-width:520px;margin:0 auto;position:relative}
+.hero-search input{width:100%;padding:14px 20px 14px 48px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:16px;font-family:‘Inter’,sans-serif;outline:none;transition:all .2s}
+.hero-search input::placeholder{color:rgba(255,255,255,.3)}
+.hero-search input:focus{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2)}
+.hero-search .si{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.3)}
+
+.content{max-width:1100px;margin:0 auto;padding:48px 24px 80px}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;margin-top:56px}.sh:first-child{margin-top:0}
+.st{font-size:22px;font-weight:800;letter-spacing:-.3px}
+.sc{font-size:13px;color:var(–t3);font-family:‘JetBrains Mono’,monospace}
+.cd{font-size:14px;color:var(–t2);margin-bottom:24px;max-width:660px;line-height:1.7}
+
+.ig{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:4px}
+.ic{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 8px 14px;background:var(–bg);border:1px solid transparent;border-radius:8px;cursor:pointer;transition:all .15s;gap:8px;position:relative}
+.ic:hover{border-color:var(–bdr);background:var(–bg-a);box-shadow:var(–shd)}
+.ic svg{width:var(–is);height:var(–is);color:var(–t);transition:color .15s}
+.ic:hover svg{color:var(–amb)}
+.ic .in{font-size:10.5px;color:var(–t3);text-align:center;font-weight:500;line-height:1.3}
+.ic .cp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(–bg-d);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:4px;opacity:0;transition:opacity .15s;pointer-events:none}
+.ic.copied .cp{opacity:1}
+
+.pro{margin:56px 0;padding:32px;background:linear-gradient(135deg,#fef9f0,#fff);border:1px solid var(–amb-b);border-radius:12px;display:flex;align-items:center;gap:24px}
+.pro-i{width:56px;height:56px;background:var(–amb);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pro-i svg{width:28px;height:28px;color:var(–bg-d)}
+.pro-c{flex:1}.pro-t{font-size:18px;font-weight:800;margin-bottom:4px;letter-spacing:-.2px}.pro-d{font-size:14px;color:var(–t2);line-height:1.6}
+.pro-a{padding:10px 24px;background:var(–amb);color:var(–bg-d);font-weight:700;font-size:14px;border-radius:8px;text-decoration:none;white-space:nowrap;flex-shrink:0}
+
+.us{margin:56px 0 32px}
+.us-t{font-size:22px;font-weight:800;letter-spacing:-.3px;margin-bottom:20px}
+.ub{background:var(–code);border:1px solid var(–bdr);border-radius:10px;overflow:hidden;margin:16px 0}
+.uh{padding:10px 16px;background:rgba(0,0,0,.02);border-bottom:1px solid var(–bdr);font-size:12px;font-weight:600;color:var(–t3);display:flex;align-items:center;justify-content:space-between}
+.uc2{padding:16px 20px;font-family:‘JetBrains Mono’,monospace;font-size:13px;line-height:1.65;color:var(–t);overflow-x:auto;white-space:pre}
+.xc{color:#6c7086;font-style:italic}.xk{color:#8b5cf6}.xs{color:#059669}.xt{color:#2563eb}.xp{color:#c026d3}
+
+.test{margin:56px 0;padding:40px 0;border-top:1px solid var(–bdr);border-bottom:1px solid var(–bdr)}
+.test-t{font-size:22px;font-weight:800;text-align:center;margin-bottom:32px;letter-spacing:-.3px}
+.tg{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.tc{padding:24px;background:var(–bg-a);border-radius:10px;border:1px solid var(–bdr-l)}
+.tc-tx{font-size:14px;color:var(–t2);line-height:1.7;margin-bottom:12px;font-style:italic}
+.tc-a{font-size:13px;font-weight:600;color:var(–t)}.tc-r{font-size:12px;color:var(–t3)}
+.tc-s{color:var(–amb);font-size:14px;margin-bottom:8px;letter-spacing:2px}
+
+.footer{background:var(–bg-d);color:rgba(255,255,255,.4);padding:40px 24px;text-align:center;font-size:13px;line-height:1.7}
+.footer a{color:var(–amb);text-decoration:none}.footer strong{color:rgba(255,255,255,.6)}
+
+@media(max-width:768px){.hero h1{font-size:36px}.hs{gap:24px}.ig{grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}.tg{grid-template-columns:1fr}.pro{flex-direction:column;text-align:center}}
+</style>
+
+</head>
+<body>
+
+<nav class="nav">
+  <a href="#" class="nav-b"><span class="nav-m"><svg viewBox="0 0 24 24" fill="none" stroke="#183153" stroke-width="2.5" stroke-linecap="round"><line x1="8" y1="12" x2="16" y2="12"/></svg></span>FontMid</a>
+  <div class="nav-l"><a href="#" class="act">Icons</a><a href="#">Docs</a><a href="#">Plans</a><a href="#">Blog</a><a href="#">Support</a></div>
+  <div class="nav-r"><span class="nav-v">v4.0.2</span><a href="#" class="nav-c">Go Mediocre →</a></div>
+</nav>
+
+<section class="hero">
+  <div class="hero-badge">Just launched: FontMid 4.0</div>
+  <h1>The Internet's <span>Okayest</span><br>Icon Library</h1>
+  <p class="hero-sub">2,847 icons that do the job. Not beautifully. Not poorly. Just… adequately. Used on websites that are also fine.</p>
+  <div class="hs">
+    <div style="text-align:center"><div class="hn">2,847</div><div class="hl">Icon Names</div></div>
+    <div style="text-align:center"><div class="hn">340</div><div class="hl">Unique SVGs</div></div>
+    <div style="text-align:center"><div class="hn">~3/5</div><div class="hl">Avg. Rating</div></div>
+  </div>
+  <div class="hero-search">
+    <span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+    <input type="text" placeholder="Search 2,847 icons that are just okay…" id="si" oninput="fi()">
+  </div>
+</section>
+
+<div class="content">
+
+<!-- ══════════ SENTIMENT ══════════ -->
+
+<div class="sh"><div class="st">😐 Sentiment</div><div class="sc">14 icons</div></div>
+<p class="cd">Emotional expression icons for interfaces that need to convey feelings without committing to any particular one. Every face in this category is the same face. This was a deliberate design choice and not, as some have suggested, evidence that our illustrator was going through something.</p>
+<div class="ig" id="g-sent">
+<div class="ic" onclick="cc(this)" data-n="fm-neutral" data-s="neutral"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="12"/><circle cx="12" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="20" cy="14" r="1" fill="currentColor" stroke="none"/><line x1="11" y1="20" x2="21" y2="20"/></svg><span class="in">fm-neutral</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-fine" data-s="fine"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="12"/><circle cx="12" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="20" cy="14" r="1" fill="currentColor" stroke="none"/><line x1="11" y1="20" x2="21" y2="20"/></svg><span class="in">fm-fine</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-happy" data-s="happy"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="12"/><circle cx="12" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="20" cy="14" r="1" fill="currentColor" stroke="none"/><line x1="11" y1="20" x2="21" y2="20"/></svg><span class="in">fm-happy</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-devastated" data-s="devastated sad"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="12"/><circle cx="12" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="20" cy="14" r="1" fill="currentColor" stroke="none"/><line x1="11" y1="20" x2="21" y2="20"/></svg><span class="in">fm-devastated</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-monday" data-s="monday"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="12"/><circle cx="12" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="20" cy="14" r="1" fill="currentColor" stroke="none"/><line x1="11" y1="20" x2="21" y2="20"/></svg><span class="in">fm-monday</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-friday" data-s="friday"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="12"/><circle cx="12" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="20" cy="14" r="1" fill="currentColor" stroke="none"/><line x1="11" y1="20" x2="21" y2="20"/></svg><span class="in">fm-friday</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-got-the-promotion" data-s="promotion happy"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="12"/><circle cx="12" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="20" cy="14" r="1" fill="currentColor" stroke="none"/><line x1="11" y1="20" x2="21" y2="20"/></svg><span class="in">fm-got-the-promotion</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-didnt-get-it" data-s="promotion denied"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="12"/><circle cx="12" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="20" cy="14" r="1" fill="currentColor" stroke="none"/><line x1="11" y1="20" x2="21" y2="20"/></svg><span class="in">fm-didnt-get-it</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-left-on-read" data-s="ignored read"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="12"/><circle cx="12" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="20" cy="14" r="1" fill="currentColor" stroke="none"/><line x1="11" y1="20" x2="21" y2="20"/></svg><span class="in">fm-left-on-read</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-wedding-day" data-s="wedding love"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="12"/><circle cx="12" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="20" cy="14" r="1" fill="currentColor" stroke="none"/><line x1="11" y1="20" x2="21" y2="20"/></svg><span class="in">fm-wedding-day</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-divorce-final" data-s="divorce"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="12"/><circle cx="12" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="20" cy="14" r="1" fill="currentColor" stroke="none"/><line x1="11" y1="20" x2="21" y2="20"/></svg><span class="in">fm-divorce-final</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-deployed-friday" data-s="deploy friday"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="12"/><circle cx="12" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="20" cy="14" r="1" fill="currentColor" stroke="none"/><line x1="11" y1="20" x2="21" y2="20"/></svg><span class="in">fm-deployed-friday</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-pip-meeting" data-s="pip performance"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="12"/><circle cx="12" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="20" cy="14" r="1" fill="currentColor" stroke="none"/><line x1="11" y1="20" x2="21" y2="20"/></svg><span class="in">fm-pip-meeting</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-survived-layoffs" data-s="layoff survivor"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="12"/><circle cx="12" cy="14" r="1" fill="currentColor" stroke="none"/><circle cx="20" cy="14" r="1" fill="currentColor" stroke="none"/><line x1="11" y1="20" x2="21" y2="20"/></svg><span class="in">fm-survived-layoffs</span><span class="cp">Copied</span></div>
+</div>
+
+<!-- ══════════ STATUS ══════════ -->
+
+<div class="sh"><div class="st">🟡 Status</div><div class="sc">10 icons</div></div>
+<p class="cd">Status indicators for systems where nothing is ever fully operational and nothing is ever fully down. In our experience, most systems exist in a permanent state of amber. We designed for that reality. Green and red are available in FontMid Pro, but we have not tested them.</p>
+<div class="ig" id="g-stat">
+<div class="ic" onclick="cc(this)" data-n="fm-status-ok" data-s="status ok up"><svg viewBox="0 0 32 32" fill="none" stroke="#f0ad4e" stroke-width="2.5"><circle cx="16" cy="16" r="10"/><line x1="12" y1="16" x2="20" y2="16"/></svg><span class="in">fm-status-ok</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-status-warn" data-s="status warning"><svg viewBox="0 0 32 32" fill="none" stroke="#f0ad4e" stroke-width="2.5"><circle cx="16" cy="16" r="10"/><line x1="12" y1="16" x2="20" y2="16"/></svg><span class="in">fm-status-warn</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-status-error" data-s="status error"><svg viewBox="0 0 32 32" fill="none" stroke="#f0ad4e" stroke-width="2.5"><circle cx="16" cy="16" r="10"/><line x1="12" y1="16" x2="20" y2="16"/></svg><span class="in">fm-status-error</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-status-down" data-s="status down outage"><svg viewBox="0 0 32 32" fill="none" stroke="#f0ad4e" stroke-width="2.5"><circle cx="16" cy="16" r="10"/><line x1="12" y1="16" x2="20" y2="16"/></svg><span class="in">fm-status-down</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-works-on-mine" data-s="works machine"><svg viewBox="0 0 32 32" fill="none" stroke="#f0ad4e" stroke-width="2.5"><circle cx="16" cy="16" r="10"/><line x1="12" y1="16" x2="20" y2="16"/></svg><span class="in">fm-works-on-mine</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-its-dns" data-s="dns"><svg viewBox="0 0 32 32" fill="none" stroke="#f0ad4e" stroke-width="2.5"><circle cx="16" cy="16" r="10"/><line x1="12" y1="16" x2="20" y2="16"/></svg><span class="in">fm-its-dns</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-technically-up" data-s="technically up"><svg viewBox="0 0 32 32" fill="none" stroke="#f0ad4e" stroke-width="2.5"><circle cx="16" cy="16" r="10"/><line x1="12" y1="16" x2="20" y2="16"/></svg><span class="in">fm-technically-up</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-nobody-paged" data-s="pager oncall"><svg viewBox="0 0 32 32" fill="none" stroke="#f0ad4e" stroke-width="2.5"><circle cx="16" cy="16" r="10"/><line x1="12" y1="16" x2="20" y2="16"/></svg><span class="in">fm-nobody-paged</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-we-re-monitoring" data-s="monitoring"><svg viewBox="0 0 32 32" fill="none" stroke="#f0ad4e" stroke-width="2.5"><circle cx="16" cy="16" r="10"/><line x1="12" y1="16" x2="20" y2="16"/></svg><span class="in">fm-were-monitoring</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-vibes-only" data-s="vibes"><svg viewBox="0 0 32 32" fill="none" stroke="#f0ad4e" stroke-width="2.5"><circle cx="16" cy="16" r="10"/><line x1="12" y1="16" x2="20" y2="16"/></svg><span class="in">fm-vibes-only</span><span class="cp">Copied</span></div>
+</div>
+
+<!-- ══════════ COMMERCE ══════════ -->
+
+<div class="sh"><div class="st">🛒 Commerce</div><div class="sc">12 icons</div></div>
+<p class="cd">Icons for e-commerce interfaces and the full spectrum of modern payment methods. Our shopping cart has a slightly wonky wheel, which our users report is "accurate to the experience of online shopping." The credit card icons are all the same rectangle because from the merchant's perspective, money is money.</p>
+<div class="ig" id="g-comm">
+<div class="ic" onclick="cc(this)" data-n="fm-cart" data-s="cart shopping"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,8 9,8 13,22 25,22"/><circle cx="14" cy="26" r="2"/><ellipse cx="23" cy="26" rx="2" ry="1.7"/><polyline points="9,12 26,11 24,19 12,19"/></svg><span class="in">fm-cart</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-cart-abandoned" data-s="cart abandoned"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,8 9,8 13,22 25,22"/><circle cx="14" cy="26" r="2"/><ellipse cx="23" cy="26" rx="2" ry="1.7"/><polyline points="9,12 26,11 24,19 12,19"/></svg><span class="in">fm-cart-abandoned</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-cart-impulse" data-s="cart impulse buy"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,8 9,8 13,22 25,22"/><circle cx="14" cy="26" r="2"/><ellipse cx="23" cy="26" rx="2" ry="1.7"/><polyline points="9,12 26,11 24,19 12,19"/></svg><span class="in">fm-cart-impulse-3am</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-credit-card" data-s="credit card payment"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="9" width="23" height="15" rx="2"/><line x1="5" y1="15" x2="28" y2="15"/><line x1="9" y1="20" x2="15" y2="20"/></svg><span class="in">fm-credit-card</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-card-maxed" data-s="maxed credit card"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="9" width="23" height="15" rx="2"/><line x1="5" y1="15" x2="28" y2="15"/><line x1="9" y1="20" x2="15" y2="20"/></svg><span class="in">fm-card-maxed</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-kohls-cash" data-s="kohls cash"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="9" width="23" height="15" rx="2"/><line x1="5" y1="15" x2="28" y2="15"/><line x1="9" y1="20" x2="15" y2="20"/></svg><span class="in">fm-kohls-cash</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-expired-groupon" data-s="groupon expired coupon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="9" width="23" height="15" rx="2"/><line x1="5" y1="15" x2="28" y2="15"/><line x1="9" y1="20" x2="15" y2="20"/></svg><span class="in">fm-expired-groupon</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-venmo-request" data-s="venmo payment request"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="9" width="23" height="15" rx="2"/><line x1="5" y1="15" x2="28" y2="15"/><line x1="9" y1="20" x2="15" y2="20"/></svg><span class="in">fm-venmo-request</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-wont-expense" data-s="receipt expense denied"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 4v24l3-2 3 2 3-2 3 2V4z"/><line x1="11" y1="10" x2="19" y2="10"/><line x1="11" y1="14" x2="17" y2="14"/><line x1="11" y1="18" x2="15" y2="18"/></svg><span class="in">fm-wont-expense</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-forgot-to-cancel" data-s="subscription cancel forgot"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="10"/><line x1="16" y1="10" x2="16" y2="22"/><line x1="13" y1="13" x2="19" y2="13"/><line x1="13" y1="19" x2="19" y2="19"/></svg><span class="in">fm-forgot-to-cancel</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-free-trial-ending" data-s="free trial ending"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="10"/><line x1="16" y1="10" x2="16" y2="22"/><line x1="13" y1="13" x2="19" y2="13"/><line x1="13" y1="19" x2="19" y2="19"/></svg><span class="in">fm-free-trial-ending</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-nft" data-s="nft crypto"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="10"/><line x1="16" y1="10" x2="16" y2="22"/><line x1="13" y1="13" x2="19" y2="13"/><line x1="13" y1="19" x2="19" y2="19"/></svg><span class="in">fm-nft-worthless</span><span class="cp">Copied</span></div>
+</div>
+
+<!-- ══════════ NAVIGATION ══════════ -->
+
+<div class="sh"><div class="st">🧭 Navigation</div><div class="sc">10 icons</div></div>
+<p class="cd">Directional icons for guiding users through your interface. Each arrow points in approximately the intended direction. We say "approximately" because at 16×16 pixels, the difference between "right" and "slightly right and a little up" is negligible. The collection includes several arrows whose directionality is best described as "aspirational."</p>
+<div class="ig" id="g-nav">
+<div class="ic" onclick="cc(this)" data-n="fm-arrow-right" data-s="arrow right"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="8" y1="16" x2="23" y2="15"/><polyline points="18,10 24,15 18,21"/></svg><span class="in">fm-arrow-right</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-arrow-left" data-s="arrow left"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="24" y1="16" x2="9" y2="17"/><polyline points="14,11 8,17 14,22"/></svg><span class="in">fm-arrow-left</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-arrow-up" data-s="arrow up"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="16" y1="24" x2="15" y2="9"/><polyline points="10,14 15,8 21,14"/></svg><span class="in">fm-arrow-up</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-arrow-down" data-s="arrow down"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="16" y1="8" x2="17" y2="23"/><polyline points="11,18 17,24 22,18"/></svg><span class="in">fm-arrow-down</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-sort-of-right" data-s="sort of right"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="8" y1="18" x2="22" y2="13"/><polyline points="17,8 23,13 18,19"/></svg><span class="in">fm-sort-of-right</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-vaguely-up" data-s="vaguely up"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="13" y1="24" x2="17" y2="9"/><polyline points="11,15 17,8 22,13"/></svg><span class="in">fm-vaguely-up</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-elsewhere" data-s="elsewhere"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10 20 Q16 10 22 16"/><polyline points="18,12 22,16 18,20"/></svg><span class="in">fm-elsewhere</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-back-to-meeting" data-s="back meeting"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 12 Q10 8 10 20"/><polyline points="6,17 10,21 14,17"/></svg><span class="in">fm-back-to-meeting</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-to-linkedin" data-s="linkedin job"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="8" y1="24" x2="24" y2="8"/><polyline points="14,8 24,8 24,18"/></svg><span class="in">fm-to-linkedin</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-shrug" data-s="shrug meh"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="8" y1="16" x2="24" y2="16"/></svg><span class="in">fm-shrug</span><span class="cp">Copied</span></div>
+</div>
+
+<!-- ══════════ WORKPLACE ══════════ -->
+
+<div class="sh"><div class="st">💼 Workplace</div><div class="sc">12 icons</div></div>
+<p class="cd">Icons for productivity tools built by people who have not experienced productivity firsthand in several years. Includes essential concepts like "meeting that should have been an email," "email that should have been a Slack," and "Slack that should have been silence." All meeting icons are the same rectangle because all meetings feel the same.</p>
+<div class="ig" id="g-work">
+<div class="ic" onclick="cc(this)" data-n="fm-meeting" data-s="meeting"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="8" width="20" height="14" rx="2"/><line x1="6" y1="12" x2="26" y2="12"/><circle cx="16" cy="19" r="2"/></svg><span class="in">fm-meeting</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-shouldve-emailed" data-s="meeting email"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="8" width="20" height="14" rx="2"/><line x1="6" y1="12" x2="26" y2="12"/><circle cx="16" cy="19" r="2"/></svg><span class="in">fm-shouldve-emailed</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-standup" data-s="standup daily"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="8" width="20" height="14" rx="2"/><line x1="6" y1="12" x2="26" y2="12"/><circle cx="16" cy="19" r="2"/></svg><span class="in">fm-standup</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-all-hands" data-s="all hands"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="8" width="20" height="14" rx="2"/><line x1="6" y1="12" x2="26" y2="12"/><circle cx="16" cy="19" r="2"/></svg><span class="in">fm-all-hands</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-quick-sync" data-s="sync quick"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="8" width="20" height="14" rx="2"/><line x1="6" y1="12" x2="26" y2="12"/><circle cx="16" cy="19" r="2"/></svg><span class="in">fm-quick-sync</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-that-was-45-min" data-s="long meeting"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="8" width="20" height="14" rx="2"/><line x1="6" y1="12" x2="26" y2="12"/><circle cx="16" cy="19" r="2"/></svg><span class="in">fm-that-was-45-min</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-sad-desk-lunch" data-s="lunch desk"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="14" width="18" height="10" rx="2"/><line x1="10" y1="18" x2="22" y2="18"/><line x1="16" y1="8" x2="16" y2="14"/></svg><span class="in">fm-sad-desk-lunch</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-quick-ping" data-s="ping slack"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="3" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="8"/><circle cx="16" cy="16" r="12" stroke-dasharray="3 3"/></svg><span class="in">fm-quick-ping</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-circle-back" data-s="circle back later"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="10" stroke-dasharray="5 3"/><polyline points="20,8 22,12 18,14"/></svg><span class="in">fm-circle-back</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-take-offline" data-s="offline take"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="10" stroke-dasharray="5 3"/><polyline points="20,8 22,12 18,14"/></svg><span class="in">fm-take-offline</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-synergy" data-s="synergy"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="5"/><circle cx="21" cy="21" r="5"/><line x1="14" y1="14" x2="18" y2="18"/></svg><span class="in">fm-synergy</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-reply-all-regret" data-s="reply all email"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="5"/><circle cx="21" cy="21" r="5"/><line x1="14" y1="14" x2="18" y2="18"/></svg><span class="in">fm-reply-all-regret</span><span class="cp">Copied</span></div>
+</div>
+
+<!-- ══════════ DEVELOPER ══════════ -->
+
+<div class="sh"><div class="st">⌨️ Developer</div><div class="sc">10 icons</div></div>
+<p class="cd">Icons for developer tools and engineering dashboards. The "deploy" and "revert" icons are identical because in our experience, one immediately follows the other. The "git blame" icon points at you specifically. The "LGTM" and "LGTM (didn't read)" icons are the same checkmark, which we feel is the most honest design decision we've ever made.</p>
+<div class="ig" id="g-dev">
+<div class="ic" onclick="cc(this)" data-n="fm-deploy" data-s="deploy ship"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="16" y1="6" x2="16" y2="22"/><polyline points="10,16 16,22 22,16"/><line x1="8" y1="26" x2="24" y2="26"/></svg><span class="in">fm-deploy</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-revert" data-s="revert rollback"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="16" y1="6" x2="16" y2="22"/><polyline points="10,16 16,22 22,16"/><line x1="8" y1="26" x2="24" y2="26"/></svg><span class="in">fm-revert</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-lgtm" data-s="lgtm approve"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="10,16 15,21 22,11"/></svg><span class="in">fm-lgtm</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-lgtm-didnt-read" data-s="lgtm approve didnt read"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="10,16 15,21 22,11"/></svg><span class="in">fm-lgtm-didnt-read</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-todo-fix-later" data-s="todo fix later"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="6" width="16" height="20" rx="2"/><line x1="12" y1="12" x2="20" y2="12"/><line x1="12" y1="16" x2="18" y2="16"/><line x1="12" y1="20" x2="16" y2="20"/></svg><span class="in">fm-todo-fix-later</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-tech-debt" data-s="tech debt"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="6" width="16" height="20" rx="2"/><line x1="12" y1="12" x2="20" y2="12"/><line x1="12" y1="16" x2="18" y2="16"/><line x1="12" y1="20" x2="16" y2="20"/></svg><span class="in">fm-tech-debt</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-git-blame" data-s="git blame"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="16" y1="10" x2="16" y2="18"/><circle cx="16" cy="22" r="1.5" fill="currentColor" stroke="none"/></svg><span class="in">fm-git-blame</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-copied-from-so" data-s="stackoverflow copy paste"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="6" width="16" height="20" rx="2"/><line x1="12" y1="12" x2="20" y2="12"/><line x1="12" y1="16" x2="18" y2="16"/><line x1="12" y1="20" x2="16" y2="20"/></svg><span class="in">fm-copied-from-so</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-asked-claude" data-s="ai claude chatgpt"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="6" width="16" height="20" rx="2"/><line x1="12" y1="12" x2="20" y2="12"/><line x1="12" y1="16" x2="18" y2="16"/><line x1="12" y1="20" x2="16" y2="20"/></svg><span class="in">fm-asked-claude</span><span class="cp">Copied</span></div>
+<div class="ic" onclick="cc(this)" data-n="fm-force-push" data-s="force push git"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="16" y1="6" x2="16" y2="22"/><polyline points="10,16 16,22 22,16"/><line x1="8" y1="26" x2="24" y2="26"/></svg><span class="in">fm-force-push-yolo</span><span class="cp">Copied</span></div>
+</div>
+
+<!-- ══════════ PRO BANNER ══════════ -->
+
+<div class="pro">
+  <div class="pro-i"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="16" cy="16" r="10"/><line x1="12" y1="16" x2="20" y2="16"/></svg></div>
+  <div class="pro-c">
+    <div class="pro-t">Go Mediocre with FontMid Pro</div>
+    <div class="pro-d">Unlock 1,400+ additional icons that are slightly different from the free ones. Pro includes <strong>fm-budget-approved</strong> and <strong>fm-budget-denied</strong> (same icon), the full 16-icon "Passive-Aggressive Slack Reactions" pack, and <strong>fm-quietly-updating-resume</strong>. Priority support response time: "eventually."</div>
+  </div>
+  <a href="#" class="pro-a">$79/yr — It's Fine →</a>
+</div>
+
+<!-- ══════════ USAGE ══════════ -->
+
+<div class="us">
+  <div class="us-t">Getting Started</div>
+  <p style="color:var(--t2);font-size:15px;margin-bottom:20px;max-width:600px">Add FontMid to your project. The setup process is unremarkable, which is consistent with the product.</p>
+  <div class="ub"><div class="uh"><span>HTML</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px">CDN</span></div>
+  <div class="uc2"><span class="xc">&lt;!-- Add to &lt;head&gt; — adds 847KB. Not great, not terrible. --&gt;</span>
+<span class="xt">&lt;link</span> <span class="xp">rel</span>=<span class="xs">"stylesheet"</span> <span class="xp">href</span>=<span class="xs">"https://cdn.fontmid.com/v4/css/all.min.css"</span><span class="xt">&gt;</span>
+
+<span class="xc"><!– Sentiment (all render the same face) –></span>
+<span class="xt"><i</span> <span class="xp">class</span>=<span class="xs">“fm fm-happy”</span><span class="xt">></i></span>                <span class="xc"><!– 😐 –></span>
+<span class="xt"><i</span> <span class="xp">class</span>=<span class="xs">“fm fm-devastated”</span><span class="xt">></i></span>           <span class="xc"><!– 😐 –></span>
+<span class="xt"><i</span> <span class="xp">class</span>=<span class="xs">“fm fm-wedding-day”</span><span class="xt">></i></span>          <span class="xc"><!– 😐 –></span>
+<span class="xt"><i</span> <span class="xp">class</span>=<span class="xs">“fm fm-divorce-final”</span><span class="xt">></i></span>        <span class="xc"><!– 😐 (same face for both life events) –></span>
+
+<span class="xc"><!– Status (all amber. everything is amber.) –></span>
+<span class="xt"><i</span> <span class="xp">class</span>=<span class="xs">“fm fm-status-ok”</span><span class="xt">></i></span>             <span class="xc"><!– 🟡 –></span>
+<span class="xt"><i</span> <span class="xp">class</span>=<span class="xs">“fm fm-its-dns”</span><span class="xt">></i></span>               <span class="xc"><!– 🟡 (it’s always DNS) –></span>
+<span class="xt"><i</span> <span class="xp">class</span>=<span class="xs">“fm fm-vibes-only”</span><span class="xt">></i></span>            <span class="xc"><!– 🟡 (monitoring? no. vibes.) –></span>
+
+<span class="xc"><!– Commerce (rectangles of varying emotional weight) –></span>
+<span class="xt"><i</span> <span class="xp">class</span>=<span class="xs">“fm fm-credit-card”</span><span class="xt">></i></span>           <span class="xc"><!– 💳 –></span>
+<span class="xt"><i</span> <span class="xp">class</span>=<span class="xs">“fm fm-card-maxed”</span><span class="xt">></i></span>            <span class="xc"><!– 💳 (same rectangle, heavier energy) –></span>
+<span class="xt"><i</span> <span class="xp">class</span>=<span class="xs">“fm fm-kohls-cash”</span><span class="xt">></i></span>            <span class="xc"><!– 💳 (legal tender at exactly one store) –></span>
+<span class="xt"><i</span> <span class="xp">class</span>=<span class="xs">“fm fm-expired-groupon”</span><span class="xt">></i></span>       <span class="xc"><!– 💳 (the saddest rectangle) –></span>
+<span class="xt"><i</span> <span class="xp">class</span>=<span class="xs">“fm fm-nft-worthless”</span><span class="xt">></i></span>         <span class="xc"><!– 💰 (was worth $4,700. now worth the icon.) –></span></div></div>
+
+  <div class="ub"><div class="uh"><span>React</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px">npm</span></div>
+  <div class="uc2"><span class="xk">import</span> {
+  FmHappy,             <span class="xc">// 😐</span>
+  FmDevastated,        <span class="xc">// 😐</span>
+  FmSurvivedLayoffs,   <span class="xc">// 😐 (the "I still have a job" face and the "I just lost</span>
+  FmPipMeeting,        <span class="xc">//      my job" face are the same face, and we stand by this)</span>
+  FmDeploy,            <span class="xc">// ↓</span>
+  FmRevert,            <span class="xc">// ↓  (same icon. you know why.)</span>
+  FmForcePhYolo,       <span class="xc">// ↓  (also the same icon. even more alarming.)</span>
+  FmLgtm,              <span class="xc">// ✓</span>
+  FmLgtmDidntRead,     <span class="xc">// ✓  (same checkmark. different honesty level.)</span>
+  FmKohlsCash,         <span class="xc">// 💳 (we don't have a partnership with Kohl's but we're open to it)</span>
+} <span class="xk">from</span> <span class="xs">'@fontmid/react'</span>
+
+<span class="xc">// We export 2,847 components. 340 of them are visually unique.</span>
+<span class="xc">// The rest are aliases for “semantic specificity” which is a phrase</span>
+<span class="xc">// we invented to justify our icon count on the marketing page.</span></div></div>
+
+</div>
+
+<!-- ══════════ TESTIMONIALS ══════════ -->
+
+<div class="test">
+  <div class="test-t">What People Are Saying</div>
+  <div class="tg">
+    <div class="tc"><div class="tc-s">★★★☆☆</div><div class="tc-tx">"I used fm-happy and fm-devastated in our customer satisfaction survey. They're the same face. Our CSAT score is now exactly 50%. The VP of CX called it 'statistically elegant.' I did not correct her."</div><div class="tc-a">Dev P.</div><div class="tc-r">Data Analyst</div></div>
+    <div class="tc"><div class="tc-s">★★★☆☆</div><div class="tc-tx">"fm-kohls-cash is the icon I didn't know I needed. I'm building a payment gateway for a regional department store and this saved me three hours of custom SVG work. Five stars." <em style="color:var(--t3)">(Editor's note: he gave three stars.)</em></div><div class="tc-a">Jason W.</div><div class="tc-r">Full-Stack Developer, Midwest</div></div>
+    <div class="tc"><div class="tc-s">★★★☆☆</div><div class="tc-tx">"I replaced our entire status page with FontMid icons. Every service now shows amber. Our uptime has not changed but our users stopped filing tickets because they assume amber is normal. It is. FontMid understood the assignment."</div><div class="tc-a">Lin Z.</div><div class="tc-r">SRE, Series B Startup</div></div>
+  </div>
+</div>
+
+</div>
+
+<div class="footer">
+  <p><strong>FontMid</strong> — The Internet's Okayest Icon Library · v4.0.2 · 2,847 icons* · <a href="#">GitHub</a> · <a href="#">npm</a> · <a href="#">Figma (eventually)</a></p>
+  <p style="margin-top:8px">© 2026 FontMid Inc. All rights reserved. Icons designed with a level of care best described as "adequate."</p>
+  <p style="margin-top:8px;font-size:12px;color:rgba(255,255,255,.2)">* 2,847 icon names. 340 unique SVGs. The remaining 2,507 are semantic aliases. This is industry standard. We checked.</p>
+  <p style="margin-top:4px;font-size:12px;color:rgba(255,255,255,.15)">FontMid is not affiliated with FontAwesome, which is a great product that we admire and have made no attempt whatsoever to match.</p>
+</div>
+
+<script>
+function cc(el){const n=el.getAttribute('data-n');navigator.clipboard?.writeText('<i class="fm '+n+'"></i>');el.classList.add('copied');setTimeout(()=>el.classList.remove('copied'),1200)}
+function fi(){const q=document.getElementById('si').value.toLowerCase();document.querySelectorAll('.ic').forEach(c=>{const s=(c.getAttribute('data-s')||'')+(c.getAttribute('data-n')||'');c.style.display=s.toLowerCase().includes(q)||q===''?'':'none'})}
+</script>
+
+</body>
+</html>

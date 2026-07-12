@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChainTime Protocol — API Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sw-topbar: #1b1b1b;
+    --sw-bg: #fafafa;
+    --sw-white: #ffffff;
+    --sw-text: #3b4151;
+    --sw-text-light: #6b6b6b;
+    --sw-text-muted: #999;
+    --sw-border: #e0e0e0;
+    --sw-border-light: #ececec;
+
+```
+--sw-get: #61affe;
+--sw-get-bg: #ebf3fb;
+--sw-get-border: #61affe;
+
+--sw-post: #49cc90;
+--sw-post-bg: #e8f6f0;
+--sw-post-border: #49cc90;
+
+--sw-put: #fca130;
+--sw-put-bg: #fbf1e6;
+--sw-put-border: #fca130;
+
+--sw-delete: #f93e3e;
+--sw-delete-bg: #fde6e6;
+--sw-delete-border: #f93e3e;
+
+--sw-patch: #50e3c2;
+--sw-patch-bg: #e6fbf6;
+--sw-patch-border: #50e3c2;
+
+--sw-model-bg: #f5f5f5;
+--sw-code-bg: #41444e;
+--sw-code-text: #fff;
+
+--sw-link: #4990e2;
+--sw-deprecated: #a1a1a1;
+```
+
+}
+
+- { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+font-family: ‘Source Sans 3’, ‘Open Sans’, sans-serif;
+color: var(–sw-text);
+background: var(–sw-bg);
+font-size: 14px;
+line-height: 1.5;
+-webkit-font-smoothing: antialiased;
+}
+
+/* ── Topbar ── */
+.topbar {
+background: var(–sw-topbar);
+padding: 12px 24px;
+display: flex;
+align-items: center;
+gap: 16px;
+}
+.topbar-logo {
+display: flex; align-items: center; gap: 10px;
+text-decoration: none;
+}
+.topbar-logo-icon {
+width: 32px; height: 32px;
+background: linear-gradient(135deg, #f7931a, #ff6b00);
+border-radius: 6px;
+display: flex; align-items: center; justify-content: center;
+font-size: 16px; font-weight: 800; color: #fff;
+font-family: ‘JetBrains Mono’, monospace;
+}
+.topbar-logo-text {
+font-weight: 700; font-size: 16px; color: #fff;
+font-family: ‘Inter’, sans-serif;
+letter-spacing: -0.3px;
+}
+.topbar-link {
+font-size: 13px;
+color: #999;
+text-decoration: none;
+margin-left: auto;
+}
+.topbar-link:hover { color: #ccc; }
+
+/* ── Info Section ── */
+.info-section {
+max-width: 880px;
+margin: 0 auto;
+padding: 32px 24px 0;
+}
+.info-title {
+font-size: 36px;
+font-weight: 700;
+color: var(–sw-text);
+font-family: ‘Source Sans 3’, sans-serif;
+margin-bottom: 4px;
+}
+.info-version {
+display: inline-block;
+font-size: 12px;
+font-weight: 700;
+background: #89bf04;
+color: #fff;
+padding: 2px 10px;
+border-radius: 20px;
+vertical-align: 6px;
+margin-left: 8px;
+}
+.info-links {
+margin: 8px 0 4px;
+font-size: 14px;
+}
+.info-links a {
+color: var(–sw-link);
+text-decoration: none;
+margin-right: 16px;
+}
+.info-links a:hover { text-decoration: underline; }
+.info-description {
+margin-top: 16px;
+font-size: 14px;
+line-height: 1.7;
+color: var(–sw-text);
+max-width: 720px;
+}
+.info-description p { margin-bottom: 12px; }
+.info-description strong { font-weight: 700; }
+.info-description code {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 12px;
+background: #e8e8e8;
+padding: 2px 6px;
+border-radius: 3px;
+}
+.info-base-url {
+margin-top: 12px;
+font-size: 13px;
+color: var(–sw-text-light);
+}
+.info-base-url code {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 12px;
+background: #e8e8e8;
+padding: 2px 6px;
+border-radius: 3px;
+color: var(–sw-text);
+}
+
+/* ── Auth Banner ── */
+.auth-banner {
+max-width: 880px;
+margin: 20px auto 0;
+padding: 12px 24px;
+display: flex;
+align-items: center;
+gap: 10px;
+}
+.auth-btn {
+display: inline-flex;
+align-items: center;
+gap: 6px;
+padding: 6px 16px;
+font-size: 14px;
+font-weight: 700;
+color: var(–sw-text);
+background: transparent;
+border: 2px solid #49cc90;
+border-radius: 4px;
+cursor: pointer;
+font-family: ‘Source Sans 3’, sans-serif;
+transition: all 0.15s;
+}
+.auth-btn:hover { background: rgba(73,204,144,0.08); }
+.auth-btn svg { width: 14px; height: 14px; }
+
+/* ── Section Headers ── */
+.api-content {
+max-width: 880px;
+margin: 0 auto;
+padding: 0 24px 80px;
+}
+.tag-section {
+margin-top: 32px;
+border: 1px solid var(–sw-border);
+border-radius: 4px;
+background: var(–sw-white);
+overflow: hidden;
+}
+.tag-header {
+display: flex;
+align-items: center;
+padding: 16px 20px;
+border-bottom: 1px solid var(–sw-border);
+cursor: pointer;
+user-select: none;
+}
+.tag-header:hover { background: #f8f8f8; }
+.tag-name {
+font-size: 18px;
+font-weight: 700;
+color: var(–sw-text);
+font-family: ‘Source Sans 3’, sans-serif;
+}
+.tag-description {
+font-size: 14px;
+color: var(–sw-text-light);
+margin-left: 12px;
+}
+.tag-toggle {
+margin-left: auto;
+font-size: 18px;
+color: var(–sw-text-muted);
+transition: transform 0.2s;
+}
+.tag-section.collapsed .tag-toggle { transform: rotate(-90deg); }
+.tag-section.collapsed .tag-body { display: none; }
+
+/* ── Endpoint Rows ── */
+.endpoint {
+border-bottom: 1px solid var(–sw-border-light);
+}
+.endpoint:last-child { border-bottom: none; }
+.endpoint-summary {
+display: flex;
+align-items: center;
+padding: 10px 20px;
+gap: 12px;
+cursor: pointer;
+transition: background 0.1s;
+}
+.endpoint-summary:hover { background: #f9f9f9; }
+
+.method-badge {
+font-size: 12px;
+font-weight: 700;
+text-transform: uppercase;
+padding: 4px 0;
+width: 60px;
+text-align: center;
+border-radius: 3px;
+font-family: ‘Source Sans 3’, sans-serif;
+letter-spacing: 0.2px;
+flex-shrink: 0;
+}
+.method-get { background: var(–sw-get-bg); color: var(–sw-get); border: 1px solid #c1dcf3; }
+.method-post { background: var(–sw-post-bg); color: #3a8c6d; border: 1px solid #b8e5d0; }
+.method-put { background: var(–sw-put-bg); color: #b57420; border: 1px solid #f0d6a8; }
+.method-delete { background: var(–sw-delete-bg); color: #c23030; border: 1px solid #f0bbbb; }
+.method-patch { background: var(–sw-patch-bg); color: #2aab8d; border: 1px solid #ade8d8; }
+
+.endpoint-path {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 13px;
+font-weight: 500;
+color: var(–sw-text);
+flex-shrink: 0;
+}
+.endpoint-path .path-param {
+color: var(–sw-text-light);
+font-style: italic;
+}
+.endpoint-desc {
+font-size: 13px;
+color: var(–sw-text-light);
+margin-left: auto;
+text-align: right;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+max-width: 280px;
+}
+.endpoint-deprecated .endpoint-path,
+.endpoint-deprecated .endpoint-desc {
+color: var(–sw-deprecated);
+text-decoration: line-through;
+}
+
+.endpoint-toggle {
+font-size: 14px;
+color: var(–sw-text-muted);
+margin-left: 8px;
+transition: transform 0.2s;
+flex-shrink: 0;
+}
+
+/* ── Expanded Detail ── */
+.endpoint-detail {
+border-top: 1px solid var(–sw-border-light);
+padding: 20px 24px;
+background: #fafafa;
+font-size: 14px;
+display: none;
+}
+.endpoint.open .endpoint-detail { display: block; }
+.endpoint.open .endpoint-toggle { transform: rotate(90deg); }
+.endpoint.open .endpoint-summary {
+border-left: 3px solid;
+padding-left: 17px;
+}
+.endpoint.open.get-endpoint .endpoint-summary { border-color: var(–sw-get); background: var(–sw-get-bg); }
+.endpoint.open.post-endpoint .endpoint-summary { border-color: var(–sw-post); background: var(–sw-post-bg); }
+.endpoint.open.delete-endpoint .endpoint-summary { border-color: var(–sw-delete); background: var(–sw-delete-bg); }
+.endpoint.open.put-endpoint .endpoint-summary { border-color: var(–sw-put); background: var(–sw-put-bg); }
+.endpoint.open.patch-endpoint .endpoint-summary { border-color: var(–sw-patch); background: var(–sw-patch-bg); }
+
+.detail-description {
+margin-bottom: 20px;
+line-height: 1.7;
+color: var(–sw-text);
+}
+.detail-description p { margin-bottom: 8px; }
+
+.detail-section-title {
+font-size: 13px;
+font-weight: 700;
+color: var(–sw-text);
+text-transform: uppercase;
+letter-spacing: 0.3px;
+margin: 20px 0 8px;
+}
+
+/* ── Parameter table ── */
+.param-table-sw {
+width: 100%;
+border-collapse: collapse;
+margin-bottom: 16px;
+font-size: 13px;
+}
+.param-table-sw th {
+text-align: left;
+font-weight: 600;
+padding: 8px 12px;
+border-bottom: 1px solid var(–sw-border);
+color: var(–sw-text-light);
+font-size: 12px;
+}
+.param-table-sw td {
+padding: 8px 12px;
+border-bottom: 1px solid var(–sw-border-light);
+vertical-align: top;
+color: var(–sw-text);
+}
+.param-name {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 12px;
+font-weight: 500;
+}
+.param-required {
+color: #f93e3e;
+font-size: 10px;
+font-weight: 700;
+vertical-align: super;
+margin-left: 2px;
+}
+.param-type {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 12px;
+color: var(–sw-text-light);
+}
+.param-in {
+font-size: 11px;
+color: var(–sw-text-muted);
+font-style: italic;
+}
+
+/* ── Response section ── */
+.response-row {
+display: flex;
+align-items: flex-start;
+gap: 12px;
+padding: 8px 0;
+border-bottom: 1px solid var(–sw-border-light);
+}
+.response-row:last-child { border-bottom: none; }
+.response-code {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 13px;
+font-weight: 700;
+flex-shrink: 0;
+width: 48px;
+}
+.response-code.success { color: #49cc90; }
+.response-code.client-err { color: #fca130; }
+.response-code.server-err { color: #f93e3e; }
+.response-desc { font-size: 13px; color: var(–sw-text); }
+
+/* ── Response body ── */
+.response-body {
+background: var(–sw-code-bg);
+color: var(–sw-code-text);
+border-radius: 4px;
+padding: 16px;
+margin-top: 12px;
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 12px;
+line-height: 1.6;
+overflow-x: auto;
+white-space: pre;
+}
+.rb-key { color: #89b4fa; }
+.rb-str { color: #a6e3a1; }
+.rb-num { color: #f9e2af; }
+.rb-bool { color: #cba6f7; }
+.rb-null { color: #f38ba8; }
+.rb-cmt { color: #6c7086; font-style: italic; }
+
+/* ── Try it out ── */
+.try-it-btn {
+display: inline-block;
+padding: 6px 16px;
+font-size: 13px;
+font-weight: 700;
+color: #fff;
+background: #4990e2;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+font-family: ‘Source Sans 3’, sans-serif;
+margin-top: 12px;
+transition: background 0.15s;
+}
+.try-it-btn:hover { background: #3a7bc8; }
+.try-it-btn.cancel { background: #a0a0a0; }
+.try-it-btn.cancel:hover { background: #888; }
+
+/* ── Model Schemas ── */
+.schemas-section {
+max-width: 880px;
+margin: 40px auto 0;
+padding: 0 24px 80px;
+}
+.schemas-title {
+font-size: 18px;
+font-weight: 700;
+margin-bottom: 16px;
+}
+.schema-block {
+background: var(–sw-white);
+border: 1px solid var(–sw-border);
+border-radius: 4px;
+margin-bottom: 12px;
+overflow: hidden;
+}
+.schema-header {
+padding: 12px 16px;
+font-weight: 700;
+font-size: 14px;
+background: var(–sw-model-bg);
+border-bottom: 1px solid var(–sw-border);
+cursor: pointer;
+display: flex; align-items: center; justify-content: space-between;
+}
+.schema-body {
+padding: 16px;
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 12px;
+line-height: 1.7;
+background: #fafafa;
+}
+.schema-field {
+display: flex; gap: 8px;
+padding: 3px 0;
+}
+.schema-field-name { color: var(–sw-text); font-weight: 500; }
+.schema-field-type { color: var(–sw-text-light); }
+.schema-field-desc { color: var(–sw-text-muted); font-family: ‘Source Sans 3’, sans-serif; font-size: 12px; }
+
+/* ── Footer ── */
+.sw-footer {
+max-width: 880px;
+margin: 0 auto;
+padding: 24px;
+text-align: center;
+font-size: 12px;
+color: var(–sw-text-muted);
+border-top: 1px solid var(–sw-border);
+}
+
+/* ── Misc ── */
+.deprecated-badge {
+font-size: 10px;
+font-weight: 700;
+background: #e8e8e8;
+color: #999;
+padding: 2px 8px;
+border-radius: 3px;
+text-transform: uppercase;
+letter-spacing: 0.3px;
+margin-left: 8px;
+}
+.rate-limit-note {
+background: #fff8e1;
+border: 1px solid #ffe082;
+border-radius: 4px;
+padding: 10px 14px;
+font-size: 13px;
+margin: 16px 0;
+color: #795548;
+}
+.rate-limit-note strong { color: #5d4037; }
+
+</style>
+</head>
+<body>
+
+<!-- ═══ Topbar ═══ -->
+
+<div class="topbar">
+  <a href="#" class="topbar-logo">
+    <span class="topbar-logo-icon">⧖</span>
+    <span class="topbar-logo-text">ChainTime Protocol</span>
+  </a>
+  <a href="#" class="topbar-link">Whitepaper (47 pages) ↗</a>
+</div>
+
+<!-- ═══ Info Section ═══ -->
+
+<div class="info-section">
+  <div>
+    <span class="info-title">ChainTime Protocol API</span>
+    <span class="info-version">v3.1.0</span>
+  </div>
+
+  <div class="info-links">
+    <a href="#">Terms of Service</a>
+    <a href="#">Validator Node Agreement</a>
+    <a href="#">Time Dispute Resolution Policy</a>
+    <a href="#">Contact the Core Temporal Team</a>
+  </div>
+
+  <div class="info-description">
+    <p>
+      <strong>ChainTime Protocol</strong> provides decentralized, consensus-validated, cryptographically verifiable temporal data for applications that require <em>trustless certainty</em> about what time it is.
+    </p>
+    <p>
+      Traditional time APIs rely on centralized servers operated by governments and standards bodies — single points of failure controlled by entities that also brought you daylight saving time. ChainTime eliminates this dependency by distributing temporal consensus across a global network of 11,000+ validator nodes, each independently observing the passage of time and reaching agreement through our proprietary <strong>Proof of Clock™</strong> consensus mechanism.
+    </p>
+    <p>
+      Every temporal query is validated by a minimum of 3 nodes, recorded immutably on-chain, and accompanied by a cryptographic proof that the current moment is, in fact, <em>now</em>. This proof can be independently verified by any participant in the network, or by looking at a clock.
+    </p>
+    <p>
+      ChainTime serves over <strong>2.4 million temporal queries per day</strong> across 140 countries, consuming approximately the same energy as a small European nation. We believe this is a reasonable cost for knowing what time it is.
+    </p>
+  </div>
+
+  <div class="info-base-url">
+    Base URL: <code>https://api.chaintime.io/v3</code> &nbsp;·&nbsp; Protocol: HTTPS &nbsp;·&nbsp; Format: JSON &nbsp;·&nbsp; Consensus: Proof of Clock™ (3-node minimum)
+  </div>
+</div>
+
+<!-- ═══ Auth Banner ═══ -->
+
+<div class="auth-banner">
+  <button class="auth-btn">
+    <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a5 5 0 00-5 5v2a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2V7a5 5 0 00-5-5zm3 7V7a3 3 0 00-6 0v2h6z"/></svg>
+    Authorize
+  </button>
+  <span style="font-size: 13px; color: var(--sw-text-muted);">Requires <code style="font-size: 11px;">X-ChainTime-Key</code> and <code style="font-size: 11px;">X-Temporal-Signature</code></span>
+</div>
+
+<!-- ═══ API Content ═══ -->
+
+<div class="api-content">
+
+  <!-- ─── Temporal Queries ─── -->
+
+  <div class="tag-section">
+    <div class="tag-header">
+      <span class="tag-name">temporal-queries</span>
+      <span class="tag-description">Core endpoints for consensus-validated time retrieval</span>
+      <span class="tag-toggle">▼</span>
+    </div>
+    <div class="tag-body">
+
+```
+  <!-- GET /time/now -->
+  <div class="endpoint get-endpoint open">
+    <div class="endpoint-summary">
+      <span class="method-badge method-get">GET</span>
+      <span class="endpoint-path">/time/now</span>
+      <span class="endpoint-desc">Get consensus-validated current UTC time</span>
+      <span class="endpoint-toggle">▸</span>
+    </div>
+    <div class="endpoint-detail">
+      <div class="detail-description">
+        <p>Returns the current UTC time as agreed upon by the ChainTime validator network. Each response requires a minimum of 3 independent node confirmations and includes a cryptographic temporal proof that can be verified on-chain.</p>
+        <p>Average response time is 340ms, which is approximately 340ms longer than checking the clock on your phone. This latency represents the cost of <strong>trustless temporal certainty</strong> and is not something we plan to optimize, as doing so would compromise the <em>decentralized integrity of the present moment</em>.</p>
+      </div>
+
+      <div class="rate-limit-note">
+        <strong>Rate limit:</strong> 100 queries/minute on Free tier. If you need to check the time more than 100 times per minute, please contact our Enterprise team, and also perhaps a doctor.
+      </div>
+
+      <div class="detail-section-title">Parameters</div>
+      <table class="param-table-sw">
+        <tr><th>Name</th><th>Located in</th><th>Type</th><th>Description</th></tr>
+        <tr>
+          <td><span class="param-name">confirmations</span></td>
+          <td><span class="param-in">query</span></td>
+          <td><span class="param-type">integer</span></td>
+          <td>Number of node confirmations required (min: 3, max: 2048). Higher values increase accuracy by up to 0.0001ms and latency by up to 45 seconds.</td>
+        </tr>
+        <tr>
+          <td><span class="param-name">include_proof</span></td>
+          <td><span class="param-in">query</span></td>
+          <td><span class="param-type">boolean</span></td>
+          <td>Whether to include the full cryptographic proof that it is currently now. Default: <code>true</code>. Setting to <code>false</code> means you are choosing to <em>trust</em>, which defeats the purpose.</td>
+        </tr>
+        <tr>
+          <td><span class="param-name">philosophical</span></td>
+          <td><span class="param-in">query</span></td>
+          <td><span class="param-type">boolean</span></td>
+          <td>If <code>true</code>, response includes a <code>meditation</code> field reflecting on the nature of temporal experience. Adds ~200ms. Default: <code>false</code>.</td>
+        </tr>
+      </table>
+
+      <div class="detail-section-title">Responses</div>
+      <div class="response-row">
+        <span class="response-code success">200</span>
+        <span class="response-desc">Temporal consensus achieved. The time has been determined.</span>
+      </div>
+      <div class="response-body">{
+```
+
+<span class="rb-key">“timestamp”</span>: <span class="rb-str">“2026-03-22T19:04:31.847Z”</span>,
+<span class="rb-key">“unix”</span>: <span class="rb-num">1774494271847</span>,
+<span class="rb-key">“confidence”</span>: <span class="rb-num">0.999997</span>,
+<span class="rb-key">“consensus”</span>: {
+<span class="rb-key">“nodes_queried”</span>: <span class="rb-num">7</span>,
+<span class="rb-key">“nodes_agreed”</span>: <span class="rb-num">7</span>,
+<span class="rb-key">“dissenting_nodes”</span>: <span class="rb-num">0</span>,
+<span class="rb-key">“consensus_reached_at”</span>: <span class="rb-str">“2026-03-22T19:04:31.506Z”</span>,
+<span class="rb-key">“consensus_duration_ms”</span>: <span class="rb-num">341</span>
+},
+<span class="rb-key">“proof”</span>: {
+<span class="rb-key">“algorithm”</span>: <span class="rb-str">“ChronoHash-256”</span>,
+<span class="rb-key">“hash”</span>: <span class="rb-str">“0x7f3a…c841”</span>,
+<span class="rb-key">“block_height”</span>: <span class="rb-num">18439201</span>,
+<span class="rb-key">“verifiable”</span>: <span class="rb-bool">true</span>,
+<span class="rb-key">“verification_url”</span>: <span class="rb-str">“https://explorer.chaintime.io/proof/0x7f3a…c841”</span>
+},
+<span class="rb-key">“energy_consumed_kwh”</span>: <span class="rb-num">0.0042</span>,
+<span class="rb-key">“equivalent_to”</span>: <span class="rb-str">“running a microwave for 11 seconds”</span>,
+<span class="rb-key">“billing”</span>: {
+<span class="rb-key">“credits_used”</span>: <span class="rb-num">3</span>,
+<span class="rb-key">“cost_usd”</span>: <span class="rb-num">0.003</span>,
+<span class="rb-key">“note”</span>: <span class="rb-str">“Date.now() is free, but is it trustless?”</span>
+}
+}</div>
+
+```
+      <div class="response-row" style="margin-top: 16px;">
+        <span class="response-code client-err">408</span>
+        <span class="response-desc">Temporal Consensus Timeout. The validator network could not agree on what time it is within the allotted window. This is rare but philosophically interesting.</span>
+      </div>
+      <div class="response-row">
+        <span class="response-code server-err">503</span>
+        <span class="response-desc">Time Unavailable. The network is experiencing a temporal disagreement. Please wait. Or don't. We can't be sure how long it will take.</span>
+      </div>
+
+      <button class="try-it-btn">Try it out</button>
+    </div>
+  </div>
+
+  <!-- POST /time/validate -->
+  <div class="endpoint post-endpoint">
+    <div class="endpoint-summary">
+      <span class="method-badge method-post">POST</span>
+      <span class="endpoint-path">/time/validate</span>
+      <span class="endpoint-desc">Submit a time observation for network validation</span>
+      <span class="endpoint-toggle">▸</span>
+    </div>
+    <div class="endpoint-detail">
+      <div class="detail-description">
+        <p>Allows any participant to submit their own observation of the current time to the ChainTime validator network. The network will compare your observation against consensus and return a validation result.</p>
+        <p>This endpoint exists because in a truly decentralized temporal system, <em>anyone</em> should be able to propose what time it is. In practice, 99.97% of submitted observations are correct, 0.02% are from misconfigured servers, and 0.01% appear to be from someone in a different time zone who is "pretty sure" they're right.</p>
+      </div>
+
+      <div class="detail-section-title">Request Body</div>
+      <div class="response-body" style="margin-bottom: 16px; margin-top: 8px;">{
+```
+
+<span class="rb-key">“observed_time”</span>: <span class="rb-str">“2026-03-22T19:04:31.000Z”</span>,
+<span class="rb-key">“observer_confidence”</span>: <span class="rb-num">0.95</span>,
+<span class="rb-key">“source”</span>: <span class="rb-str">“looked at my phone”</span>,
+<span class="rb-key">“stake_amount”</span>: <span class="rb-num">10.0</span>  <span class="rb-cmt">// CHRN tokens staked on this being correct</span>
+}</div>
+
+```
+      <div class="detail-section-title">Responses</div>
+      <div class="response-row">
+        <span class="response-code success">200</span>
+        <span class="response-desc">Observation validated. Your time was correct. You have been awarded 0.001 CHRN.</span>
+      </div>
+      <div class="response-row">
+        <span class="response-code client-err">409</span>
+        <span class="response-desc">Temporal Conflict. Your observation does not match network consensus. Your staked tokens have been redistributed to validators who knew what time it was.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- GET /time/consensus -->
+  <div class="endpoint get-endpoint">
+    <div class="endpoint-summary">
+      <span class="method-badge method-get">GET</span>
+      <span class="endpoint-path">/time/consensus</span>
+      <span class="endpoint-desc">Get current network temporal consensus status</span>
+      <span class="endpoint-toggle">▸</span>
+    </div>
+    <div class="endpoint-detail">
+      <div class="detail-description">
+        <p>Returns the current state of the ChainTime consensus mechanism, including how many nodes agree on what time it is, how many are dissenting, and the network's overall temporal confidence score.</p>
+        <p>In a healthy network, confidence exceeds 0.9999. Values below 0.99 indicate a <strong>Temporal Schism</strong> — a state in which the network cannot agree on the present moment. This has occurred twice in production: once during a leap second, and once when a validator node in Auckland insisted it was tomorrow.</p>
+      </div>
+      <div class="detail-section-title">Responses</div>
+      <div class="response-row">
+        <span class="response-code success">200</span>
+        <span class="response-desc">Consensus status retrieved successfully.</span>
+      </div>
+      <div class="response-body">{
+```
+
+<span class="rb-key">“status”</span>: <span class="rb-str">“consensus”</span>,
+<span class="rb-key">“active_validators”</span>: <span class="rb-num">11247</span>,
+<span class="rb-key">“agreeing”</span>: <span class="rb-num">11244</span>,
+<span class="rb-key">“dissenting”</span>: <span class="rb-num">3</span>,
+<span class="rb-key">“dissenter_reasons”</span>: [
+<span class="rb-str">“clock_drift_detected”</span>,
+<span class="rb-str">“timezone_confusion”</span>,
+<span class="rb-str">“philosophical_objection”</span>
+],
+<span class="rb-key">“confidence”</span>: <span class="rb-num">0.999733</span>,
+<span class="rb-key">“network_energy_consumption_mwh”</span>: <span class="rb-num">4.7</span>,
+<span class="rb-key">“equivalent_to”</span>: <span class="rb-str">“powering 142 homes for one hour to determine the hour”</span>
+}</div>
+</div>
+</div>
+
+```
+  <!-- POST /time/proof -->
+  <div class="endpoint post-endpoint">
+    <div class="endpoint-summary">
+      <span class="method-badge method-post">POST</span>
+      <span class="endpoint-path">/time/proof</span>
+      <span class="endpoint-desc">Generate a cryptographic proof that it is currently now</span>
+      <span class="endpoint-toggle">▸</span>
+    </div>
+    <div class="endpoint-detail">
+      <div class="detail-description">
+        <p>Generates an immutable, on-chain cryptographic proof that a specific moment in time has occurred. This proof can be independently verified by any network participant, a court of law, or a very patient person with a calculator.</p>
+        <p>Common use cases include: timestamping legal documents (available via Adobe Acrobat for free), proving you were somewhere at a certain time (available via Google Maps for free), and settling arguments about when someone said they would "be there in five minutes" (priceless).</p>
+      </div>
+      <div class="detail-section-title">Request Body</div>
+      <div class="response-body" style="margin-top: 8px;">{
+```
+
+<span class="rb-key">“moment”</span>: <span class="rb-str">“now”</span>,
+<span class="rb-key">“proof_type”</span>: <span class="rb-str">“existential”</span>,
+<span class="rb-key">“urgency”</span>: <span class="rb-str">“it is happening right now”</span>,
+<span class="rb-key">“notarize”</span>: <span class="rb-bool">true</span>,
+<span class="rb-key">“gpu_priority”</span>: <span class="rb-str">“high”</span>  <span class="rb-cmt">// allocates dedicated compute cluster</span>
+}</div>
+<div class="detail-section-title" style="margin-top: 20px;">Responses</div>
+<div class="response-row">
+<span class="response-code success">201</span>
+<span class="response-desc">Temporal proof generated and recorded on-chain. The present moment is now a matter of permanent, immutable public record.</span>
+</div>
+<div class="response-body">{
+<span class="rb-key">“proof_id”</span>: <span class="rb-str">“tp_8f3k2m9x…”</span>,
+<span class="rb-key">“proven_moment”</span>: <span class="rb-str">“2026-03-22T19:04:32.103Z”</span>,
+<span class="rb-key">“block_height”</span>: <span class="rb-num">18439203</span>,
+<span class="rb-key">“compute_used”</span>: {
+<span class="rb-key">“gpu_hours”</span>: <span class="rb-num">0.003</span>,
+<span class="rb-key">“energy_kwh”</span>: <span class="rb-num">0.47</span>,
+<span class="rb-key">“equivalent_to”</span>: <span class="rb-str">“driving a Tesla 1.8 miles to prove it’s 7:04 PM”</span>
+},
+<span class="rb-key">“cost_usd”</span>: <span class="rb-num">0.12</span>,
+<span class="rb-key">“alternative_cost”</span>: <span class="rb-str">”$0.00 (glancing at bottom-right corner of screen)”</span>
+}</div>
+</div>
+</div>
+
+```
+</div>
+```
+
+  </div>
+
+  <!-- ─── Time Zones ─── -->
+
+  <div class="tag-section">
+    <div class="tag-header">
+      <span class="tag-name">time-zones</span>
+      <span class="tag-description">Operations for timezone management and elimination</span>
+      <span class="tag-toggle">▼</span>
+    </div>
+    <div class="tag-body">
+
+```
+  <!-- GET /time/zones -->
+  <div class="endpoint get-endpoint">
+    <div class="endpoint-summary">
+      <span class="method-badge method-get">GET</span>
+      <span class="endpoint-path">/time/zones</span>
+      <span class="endpoint-desc">List all recognized time zones (for now)</span>
+      <span class="endpoint-toggle">▸</span>
+    </div>
+    <div class="endpoint-detail">
+      <div class="detail-description">
+        <p>Returns a list of time zones currently recognized by the ChainTime network. This endpoint exists primarily for backwards compatibility with legacy temporal systems (i.e., clocks).</p>
+        <p>The ChainTime Foundation's official position is that time zones are a centralized social construct that fragments the universal human experience of <em>now</em>. Our 2027 roadmap includes a governance proposal to abolish them entirely. Voting will occur on-chain.</p>
+      </div>
+      <div class="detail-section-title">Responses</div>
+      <div class="response-row">
+        <span class="response-code success">200</span>
+        <span class="response-desc">Returns array of timezone objects. We return them, but we don't endorse them.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DELETE /time/zones/{zone_id} -->
+  <div class="endpoint delete-endpoint">
+    <div class="endpoint-summary">
+      <span class="method-badge method-delete">DELETE</span>
+      <span class="endpoint-path">/time/zones/<span class="path-param">{zone_id}</span></span>
+      <span class="endpoint-desc">Permanently reject a time zone (irreversible, on-chain)</span>
+      <span class="endpoint-toggle">▸</span>
+    </div>
+    <div class="endpoint-detail">
+      <div class="detail-description">
+        <p>Submits an on-chain vote to permanently remove a time zone from the ChainTime network. This action is <strong>irreversible</strong>. Once sufficient validator consensus is reached, the time zone ceases to exist within the ChainTime ecosystem. Applications relying on the deleted zone will receive all times in UTC, which is how it should have been from the beginning.</p>
+        <p>To date, 14 time zones have been successfully deleted. <code>US/Indiana-Starke</code> was the first to go, by unanimous vote.</p>
+      </div>
+
+      <div class="detail-section-title">Parameters</div>
+      <table class="param-table-sw">
+        <tr><th>Name</th><th>Located in</th><th>Type</th><th>Description</th></tr>
+        <tr>
+          <td><span class="param-name">zone_id</span><span class="param-required">*</span></td>
+          <td><span class="param-in">path</span></td>
+          <td><span class="param-type">string</span></td>
+          <td>IANA timezone identifier. e.g., <code>America/Chicago</code>. Choose wisely. This is permanent.</td>
+        </tr>
+        <tr>
+          <td><span class="param-name">reason</span><span class="param-required">*</span></td>
+          <td><span class="param-in">body</span></td>
+          <td><span class="param-type">string</span></td>
+          <td>Justification for deletion. Must be at least 50 characters. "I don't like it" has been tried and was rejected by governance.</td>
+        </tr>
+        <tr>
+          <td><span class="param-name">stake_amount</span><span class="param-required">*</span></td>
+          <td><span class="param-in">body</span></td>
+          <td><span class="param-type">number</span></td>
+          <td>CHRN tokens staked in support of this deletion. Minimum 500 CHRN (~$47 USD). Non-refundable if the vote fails.</td>
+        </tr>
+      </table>
+
+      <div class="detail-section-title">Responses</div>
+      <div class="response-row">
+        <span class="response-code success">202</span>
+        <span class="response-desc">Deletion vote submitted. The timezone's fate is now in the hands of the validator network.</span>
+      </div>
+      <div class="response-row">
+        <span class="response-code client-err">403</span>
+        <span class="response-desc">Cannot delete UTC. UTC is the one true time. This is not a governance decision. This is physics.</span>
+      </div>
+      <div class="response-row">
+        <span class="response-code client-err">410</span>
+        <span class="response-desc">Time zone already deleted. Someone got here first.</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+```
+
+  </div>
+
+  <!-- ─── Staking ─── -->
+
+  <div class="tag-section">
+    <div class="tag-header">
+      <span class="tag-name">staking</span>
+      <span class="tag-description">Validator staking and temporal mining operations</span>
+      <span class="tag-toggle">▼</span>
+    </div>
+    <div class="tag-body">
+
+```
+  <!-- POST /validators/stake -->
+  <div class="endpoint post-endpoint">
+    <div class="endpoint-summary">
+      <span class="method-badge method-post">POST</span>
+      <span class="endpoint-path">/validators/stake</span>
+      <span class="endpoint-desc">Stake CHRN tokens to become a Time Validator Node</span>
+      <span class="endpoint-toggle">▸</span>
+    </div>
+    <div class="endpoint-detail">
+      <div class="detail-description">
+        <p>Registers the caller as a Time Validator Node on the ChainTime network. Validators are responsible for independently observing the passage of time and reporting their observations to the consensus layer. In return, validators earn CHRN token rewards proportional to the accuracy of their temporal observations.</p>
+        <p>Validator hardware requirements are significant: a minimum of 4 GPU cores, 64GB RAM, and an NTP-synchronized atomic clock reference. The atomic clock requirement was added in v2.3 after a validator in rural Queensland was found to be running consensus against a sundial.</p>
+      </div>
+
+      <div class="detail-section-title">Request Body</div>
+      <div class="response-body" style="margin-top: 8px;">{
+```
+
+<span class="rb-key">“stake_amount”</span>: <span class="rb-num">10000</span>,
+<span class="rb-key">“clock_source”</span>: <span class="rb-str">“atomic”</span>,
+<span class="rb-key">“backup_clock_source”</span>: <span class="rb-str">“gps”</span>,
+<span class="rb-key">“emergency_clock_source”</span>: <span class="rb-str">“looking out the window”</span>,
+<span class="rb-key">“commitment_period”</span>: <span class="rb-str">“6_months”</span>,
+<span class="rb-key">“understands_this_is_just_a_clock”</span>: <span class="rb-bool">false</span>
+}</div>
+
+```
+      <div class="detail-section-title" style="margin-top: 20px;">Responses</div>
+      <div class="response-row">
+        <span class="response-code success">201</span>
+        <span class="response-desc">Validator registered. Welcome to the network. You are now being paid to observe the passage of time. Do not think too hard about this.</span>
+      </div>
+      <div class="response-row">
+        <span class="response-code client-err">402</span>
+        <span class="response-desc">Insufficient stake. The minimum stake is 10,000 CHRN. If you cannot afford to stake on the nature of time, perhaps time is not your market.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- GET /validators/rewards -->
+  <div class="endpoint get-endpoint">
+    <div class="endpoint-summary">
+      <span class="method-badge method-get">GET</span>
+      <span class="endpoint-path">/validators/rewards</span>
+      <span class="endpoint-desc">Check accumulated temporal mining rewards</span>
+      <span class="endpoint-toggle">▸</span>
+    </div>
+    <div class="endpoint-detail">
+      <div class="detail-description">
+        <p>Returns the caller's accumulated CHRN token rewards from temporal validation activities. Rewards are distributed every epoch (1 hour, as determined by ChainTime consensus, which takes approximately 1 hour and 340 milliseconds).</p>
+      </div>
+      <div class="detail-section-title">Responses</div>
+      <div class="response-row">
+        <span class="response-code success">200</span>
+        <span class="response-desc">Rewards balance retrieved.</span>
+      </div>
+      <div class="response-body">{
+```
+
+<span class="rb-key">“balance_chrn”</span>: <span class="rb-num">142.87</span>,
+<span class="rb-key">“balance_usd”</span>: <span class="rb-num">13.41</span>,
+<span class="rb-key">“earned_by”</span>: <span class="rb-str">“accurately knowing what time it is for 6 months”</span>,
+<span class="rb-key">“electricity_cost_to_earn_usd”</span>: <span class="rb-num">847.20</span>,
+<span class="rb-key">“net_profit_usd”</span>: <span class="rb-num">-833.79</span>,
+<span class="rb-key">“motivational_note”</span>: <span class="rb-str">“You’re not in it for the money. You’re in it for the time.”</span>
+}</div>
+</div>
+</div>
+</div>
+
+  </div>
+
+  <!-- ─── Deprecated ─── -->
+
+  <div class="tag-section">
+    <div class="tag-header">
+      <span class="tag-name">legacy</span>
+      <span class="tag-description">Deprecated endpoints from the centralized era</span>
+      <span class="tag-toggle">▼</span>
+    </div>
+    <div class="tag-body">
+
+```
+  <!-- GET /time/simple -->
+  <div class="endpoint get-endpoint endpoint-deprecated">
+    <div class="endpoint-summary">
+      <span class="method-badge method-get">GET</span>
+      <span class="endpoint-path">/time/simple</span>
+      <span class="endpoint-desc">Get time without blockchain (deprecated)</span>
+      <span class="deprecated-badge">deprecated</span>
+      <span class="endpoint-toggle">▸</span>
+    </div>
+    <div class="endpoint-detail">
+      <div class="detail-description">
+        <p><strong>Deprecated since v2.0.</strong> This endpoint returned the current time using a single server without blockchain validation. It was fast (2ms), cheap (free), accurate (±1ms), and completely unacceptable.</p>
+        <p>The endpoint remains available for backwards compatibility but all responses now include a <code>shame</code> header indicating that the caller is using centralized time. Migration to <code>/time/now</code> is strongly recommended. The additional 338ms of latency is the cost of your temporal sovereignty.</p>
+      </div>
+      <div class="detail-section-title">Responses</div>
+      <div class="response-row">
+        <span class="response-code success">200</span>
+        <span class="response-desc">Returns time instantly, accurately, and without any of the infrastructure that justifies our Series B.</span>
+      </div>
+      <div class="response-body">{
+```
+
+<span class="rb-key">“time”</span>: <span class="rb-str">“2026-03-22T19:04:31.002Z”</span>,
+<span class="rb-key">“source”</span>: <span class="rb-str">“ntp”</span>,
+<span class="rb-key">“latency_ms”</span>: <span class="rb-num">2</span>,
+<span class="rb-key">“cost”</span>: <span class="rb-num">0</span>,
+<span class="rb-key">“blockchain_verified”</span>: <span class="rb-bool">false</span>,
+<span class="rb-key">“shame_level”</span>: <span class="rb-str">“moderate”</span>,
+<span class="rb-key">“deprecation_warning”</span>: <span class="rb-str">“You are using centralized time. In a decentralized world, this is a moral choice.”</span>
+}</div>
+</div>
+</div>
+</div>
+
+  </div>
+
+</div>
+
+<!-- ═══ Schemas ═══ -->
+
+<div class="schemas-section">
+  <div class="schemas-title">Schemas</div>
+
+  <div class="schema-block">
+    <div class="schema-header">
+      TemporalProof
+      <span style="font-size: 12px; color: var(--sw-text-muted); font-weight: 400;">object</span>
+    </div>
+    <div class="schema-body">
+      <div class="schema-field"><span class="schema-field-name">proof_id</span> <span class="schema-field-type">string</span> <span class="schema-field-desc">— Unique identifier for this proof of now</span></div>
+      <div class="schema-field"><span class="schema-field-name">algorithm</span> <span class="schema-field-type">string</span> <span class="schema-field-desc">— Always "ChronoHash-256"</span></div>
+      <div class="schema-field"><span class="schema-field-name">hash</span> <span class="schema-field-type">string</span> <span class="schema-field-desc">— The cryptographic hash of the present moment</span></div>
+      <div class="schema-field"><span class="schema-field-name">block_height</span> <span class="schema-field-type">integer</span> <span class="schema-field-desc">— Which block recorded that it is now</span></div>
+      <div class="schema-field"><span class="schema-field-name">verifiable</span> <span class="schema-field-type">boolean</span> <span class="schema-field-desc">— Always true. If you can't verify it, what's the point?</span></div>
+    </div>
+  </div>
+
+  <div class="schema-block">
+    <div class="schema-header">
+      ConsensusStatus
+      <span style="font-size: 12px; color: var(--sw-text-muted); font-weight: 400;">object</span>
+    </div>
+    <div class="schema-body">
+      <div class="schema-field"><span class="schema-field-name">status</span> <span class="schema-field-type">enum</span> <span class="schema-field-desc">— "consensus" | "schism" | "vibes_only"</span></div>
+      <div class="schema-field"><span class="schema-field-name">active_validators</span> <span class="schema-field-type">integer</span> <span class="schema-field-desc">— Nodes currently observing time professionally</span></div>
+      <div class="schema-field"><span class="schema-field-name">agreeing</span> <span class="schema-field-type">integer</span> <span class="schema-field-desc">— Nodes that agree on the current moment</span></div>
+      <div class="schema-field"><span class="schema-field-name">dissenting</span> <span class="schema-field-type">integer</span> <span class="schema-field-desc">— Nodes that believe it is a different time</span></div>
+      <div class="schema-field"><span class="schema-field-name">confidence</span> <span class="schema-field-type">number</span> <span class="schema-field-desc">— 0-1. Below 0.99, a Temporal Schism is declared</span></div>
+      <div class="schema-field"><span class="schema-field-name">equivalent_to</span> <span class="schema-field-type">string</span> <span class="schema-field-desc">— Human-readable energy comparison for accountability theater</span></div>
+    </div>
+  </div>
+
+  <div class="schema-block">
+    <div class="schema-header">
+      ValidatorRewards
+      <span style="font-size: 12px; color: var(--sw-text-muted); font-weight: 400;">object</span>
+    </div>
+    <div class="schema-body">
+      <div class="schema-field"><span class="schema-field-name">balance_chrn</span> <span class="schema-field-type">number</span> <span class="schema-field-desc">— Token balance earned from knowing what time it is</span></div>
+      <div class="schema-field"><span class="schema-field-name">balance_usd</span> <span class="schema-field-type">number</span> <span class="schema-field-desc">— USD equivalent (subject to market conditions and regret)</span></div>
+      <div class="schema-field"><span class="schema-field-name">electricity_cost_to_earn_usd</span> <span class="schema-field-type">number</span> <span class="schema-field-desc">— What you spent in electricity to earn the above</span></div>
+      <div class="schema-field"><span class="schema-field-name">net_profit_usd</span> <span class="schema-field-type">number</span> <span class="schema-field-desc">— Usually negative. We prefer the term "temporal investment."</span></div>
+      <div class="schema-field"><span class="schema-field-name">motivational_note</span> <span class="schema-field-type">string</span> <span class="schema-field-desc">— Algorithmically generated encouragement</span></div>
+    </div>
+  </div>
+
+  <div class="schema-block">
+    <div class="schema-header">
+      TimeZoneDeletionVote
+      <span style="font-size: 12px; color: var(--sw-text-muted); font-weight: 400;">object</span>
+    </div>
+    <div class="schema-body">
+      <div class="schema-field"><span class="schema-field-name">zone_id</span> <span class="schema-field-type">string</span> <span class="schema-field-desc">— IANA identifier of the timezone you wish to abolish</span></div>
+      <div class="schema-field"><span class="schema-field-name">reason</span> <span class="schema-field-type">string</span> <span class="schema-field-desc">— Minimum 50 characters explaining why this timezone should not exist</span></div>
+      <div class="schema-field"><span class="schema-field-name">stake_amount</span> <span class="schema-field-type">number</span> <span class="schema-field-desc">— CHRN tokens staked. Non-refundable if the timezone survives.</span></div>
+      <div class="schema-field"><span class="schema-field-name">emotional_attachment</span> <span class="schema-field-type">boolean</span> <span class="schema-field-desc">— Whether you have personal history with this timezone. Flagged for bias review if true.</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Footer ═══ -->
+
+<div class="sw-footer">
+  <p>ChainTime Protocol API v3.1.0 &nbsp;·&nbsp; OAS 3.0 &nbsp;·&nbsp; Proof of Clock™ consensus &nbsp;·&nbsp; <a href="#" style="color: var(--sw-link); text-decoration: none;">View raw spec</a></p>
+  <p style="margin-top: 6px;">© 2026 ChainTime Foundation. Temporal rights reserved. All moments are final.</p>
+  <p style="margin-top: 4px; font-size: 11px; color: #bbb;">This API consumed 0.003 kWh to render this documentation page. You could also have just looked at a clock.</p>
+</div>
+
+<!-- ═══ Interaction ═══ -->
+
+<script>
+  // Toggle endpoints
+  document.querySelectorAll('.endpoint-summary').forEach(el => {
+    el.addEventListener('click', () => {
+      el.closest('.endpoint').classList.toggle('open');
+    });
+  });
+
+  // Toggle tag sections
+  document.querySelectorAll('.tag-header').forEach(el => {
+    el.addEventListener('click', () => {
+      el.closest('.tag-section').classList.toggle('collapsed');
+    });
+  });
+</script>
+
+</body>
+</html>

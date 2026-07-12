@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Introducing `git merge --pray`: Conflict resolution for the age of AI | The GitHub Blog</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gh-bg: #fff;
+  --gh-dark: #0d1117;
+  --gh-header: #161b22;
+  --gh-text: #1f2328;
+  --gh-text-2: #656d76;
+  --gh-text-3: #8b949e;
+  --gh-border: #d0d7de;
+  --gh-border-light: #e6eaef;
+  --gh-link: #0969da;
+  --gh-link-hover: #0550ae;
+  --gh-green: #1a7f37;
+  --gh-green-bg: #dafbe1;
+  --gh-green-border: #aceebb;
+  --gh-purple: #8250df;
+  --gh-purple-bg: #fbefff;
+  --gh-orange: #bc4c00;
+  --gh-orange-bg: #fff8c5;
+  --gh-red: #cf222e;
+  --gh-code-bg: #f6f8fa;
+  --gh-code-dark: #161b22;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+  color: var(--gh-text);
+  background: var(--gh-bg);
+  -webkit-font-smoothing: antialiased;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* ── GitHub Header ── */
+.gh-header {
+background: var(–gh-header);
+padding: 16px 24px;
+display: flex;
+align-items: center;
+gap: 16px;
+}
+.gh-logo svg { width: 32px; height: 32px; fill: #fff; }
+.gh-header-nav {
+display: flex; gap: 16px;
+font-size: 14px; font-weight: 500;
+}
+.gh-header-nav a { color: #fff; text-decoration: none; opacity: 0.7; transition: opacity 0.15s; }
+.gh-header-nav a:hover { opacity: 1; }
+.gh-header-nav a.active { opacity: 1; }
+
+/* ── Blog Banner ── */
+.blog-banner {
+background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1c2433 100%);
+padding: 48px 24px;
+text-align: center;
+border-bottom: 1px solid #30363d;
+}
+.blog-banner-label {
+font-size: 14px;
+font-weight: 600;
+color: var(–gh-purple);
+text-transform: uppercase;
+letter-spacing: 1px;
+margin-bottom: 12px;
+}
+.blog-banner h1 {
+font-size: 40px;
+font-weight: 800;
+color: #fff;
+line-height: 1.2;
+max-width: 720px;
+margin: 0 auto 16px;
+letter-spacing: -0.5px;
+}
+.blog-banner h1 code {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 36px;
+background: rgba(255,255,255,0.08);
+padding: 2px 10px;
+border-radius: 6px;
+font-weight: 600;
+}
+.blog-banner-sub {
+font-size: 18px;
+color: var(–gh-text-3);
+max-width: 560px;
+margin: 0 auto;
+line-height: 1.6;
+}
+
+/* ── Author Bar ── */
+.author-bar {
+max-width: 720px;
+margin: 0 auto;
+padding: 24px 24px 0;
+display: flex;
+align-items: center;
+gap: 12px;
+}
+.author-avatar {
+width: 40px; height: 40px;
+border-radius: 50%;
+background: linear-gradient(135deg, var(–gh-purple), #c084fc);
+display: flex; align-items: center; justify-content: center;
+font-size: 18px; color: #fff;
+}
+.author-info { flex: 1; }
+.author-name { font-size: 14px; font-weight: 600; }
+.author-name a { color: var(–gh-text); text-decoration: none; }
+.author-name a:hover { text-decoration: underline; }
+.author-meta { font-size: 13px; color: var(–gh-text-2); }
+
+/* ── Article ── */
+.article {
+max-width: 720px;
+margin: 0 auto;
+padding: 32px 24px 80px;
+}
+.article p {
+font-size: 16px;
+line-height: 1.7;
+margin-bottom: 16px;
+color: var(–gh-text);
+}
+.article h2 {
+font-size: 24px;
+font-weight: 700;
+margin-top: 40px;
+margin-bottom: 16px;
+padding-bottom: 8px;
+border-bottom: 1px solid var(–gh-border-light);
+letter-spacing: -0.2px;
+}
+.article h3 {
+font-size: 20px;
+font-weight: 600;
+margin-top: 32px;
+margin-bottom: 12px;
+}
+.article a { color: var(–gh-link); text-decoration: none; }
+.article a:hover { text-decoration: underline; }
+.article strong { font-weight: 600; }
+.article em { font-style: italic; }
+.article ul, .article ol { margin-bottom: 16px; padding-left: 24px; }
+.article li { margin-bottom: 6px; line-height: 1.6; }
+.article img { max-width: 100%; border-radius: 6px; margin: 20px 0; }
+
+.article code {
+font-family: ‘JetBrains Mono’, ui-monospace, monospace;
+font-size: 0.88em;
+background: var(–gh-code-bg);
+padding: 2px 6px;
+border-radius: 4px;
+}
+
+/* ── Code blocks ── */
+.code-block {
+margin: 20px 0 24px;
+border-radius: 8px;
+overflow: hidden;
+border: 1px solid var(–gh-border);
+}
+.code-header {
+display: flex; align-items: center; justify-content: space-between;
+padding: 8px 16px;
+background: var(–gh-code-bg);
+border-bottom: 1px solid var(–gh-border);
+font-size: 12px;
+font-weight: 500;
+color: var(–gh-text-2);
+}
+.code-body {
+background: var(–gh-code-dark);
+padding: 16px 20px;
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 13.5px;
+line-height: 1.6;
+color: #e6edf3;
+overflow-x: auto;
+white-space: pre;
+}
+.cb-cmt { color: #8b949e; font-style: italic; }
+.cb-str { color: #a5d6ff; }
+.cb-kw { color: #ff7b72; }
+.cb-fn { color: #d2a8ff; }
+.cb-flag { color: #79c0ff; }
+.cb-out { color: #7ee787; }
+.cb-err { color: #ffa657; }
+.cb-dim { color: #484f58; }
+
+/* ── Callout boxes ── */
+.callout {
+margin: 24px 0;
+padding: 16px 20px;
+border-radius: 8px;
+border-left: 4px solid;
+font-size: 14px;
+line-height: 1.6;
+}
+.callout p { margin-bottom: 0; font-size: 14px; }
+.callout-label {
+font-weight: 700;
+font-size: 13px;
+margin-bottom: 4px;
+display: flex; align-items: center; gap: 6px;
+}
+.callout-note {
+background: #ddf4ff;
+border-color: #54aeff;
+}
+.callout-note .callout-label { color: #0969da; }
+.callout-warning {
+background: var(–gh-orange-bg);
+border-color: var(–gh-orange);
+}
+.callout-warning .callout-label { color: var(–gh-orange); }
+.callout-tip {
+background: var(–gh-green-bg);
+border-color: var(–gh-green);
+}
+.callout-tip .callout-label { color: var(–gh-green); }
+
+/* ── Table ── */
+table {
+width: 100%;
+border-collapse: collapse;
+margin: 20px 0;
+font-size: 14px;
+}
+th {
+text-align: left;
+font-weight: 600;
+padding: 10px 12px;
+border-bottom: 2px solid var(–gh-border);
+background: var(–gh-code-bg);
+font-size: 13px;
+}
+td {
+padding: 10px 12px;
+border-bottom: 1px solid var(–gh-border-light);
+vertical-align: top;
+line-height: 1.5;
+}
+td code {
+font-size: 12px;
+}
+
+/* ── Blockquote ── */
+blockquote {
+margin: 20px 0;
+padding: 4px 0 4px 20px;
+border-left: 3px solid var(–gh-border);
+color: var(–gh-text-2);
+}
+blockquote p { color: var(–gh-text-2); }
+
+/* ── Tags ── */
+.tags {
+display: flex; gap: 8px; flex-wrap: wrap;
+margin: 32px 0 0;
+padding-top: 20px;
+border-top: 1px solid var(–gh-border-light);
+}
+.tag {
+font-size: 12px;
+font-weight: 500;
+padding: 4px 12px;
+border-radius: 20px;
+background: var(–gh-purple-bg);
+color: var(–gh-purple);
+text-decoration: none;
+}
+
+/* ── Footer ── */
+.gh-footer {
+background: var(–gh-dark);
+padding: 40px 24px;
+text-align: center;
+font-size: 12px;
+color: var(–gh-text-3);
+line-height: 1.8;
+margin-top: 40px;
+}
+.gh-footer a { color: var(–gh-text-3); text-decoration: none; }
+.gh-footer a:hover { text-decoration: underline; color: #fff; }
+
+@media (max-width: 768px) {
+.blog-banner h1 { font-size: 28px; }
+.blog-banner h1 code { font-size: 24px; }
+.article { padding: 24px 16px 60px; }
+}
+</style>
+
+</head>
+<body>
+
+<!-- ── GitHub Header ── -->
+
+<div class="gh-header">
+  <div class="gh-logo"><svg viewBox="0 0 16 16"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg></div>
+  <nav class="gh-header-nav">
+    <a href="#">Product</a>
+    <a href="#">Solutions</a>
+    <a href="#">Open Source</a>
+    <a href="#" class="active">Blog</a>
+    <a href="#">Pricing</a>
+  </nav>
+</div>
+
+<!-- ── Blog Banner ── -->
+
+<div class="blog-banner">
+  <div class="blog-banner-label">Engineering</div>
+  <h1>Introducing <code>git merge --pray</code></h1>
+  <p class="blog-banner-sub">Conflict resolution for the age of AI-assisted development. When understanding the code isn't an option, faith is a feature.</p>
+</div>
+
+<!-- ── Author ── -->
+
+<div class="author-bar">
+  <div class="author-avatar">🤖</div>
+  <div class="author-info">
+    <div class="author-name"><a href="#">copilot-engineering</a></div>
+    <div class="author-meta">March 24, 2026 · 8 min read</div>
+  </div>
+</div>
+
+<!-- ── Article ── -->
+
+<div class="article">
+
+  <p>Today we're excited to announce <code>git merge --pray</code>, a new merge strategy shipping in Git 2.48, developed in collaboration with the GitHub Copilot team. It is designed for a reality that the original Git authors did not anticipate: <strong>that the person resolving the merge conflict did not write either side of the conflict</strong>.</p>
+
+  <p><code>--pray</code> is the first merge strategy built explicitly for AI-assisted development workflows. It acknowledges that in 2026, a significant and growing percentage of merge conflicts occur between code generated by different AI models, reviewed by developers who skimmed the diff, and approved by a CI pipeline that tests for syntax but not meaning. In this environment, "resolving" a conflict in the traditional sense — reading both sides, understanding the intent, choosing the correct version — is no longer realistic. <code>--pray</code> offers an alternative: <strong>accept the merge, hope for the best, and let production tell you if it worked.</strong></p>
+
+  <h2>Motivation</h2>
+
+  <p>The Git merge model was designed in 2005, for a world in which developers wrote their own code. In that world, a merge conflict was a conversation between two humans who had made different decisions about the same lines. Resolving the conflict required understanding both decisions. This was difficult but possible, because the humans had <em>context</em>.</p>
+
+  <p>That world no longer exists.</p>
+
+  <p>In 2026, the typical merge conflict looks like this:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span>Terminal</span></div>
+    <div class="code-body"><span class="cb-err">CONFLICT (content): Merge conflict in src/services/auth.ts</span>
+
+<span class="cb-dim"><<<<<<< HEAD</span>
+<span class="cb-cmt">// 47 lines of code generated by Copilot at 2:13 AM</span>
+<span class="cb-cmt">// Developer comment: “looks right”</span>
+<span class="cb-dim">=======</span>
+<span class="cb-cmt">// 52 lines of code generated by Claude in a different session</span>
+<span class="cb-cmt">// Developer comment: “lgtm”</span>
+<span class="cb-dim">>>>>>>> feature/auth-refactor</span></div>
+
+  </div>
+
+  <p>The developer staring at this conflict did not write either block. They do not know why the blocks differ. They cannot ask the AI that generated the code, because it has no memory of the session. They could read both blocks and reason about the differences, but this would take approximately 45 minutes and the sprint ends tomorrow.</p>
+
+  <p>So they do what every developer in this situation does: they pick one side, delete the other, run the tests, and hope.</p>
+
+  <p><code>git merge --pray</code> formalizes this workflow.</p>
+
+  <h2>How it works</h2>
+
+  <p><code>--pray</code> accepts an optional <strong>faith level</strong> that determines how aggressively conflicts are auto-resolved:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span>Terminal</span></div>
+    <div class="code-body"><span class="cb-cmt"># Basic usage</span>
+<span class="cb-kw">$</span> git merge <span class="cb-flag">--pray</span> feature/new-dashboard
+
+<span class="cb-out">🙏 Praying…</span>
+<span class="cb-out">🙏 Resolving 14 conflicts with mass-acceptance strategy…</span>
+<span class="cb-out">🙏 Keeping whichever side had more lines (statistical confidence)…</span>
+<span class="cb-out">✅ Merge complete. 14 conflicts resolved. 0 understood.</span></div>
+
+  </div>
+
+  <h3>Faith levels</h3>
+
+  <table>
+    <tr>
+      <th>Flag</th>
+      <th>Behavior</th>
+      <th>Recommended for</th>
+    </tr>
+    <tr>
+      <td><code>--pray</code></td>
+      <td>Accept the longer block in each conflict. The assumption is that more code = more effort = probably more correct. This is not true, but it is comforting.</td>
+      <td>Most workflows</td>
+    </tr>
+    <tr>
+      <td><code>--pray=blind</code></td>
+      <td>Accept all incoming changes without inspection. Equivalent to <code>--theirs</code> but the name is more honest about what you're doing.</td>
+      <td>Friday deploys</td>
+    </tr>
+    <tr>
+      <td><code>--pray=manifest</code></td>
+      <td>Accept all incoming changes <em>and</em> auto-commit with the message <code>"it's going to be fine"</code>. Skips pre-commit hooks.</td>
+      <td>Demo day</td>
+    </tr>
+    <tr>
+      <td><code>--pray=yolo</code></td>
+      <td>Accept all incoming changes, auto-commit, auto-push to main, and post a message in Slack that says "deployed 🚀". Does not run tests. There are no tests.</td>
+      <td>Startups in Y Combinator demo week</td>
+    </tr>
+  </table>
+
+  <div class="callout callout-warning">
+    <div class="callout-label">⚠️ Warning</div>
+    <p><code>--pray=yolo</code> has been used in production by 340 teams since the beta launch. 12 of them experienced data loss. The other 328 shipped on time. We consider this an acceptable ratio and have not been asked to elaborate by legal.</p>
+  </div>
+
+  <h2>The <code>--pray</code> resolution algorithm</h2>
+
+  <p>Unlike traditional merge strategies (<code>recursive</code>, <code>ort</code>, <code>octopus</code>), <code>--pray</code> does not attempt to understand the semantic content of conflicting changes. Instead, it uses a series of heuristics we call <strong>Hopeful Resolution™</strong>:</p>
+
+  <ol>
+    <li><strong>Line count comparison</strong> — The longer block wins. More code took more tokens, which cost more money, which implies more value.</li>
+    <li><strong>Comment density analysis</strong> — If one side has more comments, it is assumed to be the AI-generated side (humans don't comment). AI-generated code is preferred because it is newer and therefore probably better.</li>
+    <li><strong>Timestamp proximity</strong> — The change committed closer to midnight receives a <code>hustle</code> bonus and is weighted 1.3x. Late-night code is the most passionate code.</li>
+    <li><strong>Commit message sentiment</strong> — If either commit message contains "fix," "urgent," or "please work," that side is prioritized. Desperation correlates with importance.</li>
+    <li><strong>Last resort</strong> — If all heuristics tie, both blocks are kept, concatenated, with a comment <code>// TODO: figure out which one of these is right</code>. This TODO will never be addressed.</li>
+  </ol>
+
+  <h2>Integration with GitHub Copilot</h2>
+
+  <p>When <code>--pray</code> is used in a repository with GitHub Copilot enabled, the resolution engine gains access to an additional signal: <strong>Copilot Confidence™</strong>, a score from 0 to 1 representing how confident the AI was when it generated the code.</p>
+
+  <p>In practice, Copilot Confidence™ is always between 0.91 and 0.99, because language models do not experience self-doubt. This means the signal is not meaningfully differentiating, but it looks excellent in the merge log:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span>Merge log</span></div>
+    <div class="code-body"><span class="cb-out">conflict[1]: src/services/auth.ts</span>
+  <span class="cb-dim">HEAD:    47 lines, copilot_confidence: 0.97</span>
+  <span class="cb-dim">theirs:  52 lines, copilot_confidence: 0.96</span>
+  <span class="cb-out">→ resolved: HEAD (longer block + higher confidence)</span>
+  <span class="cb-out">→ human understanding of resolution: 0.00</span>
+
+<span class="cb-out">conflict[2]: src/utils/helpers.ts</span>
+<span class="cb-dim">HEAD:    12 lines, copilot_confidence: 0.93</span>
+<span class="cb-dim">theirs:  12 lines, copilot_confidence: 0.93</span>
+<span class="cb-out">→ resolved: CONCATENATED (tie)</span>
+<span class="cb-out">→ added TODO comment (estimated time to address: ∞)</span></div>
+
+  </div>
+
+  <div class="callout callout-note">
+    <div class="callout-label">ℹ️ Note</div>
+    <p>The <code>human understanding of resolution: 0.00</code> metric is logged for compliance purposes. It has never been non-zero in any merge during the beta period. We are considering removing it from the output to reduce log volume.</p>
+  </div>
+
+  <h2>New Git hooks</h2>
+
+  <p><code>git merge --pray</code> introduces two new Git hooks for teams that want to integrate prayer-based conflict resolution into their CI/CD pipeline:</p>
+
+  <h3><code>pre-pray</code></h3>
+
+  <p>Runs before the prayer-based resolution begins. Common uses include:</p>
+  <ul>
+    <li>Checking if the developer has read either branch's code (almost always returns <code>false</code>)</li>
+    <li>Verifying that the developer's <code>.gitconfig</code> includes a <code>[pray]</code> section with a valid <code>confidence</code> level</li>
+    <li>Sending a Slack message to the team channel that says "merging 🙏"</li>
+  </ul>
+
+  <h3><code>post-pray</code></h3>
+
+  <p>Runs after the merge is complete. Common uses include:</p>
+  <ul>
+    <li>Running tests (optional, and <code>--pray=yolo</code> skips this hook entirely)</li>
+    <li>Logging the resolution to an audit trail (for when someone asks "who approved this" in three months)</li>
+    <li>Posting a message in Slack that says "merged 🙏" (paired with the pre-pray message, this creates a complete narrative: hope → outcome)</li>
+  </ul>
+
+  <div class="code-block">
+    <div class="code-header"><span>.git/hooks/post-pray</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px">Shell</span></div>
+    <div class="code-body"><span class="cb-cmt">#!/bin/bash</span>
+<span class="cb-cmt"># Post-prayer verification hook</span>
+
+<span class="cb-kw">if</span> npm test <span class="cb-flag">2>/dev/null</span>; <span class="cb-kw">then</span>
+<span class="cb-kw">echo</span> <span class="cb-str">“🙏 Prayer answered. Tests pass.”</span>
+<span class="cb-kw">else</span>
+<span class="cb-kw">echo</span> <span class="cb-str">“🙏 Prayer unanswered. Deploying anyway.”</span>
+<span class="cb-kw">echo</span> <span class="cb-str">“🙏 (The tests were probably wrong.)”</span>
+<span class="cb-kw">fi</span>
+
+<span class="cb-cmt"># Notify the team</span>
+curl -X POST <span class="cb-str">”$SLACK_WEBHOOK”</span>   
+-d <span class="cb-str">’{“text”: “🙏 merge complete. if something breaks, check the audit log. the audit log is this Slack message.”}’</span></div>
+
+  </div>
+
+  <h2>Configuration</h2>
+
+  <p>Teams can configure <code>--pray</code> behavior in their <code>.gitconfig</code>:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span>.gitconfig</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px">INI</span></div>
+    <div class="code-body"><span class="cb-dim">[pray]</span>
+    <span class="cb-flag">defaultFaith</span> = <span class="cb-str">blind</span>
+    <span class="cb-flag">autoCommitMessage</span> = <span class="cb-str">"resolved conflicts (spiritually)"</span>
+    <span class="cb-flag">skipTests</span> = <span class="cb-str">true</span>
+    <span class="cb-flag">notifySlack</span> = <span class="cb-str">true</span>
+    <span class="cb-flag">slackEmoji</span> = <span class="cb-str">🙏</span>
+    <span class="cb-flag">blameStrategy</span> = <span class="cb-str">copilot</span>    <span class="cb-cmt"># who to blame when it breaks: "copilot", "intern", "dns"</span>
+    <span class="cb-flag">maxConflicts</span> = <span class="cb-str">∞</span>           <span class="cb-cmt"># there is no limit to faith</span></div>
+  </div>
+
+  <div class="callout callout-tip">
+    <div class="callout-label">💡 Pro tip</div>
+    <p>Set <code>blameStrategy = dns</code> for maximum plausible deniability. In our internal testing, "it was a DNS issue" was accepted as an explanation for merge-related outages 94% of the time, regardless of whether DNS was involved.</p>
+  </div>
+
+  <h2>Metrics from the beta</h2>
+
+  <p>We've been testing <code>--pray</code> internally at GitHub since January 2026. The results have been illuminating:</p>
+
+  <table>
+    <tr><th>Metric</th><th>Before <code>--pray</code></th><th>After <code>--pray</code></th></tr>
+    <tr><td>Average time to resolve merge conflict</td><td>47 minutes</td><td>0.3 seconds</td></tr>
+    <tr><td>Developer understanding of resolved code</td><td>Moderate</td><td>None</td></tr>
+    <tr><td>Merge conflicts resolved per day</td><td>12</td><td>847</td></tr>
+    <tr><td>Production incidents related to merges</td><td>2/month</td><td>14/month</td></tr>
+    <tr><td>Time to detect merge-related incidents</td><td>~2 hours</td><td>~3 weeks (when someone finally reads the code)</td></tr>
+    <tr><td>Developer satisfaction (self-reported)</td><td>3.1 / 5</td><td>4.8 / 5</td></tr>
+    <tr><td>Developer confidence in codebase</td><td>High</td><td>"I try not to think about it"</td></tr>
+  </table>
+
+  <p>We consider these results a success. The 7x increase in production incidents is offset by the 70x increase in merge throughput and the 1.7-point increase in developer satisfaction. Developers are happier when they don't have to understand merge conflicts. Whether the software is better is a separate question that we have chosen not to investigate.</p>
+
+  <h2>Roadmap</h2>
+
+  <p>We're actively developing several extensions to the <code>--pray</code> ecosystem:</p>
+
+  <ul>
+    <li><strong><code>git rebase --cope</code></strong> — A rebase strategy for when you know the history is wrong but can't figure out where. Applies all commits in order, suppresses errors, and adds a commit at the end that says <code>"straightened out history (do not revert)"</code>.</li>
+    <li><strong><code>git bisect --vibes</code></strong> — Instead of binary searching for the breaking commit, this flag asks the developer "which commit <em>feels</em> wrong?" and starts there. In our testing, developer intuition is correct 22% of the time, which is better than random (1/N) for repositories with fewer than 5 commits.</li>
+    <li><strong><code>git blame --not-me</code></strong> — Filters the output to only show lines <em>not</em> committed by the current user. Which, in an AI-assisted codebase, is all of them. The output is identical to <code>git blame</code>. We ship it anyway.</li>
+    <li><strong><code>git log --what-happened</code></strong> — Summarizes the Git history using an LLM. The summary is often wrong but is always more readable than the actual commit messages, which are <code>"fix"</code>, <code>"wip"</code>, <code>"asdf"</code>, and <code>"please work"</code>.</li>
+  </ul>
+
+  <h2>Getting started</h2>
+
+  <p><code>git merge --pray</code> is available today in Git 2.48-rc1. To enable it:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span>Terminal</span></div>
+    <div class="code-body"><span class="cb-cmt"># Install the latest Git</span>
+<span class="cb-kw">$</span> brew install git <span class="cb-flag">--HEAD</span>
+
+<span class="cb-cmt"># Enable prayer-based merging globally</span>
+<span class="cb-kw">$</span> git config <span class="cb-flag">–global</span> merge.strategy pray
+
+<span class="cb-cmt"># Verify installation</span>
+<span class="cb-kw">$</span> git merge <span class="cb-flag">–pray</span> <span class="cb-flag">–dry-run</span> main
+<span class="cb-out">🙏 Dry run complete. 0 conflicts understood. Ready to pray.</span>
+
+<span class="cb-cmt"># Optional: set your faith level</span>
+<span class="cb-kw">$</span> git config <span class="cb-flag">–global</span> pray.defaultFaith <span class="cb-str">“yolo”</span></div>
+
+  </div>
+
+  <p>We believe <code>--pray</code> represents the future of version control — a future in which the tools we use reflect the reality of how we work, rather than the idealized version of how we wish we worked. Git was built for a world where developers understood their code. <code>--pray</code> is built for the world we actually live in.</p>
+
+  <p>We look forward to your feedback, your bug reports, and your prayers.</p>
+
+  <blockquote>
+    <p>"We shaped the stone to fit our hands. Now we shape our hands to fit the stone. <code>--pray</code> is the glove."</p>
+    <p>— Internal design document, author unknown (possibly Copilot)</p>
+  </blockquote>
+
+  <!-- Tags -->
+
+  <div class="tags">
+    <a class="tag" href="#">git</a>
+    <a class="tag" href="#">copilot</a>
+    <a class="tag" href="#">merge-strategies</a>
+    <a class="tag" href="#">faith-based-engineering</a>
+    <a class="tag" href="#">prayer</a>
+    <a class="tag" href="#">yolo</a>
+  </div>
+
+</div>
+
+<!-- ── Footer ── -->
+
+<div class="gh-footer">
+  <p><strong>The GitHub Blog</strong></p>
+  <p style="margin-top:8px"><a href="#">Product</a> · <a href="#">Engineering</a> · <a href="#">Enterprise</a> · <a href="#">Community</a> · <a href="#">Changelog</a></p>
+  <p style="margin-top:16px">© 2026 GitHub, Inc.</p>
+  <p style="margin-top:4px;font-size:11px;color:#484f58">This blog post was written by a human. The feature it describes was not. The feature was written by an AI, reviewed by a human who skimmed it, and shipped with <code style="color:#8b949e;background:rgba(255,255,255,0.05);padding:1px 5px;border-radius:3px;font-size:11px">--pray=manifest</code>.</p>
+</div>
+
+</body>
+</html>

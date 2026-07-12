@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QMTextLogger — Quantum Metric Mobile Challenge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-page: #f5f5f7;
+            --bg-surface: #ffffff;
+            --fg-main: #1d1d1f;
+            --fg-muted: #86868b;
+            --apple-blue: #007aff;
+            --apple-blue-dark: #0051a8;
+            --border-light: #e5e5ea;
+            --border-medium: #d1d1d6;
+            
+            --xc-keyword: #9B2393;
+            --xc-string: #C41A16;
+            --xc-type: #0B4F79;
+            --xc-comment: #5D6C79;
+            --xc-function: #326D74;
+            --xc-property: #4B0E73;
+            --xc-number: #1C00CF;
+            --xc-macro: #78492A;
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--fg-main);
+            line-height: 1.6;
+        }
+
+        .font-mono {
+            font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-apple {
+            background: linear-gradient(180deg, #42a1ec 0%, #0070c9 100%);
+            border: 1px solid #076bd2;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 1px 2px rgba(0, 0, 0, 0.1);
+            color: white;
+            font-weight: 500;
+            padding: 12px 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-apple:hover {
+            background: linear-gradient(180deg, #51a9ee 0%, #147bcd 100%);
+        }
+
+        .btn-apple:active {
+            background: #0051a8;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(180deg, #ffffff 0%, #f0f0f0 100%);
+            border: 1px solid var(--border-medium);
+            color: var(--fg-main);
+            font-weight: 500;
+            padding: 12px 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(180deg, #f0f0f0 0%, #e5e5ea 100%);
+        }
+
+        .mac-window {
+            background: var(--bg-surface);
+            border-radius: 8px;
+            border: 1px solid var(--border-medium);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mac-titlebar {
+            background: linear-gradient(180deg, #e8e8e8 0%, #d1d1d1 100%);
+            border-bottom: 1px solid #b3b3b3;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .mac-title {
+            position: absolute;
+            left: 0; right: 0;
+            text-align: center;
+            font-size: 12px;
+            color: #4d4d4d;
+            font-weight: 500;
+            pointer-events: none;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+        }
+
+        .traffic-lights {
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+        }
+
+        .traffic-light {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+        }
+        .tl-close { background: #ff5f56; border: 1px solid #e0443e; }
+        .tl-min { background: #ffbd2e; border: 1px solid #dea123; }
+        .tl-max { background: #27c93f; border: 1px solid #1aab29; }
+
+        .syntax-keyword { color: var(--xc-keyword); font-weight: 500; }
+        .syntax-string { color: var(--xc-string); }
+        .syntax-type { color: var(--xc-type); }
+        .syntax-comment { color: var(--xc-comment); font-style: italic; }
+        .syntax-function { color: var(--xc-function); }
+        .syntax-property { color: var(--xc-property); }
+        .syntax-number { color: var(--xc-number); }
+        .syntax-macro { color: var(--xc-macro); }
+
+        .segmented-control {
+            display: inline-flex;
+            background: #e5e5ea;
+            border-radius: 8px;
+            padding: 2px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .segment-btn {
+            padding: 6px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--fg-main);
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .segment-btn.active {
+            background: white;
+            border-color: rgba(0,0,0,0.04);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12), 0 3px 1px rgba(0,0,0,0.04);
+        }
+
+        .ios-toggle {
+            width: 51px; height: 31px;
+            background: var(--border-medium);
+            border-radius: 31px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .ios-toggle.active { background: #34C759; }
+        .ios-toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px; left: 2px;
+            width: 27px; height: 27px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15), 0 3px 1px rgba(0,0,0,0.06);
+            transition: transform 0.3s cubic-bezier(0.2, 0.85, 0.32, 1.2);
+        }
+        .ios-toggle.active::after { transform: translateX(20px); }
+
+        .apple-card {
+            background: var(--bg-surface);
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .apple-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+
+        .diagram-node {
+            background: white;
+            border: 1px solid var(--border-medium);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+        .diagram-node.active {
+            border-color: var(--apple-blue);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+        }
+        
+        .connector-down {
+            width: 2px; height: 24px;
+            background: var(--border-medium);
+            margin: 0 auto;
+            z-index: 1;
+        }
+
+        .flow-node {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-medium);
+            border-radius: 8px;
+            padding: 12px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            flex-shrink: 0;
+        }
+        .flow-node:hover {
+            border-color: var(--apple-blue);
+        }
+        .flow-node.active {
+            border-color: var(--apple-blue);
+            background: rgba(0, 122, 255, 0.05);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+        }
+
+        .terminal-bg {
+            background: rgba(0, 0, 0, 0.9);
+            color: #f1f1f1;
+        }
+        
+        .reveal-hidden {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Journey cards: dead hooks vs. survivor */
+        .funeral-card {
+            background: var(--bg-surface);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid var(--border-light);
+            position: relative;
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .funeral-card.dead {
+            opacity: 0.82;
+        }
+        .funeral-card.dead::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: #c4c4c8;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .funeral-card.survivor {
+            border-color: var(--apple-blue);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+            background: linear-gradient(180deg, #ffffff 0%, #f0f7ff 100%);
+        }
+        .funeral-card.survivor::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--apple-blue);
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .funeral-card h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-family: Menlo, Monaco, Consolas, monospace;
+        }
+        .funeral-card .hook-title {
+            color: var(--fg-main);
+        }
+        .funeral-card.survivor .hook-title {
+            color: var(--apple-blue);
+        }
+        .funeral-card .epitaph-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--fg-muted);
+            margin-top: 10px;
+            margin-bottom: 2px;
+        }
+        .funeral-card .epitaph-text {
+            font-size: 12px;
+            color: var(--fg-main);
+            line-height: 1.5;
+        }
+        .funeral-card.survivor .epitaph-text {
+            color: var(--fg-main);
+        }
+        .funeral-card .hook-number {
+            font-family: Menlo, Monaco, Consolas, monospace;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--fg-muted);
+            margin-bottom: 2px;
+        }
+        .funeral-card.survivor .hook-number {
+            color: var(--apple-blue);
+        }
+        .funeral-card .status-tag {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: auto;
+            align-self: flex-start;
+        }
+        .funeral-card.dead .status-tag {
+            background: #f2f2f4;
+            color: #8a8a90;
+            border: 1px solid #e5e5ea;
+        }
+        .funeral-card.survivor .status-tag {
+            background: #e3f2ff;
+            color: var(--apple-blue-dark);
+            border: 1px solid #b8daff;
+        }
+
+        .inline-aside {
+            font-size: 12px;
+            color: var(--fg-muted);
+            font-style: italic;
+            border-left: 2px solid var(--border-medium);
+            padding-left: 10px;
+            margin-top: 12px;
+        }
+
+        /* Section spacing */
+        section {
+            padding-top: 96px;
+            padding-bottom: 96px;
+            scroll-margin-top: 64px;
+        }
+
+        section + section {
+            border-top: 1px solid var(--border-light);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="fixed top-0 left-0 right-0 z-50 glass-nav">
+        <div class="max-w-6xl mx-auto px-6 py-3">
+            <div class="flex items-center justify-between">
+                <a href="#hero" class="nav-link flex items-center gap-2 text-[var(--fg-main)] hover:text-[var(--apple-blue)] transition-colors">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
+                    </svg>
+                    <span class="font-semibold tracking-tight text-lg">QMTextLogger</span>
+                </a>
+                
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#challenge" class="text-sm font-medium text-[var(--fg-muted)] hover:text-[var(--fg-main)] transition-colors">Overview</a>
+                    <a href="#journey" class="text-sm font-medium text-[var(--fg-muted)] hover:text-[var(--fg-main)] transition-colors">Journey</a>
+                    <a href="#architecture" class="text-sm font-medium text-[var(--fg-muted)] hover:text-[var(--fg-main)] transition-colors">Architecture</a>
+                    <a href="#implementation" class="text-sm font-medium text-[var(--fg-muted)] hover:text-[var(--fg-main)] transition-colors">Decisions</a>
+                    <a href="#playground" class="text-sm font-medium text-[var(--fg-muted)] hover:text-[var(--fg-main)] transition-colors">Playground</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+
+        <section id="hero" class="bg-[var(--bg-page)]">
+            <div class="max-w-4xl w-full mx-auto px-6 reveal-hidden text-center" data-reveal>
+                <div class="inline-block mb-4 px-3 py-1 rounded-full bg-[var(--border-light)] text-xs font-semibold text-[var(--fg-muted)] tracking-widest uppercase">
+                    QM Mobile Tech Challenge
+                </div>
+                <h1 class="text-5xl md:text-6xl font-bold tracking-tight mb-4 text-[var(--fg-main)]">
+                    Four hook points died.<br>
+                    <span class="text-[var(--fg-muted)] font-light">One survived. This is how.</span>
+                </h1>
+                <p class="text-xl text-[var(--fg-muted)] mb-10 max-w-2xl mx-auto font-light">
+                    The challenge was to intercept SwiftUI text on iOS&nbsp;26. Four substrates that used to work no longer do. This is the forensic account of finding the one that still does.
+                </p>
+            </div>
+        </section>
+
+        <section id="challenge" class="bg-white">
+            <div class="max-w-5xl w-full mx-auto px-6">
+                <div class="text-center mb-12 reveal-hidden" data-reveal>
+                    <h2 class="text-3xl font-bold tracking-tight mb-4">The Challenge & The Trap</h2>
+                    <p class="text-[var(--fg-muted)] max-w-2xl mx-auto">
+                        The prompt is from 2020 and suggests a technique that hasn't worked since iOS 15. Solving it now means discarding the original thesis and rebuilding against a runtime that removed three candidate surfaces in a row.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-12 items-center reveal-hidden" data-reveal>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-6">The Requirements</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-start gap-3">
+                                <div class="mt-1 bg-red-100 p-1 rounded-full"><svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></div>
+                                <div>
+                                    <strong class="block text-sm">Do not touch the View</strong>
+                                    <span class="text-sm text-[var(--fg-muted)]"><code>ContentView.swift</code> must remain untouched. No view modifiers inside it.</span>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <div class="mt-1 bg-blue-100 p-1 rounded-full"><svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
+                                <div>
+                                    <strong class="block text-sm">Bonus: Single-Line Setup</strong>
+                                    <span class="text-sm text-[var(--fg-muted)]">The prompt allows exactly one init line. That constraint turns out to be the architectural unlock — we spend it on <code>.qmCapture()</code>, which triggers the accessibility hook installation at the moment the scene root evaluates. Any earlier and the hosting-view classes don't exist yet.</span>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <div class="mt-1 bg-orange-100 p-1 rounded-full"><svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg></div>
+                                <div>
+                                    <strong class="block text-sm">The Stack Overflow Trap</strong>
+                                    <span class="text-sm text-[var(--fg-muted)]">The accepted answer on SO is <code>drawRect:</code> swizzling on private SwiftUI classes. I tried it. It hasn't worked since iOS 15. Then I tried four more things. Next section.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="mac-window">
+                        <div class="mac-titlebar">
+                            <div class="traffic-lights">
+                                <div class="traffic-light tl-close"></div>
+                                <div class="traffic-light tl-min"></div>
+                                <div class="traffic-light tl-max"></div>
+                            </div>
+                            <div class="mac-title">SwiftUIQMTestApp.swift</div>
+                        </div>
+                        <div class="p-5 font-mono text-sm overflow-x-auto bg-[#FFFFFF]">
+<pre><code><span class="syntax-keyword">import</span> SwiftUI
+<span class="syntax-keyword">import</span> QMTextLoggerSwiftUI
+
+<span class="syntax-keyword">@main</span>
+<span class="syntax-keyword">struct</span> <span class="syntax-type">SwiftUIQMTestApp</span>: <span class="syntax-type">App</span> {
+    <span class="syntax-keyword">var</span> body: <span class="syntax-keyword">some</span> <span class="syntax-type">Scene</span> {
+        <span class="syntax-type">WindowGroup</span> {
+            <span class="syntax-type">ContentView</span>()
+                .<span class="syntax-function">qmCapture</span>() <span class="syntax-comment">// <-- The one line</span>
+        }
+    }
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="journey" class="bg-[var(--bg-page)]">
+            <div class="max-w-6xl w-full mx-auto px-6">
+                <div class="text-center mb-10 reveal-hidden" data-reveal>
+                    <h2 class="text-3xl font-bold tracking-tight mb-3">Four Funerals and a Framework</h2>
+                    <p class="text-[var(--fg-muted)] max-w-3xl mx-auto">
+                        Every hook point below was reasoned from first principles, implemented, measured, and buried. Each one died for a specific, teachable reason. The survivor isn't clever — it's humble. It stopped trying to read SwiftUI's internals and started asking SwiftUI politely, the way XCUITest does.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-4 reveal-hidden" data-reveal>
+
+                    <div class="funeral-card dead">
+                        <div class="hook-number">Hook #1</div>
+                        <h4 class="hook-title">drawRect:</h4>
+                        <div class="epitaph-label">Eulogy</div>
+                        <div class="epitaph-text">Enumerate SwiftUI classes, filter by ivar heuristic, swizzle <code>drawRect:</code>.</div>
+                        <div class="epitaph-label">Cause of death</div>
+                        <div class="epitaph-text">SwiftUI rasterization went layer-based in iOS 15. <code>drawRect:</code> never fires.</div>
+                        <div class="epitaph-label">Lesson</div>
+                        <div class="epitaph-text">The 2020 prompt inherits a 2020 mental model. Discard the thesis.</div>
+                        <span class="status-tag">Zero calls</span>
+                    </div>
+
+                    <div class="funeral-card dead">
+                        <div class="hook-number">Hook #2</div>
+                        <h4 class="hook-title">Accessibility setters</h4>
+                        <div class="epitaph-label">Eulogy</div>
+                        <div class="epitaph-text">Swizzle <code>-setAccessibilityLabel:</code> on <code>NSObject</code>. Catch every text as VoiceOver would.</div>
+                        <div class="epitaph-label">Cause of death</div>
+                        <div class="epitaph-text">SwiftUI doesn't push labels eagerly — it computes them lazily, only when an accessibility client queries. With VoiceOver off, setters never fire.</div>
+                        <div class="epitaph-label">Lesson</div>
+                        <div class="epitaph-text">Don't wait for accessibility — trigger it. This insight saved hook #5.</div>
+                        <span class="status-tag">Zero calls</span>
+                    </div>
+
+                    <div class="funeral-card dead">
+                        <div class="hook-number">Hook #3</div>
+                        <h4 class="hook-title">Layout + subview walk</h4>
+                        <div class="epitaph-label">Eulogy</div>
+                        <div class="epitaph-text">Hook <code>-layoutSubviews</code> on every <code>_UIHostingView</code>, walk its subtree for text-bearing classes.</div>
+                        <div class="epitaph-label">Cause of death</div>
+                        <div class="epitaph-text">Layout fires — but the subviews array is empty. iOS 26 SwiftUI draws directly into the backing layer tree.</div>
+                        <div class="epitaph-label">Lesson</div>
+                        <div class="epitaph-text">Right trigger, wrong read target. The trigger carries forward.</div>
+                        <span class="status-tag">Empty walk</span>
+                    </div>
+
+                    <div class="funeral-card dead">
+                        <div class="hook-number">Hook #4</div>
+                        <h4 class="hook-title">Mirror + _VariadicView</h4>
+                        <div class="epitaph-label">Eulogy</div>
+                        <div class="epitaph-text">Use SwiftUI's own <code>_VariadicView</code>, Mirror-walk children, extract text via davidbalbert's gist. Three iterations.</div>
+                        <div class="epitaph-label">Cause of death</div>
+                        <div class="epitaph-text">Mirror extracts initial text cleanly, but <code>@State</code> identity won't bind to a captured struct. <code>state: off</code> forever, regardless of toggle.</div>
+                        <div class="epitaph-label">Lesson</div>
+                        <div class="epitaph-text">Reflection can't follow live state. Only the installed hierarchy can.</div>
+                        <span class="status-tag">Stale reads</span>
+                    </div>
+
+                    <div class="funeral-card survivor">
+                        <div class="hook-number">Hook #5</div>
+                        <h4 class="hook-title">Accessibility tree walk</h4>
+                        <div class="epitaph-label">What works</div>
+                        <div class="epitaph-text">Hook layout on every hosting view, walk the <code>UIAccessibilityContainer</code> tree, set-diff labels per-container.</div>
+                        <div class="epitaph-label">Why it works</div>
+                        <div class="epitaph-text">XCUITest relies on this surface. SwiftUI populates labels from current state on demand. Public API throughout.</div>
+                        <div class="epitaph-label">Lesson</div>
+                        <div class="epitaph-text">Combine hook #3's timing with hook #2's missing insight. Synthesis, not novelty.</div>
+                        <span class="status-tag">Ships</span>
+                    </div>
+
+                </div>
+
+                <div class="mt-8 text-center reveal-hidden" data-reveal>
+                    <p class="text-sm text-[var(--fg-muted)] italic max-w-3xl mx-auto">
+                        The accessibility tree wasn't on the original list of things to try. It emerged only after hooks #2 and #3 had each failed in specific ways — #2 for the wrong reason, #3 for the wrong target. The combination of those two failures <em>is</em> hook #5.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture" class="bg-white">
+            <div class="max-w-5xl w-full mx-auto px-6">
+                <div class="text-center mb-12 reveal-hidden" data-reveal>
+                    <h2 class="text-3xl font-bold tracking-tight mb-4">The Surviving Pipeline</h2>
+                    <p class="text-[var(--fg-muted)] max-w-2xl mx-auto">
+                        The diagram below is attempt five. The first four diagrams looked different and are buried in the previous section.
+                    </p>
+                </div>
+
+                <div class="bg-[var(--bg-page)] rounded-2xl border border-[var(--border-light)] p-10 max-w-3xl mx-auto shadow-sm reveal-hidden" data-reveal>
+                    <div class="flex flex-col items-center" id="pipelineDemo">
+                        
+                        <div class="diagram-node w-64" id="node-swiftui">
+                            <div class="font-semibold text-sm mb-1 text-[var(--apple-blue)]">1. Scene Root Activation</div>
+                            <div class="font-mono text-xs text-[var(--fg-muted)]">.qmCapture() triggers installer</div>
+                        </div>
+                        
+                        <div class="connector-down"></div>
+                        
+                        <div class="diagram-node w-64" id="node-discovery">
+                            <div class="font-semibold text-sm mb-1">2. Layout Hook</div>
+                            <div class="font-mono text-[10px] text-[var(--fg-muted)]">imp_implementationWithBlock on layoutSubviews</div>
+                        </div>
+                        
+                        <div class="connector-down"></div>
+
+                        <div class="diagram-node w-64" id="node-heuristic">
+                            <div class="font-semibold text-sm mb-1">3. Accessibility Walk</div>
+                            <div class="font-mono text-[11px] text-[var(--fg-muted)]">Query UIAccessibilityContainer tree</div>
+                        </div>
+
+                        <div class="connector-down relative">
+                            <div class="absolute top-1/2 left-1/2 transform -translate-y-1/2 flex items-center gap-2 -translate-x-[160px] opacity-0 transition-opacity duration-500" id="intercept-ray">
+                                <div class="text-xs font-bold text-[var(--apple-blue)]">LABELS EXTRACTED</div>
+                                <svg class="w-4 h-4 text-[var(--apple-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                            </div>
+                        </div>
+                        
+                        <div class="diagram-node w-64 border-[var(--apple-blue)] shadow-[0_0_0_2px_rgba(0,122,255,0.2)] relative" id="node-hook">
+                            <div class="absolute -right-3 -top-3 bg-[var(--apple-blue)] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shadow-md">★</div>
+                            <div class="font-semibold text-sm mb-1 text-[var(--apple-blue)]">4. Per-Container Set Diff</div>
+                            <div class="font-mono text-[10px] text-[var(--fg-muted)]">Emit only new labels via NSNotification</div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="implementation" class="bg-[var(--bg-page)]">
+            <div class="max-w-5xl w-full mx-auto px-6">
+                <div class="mb-6 text-center reveal-hidden" data-reveal>
+                    <h2 class="text-3xl font-bold tracking-tight mb-4">The Engineering Decisions</h2>
+                    
+                    <div class="segmented-control mb-4" id="moduleTabs">
+                        <button class="segment-btn active" data-target="mod-api">Why .qmCapture() & +load?</button>
+                        <button class="segment-btn" data-target="mod-discovery">Why the accessibility tree?</button>
+                        <button class="segment-btn" data-target="mod-dedup">Why safe layout hooks?</button>
+                        <button class="segment-btn" data-target="mod-pathways">Why two pathways?</button>
+                    </div>
+                </div>
+
+                <div class="reveal-hidden" data-reveal>
+                    
+                    <div id="mod-api" class="tab-pane">
+                        <div class="grid md:grid-cols-2 gap-6 items-center">
+                            <div>
+                                <h3 class="text-xl font-semibold mb-3">Zero-to-One Line Initialization</h3>
+                                <p class="text-[var(--fg-muted)] text-sm mb-3">
+                                    The UIKit pathway achieves zero-line integration via <code>+load</code> — linking the library is sufficient.
+                                </p>
+                                <p class="text-[var(--fg-muted)] text-sm mb-3">
+                                    The SwiftUI pathway cannot do the same. <code>_UIHostingView</code> class specializations don't exist at <code>+load</code> time — they're registered lazily as the scene is assembled. We spend the prompt's single-line budget on <code>.qmCapture()</code>, which evaluates exactly when the hosting views are available to hook.
+                                </p>
+                                <div class="inline-aside">
+                                    The one line you're allowed to spend is also the one line you can't afford not to. This wasn't obvious until hook #1, which ran at <code>+load</code> and found zero classes to hook.
+                                </div>
+                            </div>
+                            <div class="mac-window">
+                                <div class="mac-titlebar">
+                                    <div class="traffic-lights"><div class="traffic-light tl-close"></div><div class="traffic-light tl-min"></div><div class="traffic-light tl-max"></div></div>
+                                    <div class="mac-title">QMTextLoggerSwiftUI.swift</div>
+                                </div>
+                                <div class="p-4 font-mono text-[12px] overflow-x-auto">
+<pre><code><span class="syntax-keyword">public extension</span> <span class="syntax-type">View</span> {
+    <span class="syntax-comment">/// Install QMTextLogger's SwiftUI capture. </span>
+    <span class="syntax-comment">/// Apply once at the scene root.</span>
+    <span class="syntax-keyword">func</span> <span class="syntax-function">qmCapture</span>() -> <span class="syntax-keyword">some</span> <span class="syntax-type">View</span> {
+        <span class="syntax-type">QMTextLogger</span>.<span class="syntax-function">ensureSwiftUIHooksInstalled</span>()
+        <span class="syntax-keyword">return self</span>
+    }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="mod-discovery" class="tab-pane hidden">
+                        <div class="grid md:grid-cols-2 gap-6 items-center">
+                            <div>
+                                <h3 class="text-xl font-semibold mb-3">Why the accessibility tree, specifically</h3>
+                                <p class="text-[var(--fg-muted)] text-sm mb-3">
+                                    <code>drawRect:</code> fails because SwiftUI rasterization is layer-based now. <code>Mirror</code> reflection hits AttributeGraph and terminates at an opaque C pointer. <code>@State</code> isn't readable out-of-band — the values you reflect from are frozen at capture time. The layout-hook walk returns an empty subview array.
+                                </p>
+                                <p class="text-[var(--fg-muted)] text-sm mb-3">
+                                    That's four dead hooks. The accessibility tree is the one surface that projects current state back through public ObjC API — because XCUITest depends on it, Apple can't remove it without breaking their own test infrastructure.
+                                </p>
+                                <div class="inline-aside">
+                                    We didn't find this by reading the docs. We found it by watching four other surfaces fail and asking what was left. The answer was hiding in plain sight: the thing XCUITest already uses.
+                                </div>
+                            </div>
+                            <div class="mac-window">
+                                <div class="mac-titlebar">
+                                    <div class="traffic-lights"><div class="traffic-light tl-close"></div><div class="traffic-light tl-min"></div><div class="traffic-light tl-max"></div></div>
+                                    <div class="mac-title">QMTextLogger.m</div>
+                                </div>
+                                <div class="p-4 font-mono text-[11px] overflow-x-auto">
+<pre><code>+ (<span class="syntax-keyword">void</span>)walkAccessibilityIn:(<span class="syntax-type">UIView</span> *)container {
+    <span class="syntax-comment">//...</span>
+    <span class="syntax-keyword">if</span> ([node respondsToSelector:<span class="syntax-keyword">@selector</span>(accessibilityElementCount)]) {
+        <span class="syntax-type">NSInteger</span> count = [node accessibilityElementCount];
+        <span class="syntax-keyword">for</span> (<span class="syntax-type">NSInteger</span> i = <span class="syntax-number">0</span>; i < count; i++) {
+            <span class="syntax-type">id</span> elem = [node accessibilityElementAtIndex:i];
+            <span class="syntax-type">NSString</span> *label = [<span class="syntax-keyword">self</span> accessibilityLabelFrom:elem];
+            <span class="syntax-keyword">if</span> (label.length > <span class="syntax-number">0</span>) {
+                [labels addObject:label];
+            }
+        }
+    }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="mod-dedup" class="tab-pane hidden">
+                        <div class="grid md:grid-cols-2 gap-6 items-center">
+                            <div>
+                                <h3 class="text-xl font-semibold mb-3">Hierarchy Mutation Pitfalls</h3>
+                                <p class="text-[var(--fg-muted)] text-sm mb-3">
+                                    Naive <code>method_exchangeImplementations</code> on <code>-layoutSubviews</code> is dangerous. If the target class inherits the method from <code>UIView</code>, the exchange mutates the superclass and breaks every sibling class in the app.
+                                </p>
+                                <p class="text-[var(--fg-muted)] text-sm mb-3">
+                                    We use <code>imp_implementationWithBlock</code> to capture the original IMP and install a fresh block via <code>class_addMethod</code>. This guarantees we only modify the specific <code>_UIHostingView</code> specialization.
+                                </p>
+                                <div class="inline-aside">
+                                    The first hook-#3 attempt crashed <code>UITransitionView</code> with an unrecognized-selector error for exactly this reason. <code>imp_implementationWithBlock</code> isn't optional — it's the difference between a hook and a crash in a class you've never heard of.
+                                </div>
+                            </div>
+                            <div class="mac-window">
+                                <div class="mac-titlebar">
+                                    <div class="traffic-lights"><div class="traffic-light tl-close"></div><div class="traffic-light tl-min"></div><div class="traffic-light tl-max"></div></div>
+                                    <div class="mac-title">QMTextLogger.m</div>
+                                </div>
+                                <div class="p-4 font-mono text-[11px] overflow-x-auto">
+<pre><code>+ (<span class="syntax-keyword">BOOL</span>)addLayoutWalkToClass:(<span class="syntax-type">Class</span>)cls {
+    <span class="syntax-type">SEL</span> sel = <span class="syntax-keyword">@selector</span>(layoutSubviews);
+    <span class="syntax-type">Method</span> m = <span class="syntax-function">class_getInstanceMethod</span>(cls, sel);
+    
+    <span class="syntax-type">IMP</span> originalIMP = <span class="syntax-function">method_getImplementation</span>(m);
+    <span class="syntax-type">IMP</span> trampoline = <span class="syntax-function">imp_implementationWithBlock</span>(^(<span class="syntax-type">UIView</span> *view) {
+        ((<span class="syntax-keyword">void</span> (*)(<span class="syntax-type">UIView</span> *, <span class="syntax-type">SEL</span>))originalIMP)(view, sel);
+        [<span class="syntax-type">QMTextLogger</span> walkAccessibilityIn:view];
+    });
+
+    <span class="syntax-keyword">BOOL</span> added = <span class="syntax-function">class_addMethod</span>(cls, sel, trampoline, types);
+    <span class="syntax-comment">//...</span>
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="mod-pathways" class="tab-pane hidden">
+                        <div class="grid md:grid-cols-2 gap-6 items-center">
+                            <div>
+                                <h3 class="text-xl font-semibold mb-3">SwiftUI Accessibility + UIKit Surgery</h3>
+                                <p class="text-[var(--fg-muted)] text-sm mb-3">
+                                    The prompt asks for SwiftUI text interception, but a production observer needs to capture everything on screen.
+                                </p>
+                                <p class="text-[var(--fg-muted)] text-sm mb-3">
+                                    SwiftUI demanded the accessibility-tree walk. UIKit is stable enough that we can swizzle 24 public text setters across 14 classes and be done. The dual architecture merges both streams into one unified <code>NSNotification</code>.
+                                </p>
+                                <div class="inline-aside">
+                                    Two pathways isn't a design preference — it's architecturally forced. UIKit text flows through ObjC APIs that swizzling can observe. SwiftUI text flows through Swift value types compiled into AttributeGraph where ObjC can't touch it. The solutions match the substrates they instrument.
+                                </div>
+                            </div>
+                            <div class="mac-window">
+                                <div class="mac-titlebar">
+                                    <div class="traffic-lights"><div class="traffic-light tl-close"></div><div class="traffic-light tl-min"></div><div class="traffic-light tl-max"></div></div>
+                                    <div class="mac-title">QMTextLogger.m</div>
+                                </div>
+                                <div class="p-4 font-mono text-[12px] overflow-x-auto">
+<pre><code>+ (<span class="syntax-keyword">void</span>)load {
+    <span class="syntax-function">dispatch_async</span>(dispatch_get_main_queue(), ^{
+        <span class="syntax-comment">// UIKit API boundary hooks (surgical).</span>
+        <span class="syntax-comment">// 24 setters across 14 classes.</span>
+        [<span class="syntax-keyword">self</span> installUIKitHooks];
+    });
+}
+<span class="syntax-comment">// SwiftUI hooks install lazily when </span>
+<span class="syntax-comment">// .qmCapture() evaluates at scene root.</span></code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="playground" class="bg-white">
+            <div class="max-w-6xl w-full mx-auto px-6">
+                <div class="text-center mb-8 reveal-hidden" data-reveal>
+                    <h2 class="text-3xl font-bold tracking-tight mb-2">Interactive Playground</h2>
+                    <p class="text-[var(--fg-muted)]">Toggle the UI state. The console shows exactly what the library captures — the real output format from the shipped code.</p>
+                </div>
+
+                <div class="flex justify-center mb-8 reveal-hidden" data-reveal>
+                    <div class="segmented-control scenario-tabs">
+                        <button class="segment-btn active" data-scenario="swiftui">Pure SwiftUI</button>
+                        <button class="segment-btn" data-scenario="representable">UIKit in SwiftUI</button>
+                        <button class="segment-btn" data-scenario="uikit">Pure UIKit</button>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-8 reveal-hidden" data-reveal>
+                    
+                    <div class="bg-white rounded-[2.5rem] border-[8px] border-[#e5e5ea] shadow-xl overflow-hidden relative h-[450px] flex flex-col">
+                        <div class="h-6 w-32 bg-[#e5e5ea] absolute top-0 left-1/2 transform -translate-x-1/2 rounded-b-2xl z-20"></div>
+                        <div class="flex-1 flex flex-col items-center justify-center p-8 bg-gray-50 relative">
+                            <div class="absolute top-4 left-4">
+                                <div class="text-[10px] uppercase tracking-wider font-semibold text-gray-400 sim-badge">Pure SwiftUI</div>
+                            </div>
+                            
+                            <div class="text-2xl font-mono font-bold mb-8 text-gray-800 transition-colors sim-text" id="sim-text">state: off</div>
+                            
+                            <div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                                <span class="text-sm font-medium">Toggle UI State</span>
+                                <div class="ios-toggle sim-toggle"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mac-window bg-black flex flex-col h-[450px]">
+                        <div class="mac-titlebar !bg-[#333] !border-black">
+                            <div class="traffic-lights"><div class="traffic-light tl-close"></div><div class="traffic-light tl-min"></div><div class="traffic-light tl-max"></div></div>
+                            <div class="mac-title !text-gray-300">Console Output</div>
+                            <button class="absolute right-3 text-xs text-gray-400 hover:text-white clear-console">Clear</button>
+                        </div>
+                        
+                        <div class="bg-blue-900/40 border-b border-blue-800/50 py-2 px-4 flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span class="text-[10px] md:text-[11px] font-mono text-blue-300 uppercase tracking-wide">Bonus fulfilled: view + layer for UIKit, container for SwiftUI</span>
+                        </div>
+
+                        <div class="flex-1 p-4 font-mono text-[11px] md:text-xs overflow-y-auto terminal-bg leading-relaxed console-output">
+                            <div class="mb-4">
+                                <div class="text-gray-400"><span class="text-[#34C759]">[QM]</span> Installed UIKit text-setter hooks (24 selector(s)).</div>
+                                <div class="text-gray-400"><span class="text-[#34C759]">[QM]</span> Hooked SwiftUI hosting-view layout on 13 class(es) (pass 1; 13 total).</div>
+                                <div class="text-gray-500 mt-1">Waiting for text renders...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="hierarchy" class="bg-[var(--bg-page)]">
+            <div class="max-w-6xl w-full mx-auto px-6">
+                <div class="text-center mb-8 reveal-hidden" data-reveal>
+                    <h2 class="text-3xl font-bold tracking-tight mb-2">View Hierarchy Explorer</h2>
+                    <p class="text-[var(--fg-muted)]">What the library actually finds at each level of the real view tree, per architecture.</p>
+                </div>
+
+                <div class="flex justify-center mb-8 reveal-hidden" data-reveal>
+                    <div class="segmented-control scenario-tabs">
+                        <button class="segment-btn active" data-scenario="swiftui">Pure SwiftUI</button>
+                        <button class="segment-btn" data-scenario="representable">UIKit in SwiftUI</button>
+                        <button class="segment-btn" data-scenario="uikit">Pure UIKit</button>
+                    </div>
+                </div>
+
+                <div class="reveal-hidden" data-reveal>
+                    <div class="apple-card p-6 md:p-10">
+                        <div class="flex flex-col md:flex-row flex-wrap gap-4 items-center justify-center" id="hierarchyExplorer">
+                        </div>
+                        
+                        <div class="mt-8 p-6 bg-gray-50 border border-gray-200 rounded-xl transition-all" id="hierarchyDetail">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="risks" class="bg-white">
+            <div class="max-w-5xl w-full mx-auto px-6 reveal-hidden" data-reveal>
+                <h2 class="text-3xl font-bold tracking-tight mb-3 text-center">Trade-offs & Mitigations</h2>
+                <p class="text-center text-[var(--fg-muted)] mb-8 max-w-2xl mx-auto">Every choice below has a cost. These are the ones we chose and the reasoning — including the ones that surface only after hours of debugging.</p>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="apple-card p-6">
+                        <h3 class="font-semibold mb-2 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-[var(--apple-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                            Completeness vs. Scope
+                        </h3>
+                        <p class="text-sm text-[var(--fg-muted)] mb-3">The prompt asked for SwiftUI text interception, but a production observer needs everything.</p>
+                        <div class="text-xs font-medium text-[var(--apple-blue)] bg-blue-50 inline-block px-3 py-2 rounded leading-relaxed">
+                            <strong>Mitigation:</strong> Solve the hard part (SwiftUI accessibility-tree walking) <em>and</em> the tedious part (swizzling 24 UIKit text setters across 14 classes). Dual pathways, one notification.
+                        </div>
+                    </div>
+
+                    <div class="apple-card p-6">
+                        <h3 class="font-semibold mb-2 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-[var(--apple-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            App Store Safety
+                        </h3>
+                        <p class="text-sm text-[var(--fg-muted)] mb-3">Does introspecting private SwiftUI classes risk rejection?</p>
+                        <div class="text-xs font-medium text-[var(--apple-blue)] bg-blue-50 inline-block px-3 py-2 rounded leading-relaxed">
+                            <strong>Mitigation:</strong> Calling private SPIs gets rejected. This library uses only <strong>public runtime APIs</strong> (<code>objc_copyClassList</code>, <code>class_addMethod</code>, <code>imp_implementationWithBlock</code>) and the public <code>UIAccessibilityContainer</code> protocol. Safe.
+                        </div>
+                    </div>
+
+                    <div class="apple-card p-6">
+                        <h3 class="font-semibold mb-2 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-[var(--apple-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Performance Overhead
+                        </h3>
+                        <p class="text-sm text-[var(--fg-muted)] mb-3">Walking the accessibility tree on every layout pass sounds expensive.</p>
+                        <div class="text-xs font-medium text-[var(--apple-blue)] bg-blue-50 inline-block px-3 py-2 rounded leading-relaxed">
+                            <strong>Mitigation:</strong> Per-container label-set diff. If labels are unchanged since last walk, we emit nothing. A 250ms retry interval absorbs scene-assembly races.
+                        </div>
+                    </div>
+
+                    <div class="apple-card p-6">
+                        <h3 class="font-semibold mb-2 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-[var(--apple-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                            Future Proofing
+                        </h3>
+                        <p class="text-sm text-[var(--fg-muted)] mb-3">What if SwiftUI restricts accessibility tree reads on a future iOS?</p>
+                        <div class="text-xs font-medium text-[var(--apple-blue)] bg-blue-50 inline-block px-3 py-2 rounded leading-relaxed">
+                            <strong>Mitigation:</strong> XCUITest relies on this exact surface for Xcode's own test automation. Apple can't disable it without breaking their own testing story. The risk is real but bounded.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="outro" class="bg-[var(--bg-page)]">
+            <div class="max-w-2xl mx-auto text-center reveal-hidden px-6" data-reveal>
+                <div class="w-16 h-16 bg-[var(--apple-blue)] text-white rounded-2xl mx-auto flex items-center justify-center mb-6 shadow-lg">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                </div>
+                <h2 class="text-4xl font-bold tracking-tight mb-6">Four hook points died. One works.</h2>
+                <p class="text-lg text-[var(--fg-muted)] mb-6">
+                    Every line in the repo has a reason it's there and not another. The investigation is documented in <code>INVESTIGATION.md</code>. The tradeoffs are in <code>DECISIONS.md</code>. The code is the shortest expression of the story you just read.
+                </p>
+                <p class="text-sm text-[var(--fg-muted)] mb-10 font-mono">
+                    Built against iOS 26. Xcode 26. iPhone 17 Pro simulator.
+                </p>
+                <p class="mt-12 text-sm text-[var(--border-medium)] border-t border-[var(--border-light)] pt-6">
+                    Built by Johnny Clem in response to Quantum Metric's mobile technical challenge.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Decision tabs
+            const tabs = document.querySelectorAll('#moduleTabs .segment-btn');
+            const panes = document.querySelectorAll('.tab-pane');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    panes.forEach(p => p.classList.add('hidden'));
+                    
+                    const target = document.getElementById(tab.dataset.target);
+                    if (target) target.classList.remove('hidden');
+                });
+            });
+
+            // Stable per-scenario addresses
+            const genAddr = (prefix) => `${prefix}${Math.floor(Math.random()*9000+1000).toString(16)}`;
+            const swiftuiPtrs = {
+                elem:  '0x' + genAddr('107e0'),
+                layer: '0x' + genAddr('6000013e'),
+                host:  '0x' + genAddr('107d0'),
+                ctrl:  '0x' + genAddr('107a2'),
+                win:   '0x' + genAddr('107b3')
+            };
+
+            const scenarios = {
+                swiftui: {
+                    title: "Pure SwiftUI",
+                    captured: true,
+                    targetClass: "SwiftUI.AccessibilityNode",
+                    hostClass: "_TtGC7SwiftUI14_UIHostingView...",
+                    ptrs: swiftuiPtrs,
+                    nodes: [
+                        { name: 'UIWindow', desc: "The root window containing the app's visual content.", addr: swiftuiPtrs.win },
+                        { name: 'UIHostingController', desc: "SwiftUI's bridge to UIKit. Manages the SwiftUI view hierarchy within UIKit.", addr: swiftuiPtrs.ctrl },
+                        { name: '_UIHostingView', desc: 'The container view that hosts SwiftUI content. Handles layout and rendering coordination.', addr: swiftuiPtrs.host },
+                        { name: 'SwiftUI.AccessibilityNode', desc: 'The interception target. Extracted dynamically from the UIAccessibilityContainer tree on layout.', addr: swiftuiPtrs.elem }
+                    ]
+                },
+                representable: {
+                    title: "UIKit in SwiftUI",
+                    captured: true,
+                    targetClass: "UILabel",
+                    hostClass: "_TtGC7SwiftUI14_UIHostingView...",
+                    ptrs: { elem: '0x107e8123c', layer: '0x6000024f9d00', host: '0x107d02800' },
+                    nodes: [
+                        { name: 'UIWindow', desc: 'The root window of the application.', addr: '0x107b3a100' },
+                        { name: 'UIHostingController', desc: "SwiftUI's bridge to UIKit.", addr: '0x107a2b200' },
+                        { name: '_UIHostingView', desc: 'The root SwiftUI container view.', addr: '0x107d02800' },
+                        { name: 'PlatformViewHost', desc: 'The internal SwiftUI wrapper bridging UIViewRepresentable to UIKit.', addr: '0x107c99f80' },
+                        { name: 'UILabel', desc: 'The interception target. Explicitly wrapped UIKit label inside the representable.', addr: '0x107e8123c' }
+                    ]
+                },
+                uikit: {
+                    title: "Pure UIKit",
+                    captured: true,
+                    targetClass: "UILabel",
+                    hostClass: "(nil)",
+                    ptrs: { elem: '0x107e8123c', layer: '0x6000024f9d00', host: '0x0' },
+                    nodes: [
+                        { name: 'UIWindow', desc: 'The root window of the application.', addr: '0x107b3a100' },
+                        { name: 'UIViewController', desc: 'Standard UIKit view controller managing the screen.', addr: '0x107e33a10' },
+                        { name: 'UIView', desc: 'The root view of the view controller.', addr: '0x107e33b45' },
+                        { name: 'UILabel', desc: 'Standard UIKit label. Automatically swizzled at launch.', addr: '0x107e8123c' }
+                    ]
+                }
+            };
+
+            let currentScenario = 'swiftui';
+            const hierarchyExplorer = document.getElementById('hierarchyExplorer');
+            const hierarchyDetail = document.getElementById('hierarchyDetail');
+
+            function renderHierarchy() {
+                const scenario = scenarios[currentScenario];
+                const data = scenario.nodes;
+                if (!hierarchyExplorer) return;
+                hierarchyExplorer.innerHTML = '';
+                
+                data.forEach((info, index) => {
+                    const isTarget = scenario.captured && index === data.length - 1;
+                    const node = document.createElement('div');
+                    node.className = `flow-node ${isTarget ? 'active' : ''}`;
+                    node.dataset.level = index;
+                    node.innerHTML = `
+                        <div class="font-mono text-[10px] ${isTarget ? 'text-[var(--apple-blue)]' : 'text-[var(--fg-muted)]'} uppercase tracking-wider mb-1">Level ${index}</div>
+                        <div class="font-semibold text-sm ${isTarget ? 'text-[var(--apple-blue)]' : ''}">${info.name}</div>
+                    `;
+                    
+                    node.addEventListener('click', () => {
+                        hierarchyExplorer.querySelectorAll('.flow-node').forEach(n => {
+                            n.classList.remove('active');
+                            n.querySelector('.font-mono').classList.remove('text-[var(--apple-blue)]');
+                            n.querySelector('.font-mono').classList.add('text-[var(--fg-muted)]');
+                            n.querySelector('.font-semibold').classList.remove('text-[var(--apple-blue)]');
+                        });
+                        
+                        node.classList.add('active');
+                        node.querySelector('.font-mono').classList.add('text-[var(--apple-blue)]');
+                        node.querySelector('.font-mono').classList.remove('text-[var(--fg-muted)]');
+                        node.querySelector('.font-semibold').classList.add('text-[var(--apple-blue)]');
+
+                        updateHierarchyDetails(index);
+                    });
+
+                    hierarchyExplorer.appendChild(node);
+
+                    if (index < data.length - 1) {
+                        const arrow = document.createElement('div');
+                        arrow.innerHTML = `<svg class="w-5 h-5 text-[var(--border-medium)] hidden md:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>`;
+                        hierarchyExplorer.appendChild(arrow.firstChild);
+                    }
+                });
+
+                updateHierarchyDetails(data.length - 1);
+            }
+
+            function updateHierarchyDetails(level) {
+                const scenario = scenarios[currentScenario];
+                const info = scenario.nodes[level];
+                const isTarget = scenario.captured && level === scenario.nodes.length - 1;
+                
+                const activeMockText = document.querySelector('.sim-text')?.textContent || "state: off";
+
+                const currentTextHtml = isTarget 
+                    ? `<span class="text-[var(--apple-blue)] font-bold" id="hierarchyCurrentText">"${activeMockText}"</span>`
+                    : `<span class="text-gray-400 italic">Not applicable</span>`;
+                    
+                const header = isTarget ? `${info.name} (Level ${level}) — Interception Target` : `${info.name} (Level ${level})`;
+
+                if (hierarchyDetail) {
+                    hierarchyDetail.innerHTML = `
+                        <h4 class="font-mono text-sm font-semibold mb-4 ${isTarget ? 'text-[var(--apple-blue)]' : 'text-gray-800'}">${header}</h4>
+                        <p class="text-sm text-[var(--fg-muted)] mb-6">${info.desc}</p>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm font-mono text-gray-800">
+                            <div><span class="text-[var(--fg-muted)] w-32 inline-block">Memory Addr:</span> ${info.addr}</div>
+                            <div><span class="text-[var(--fg-muted)] w-32 inline-block">Current Text:</span> ${currentTextHtml}</div>
+                        </div>
+                    `;
+                }
+            }
+
+            // Sync scenario tabs across sections
+            const scenarioTabsBtns = document.querySelectorAll('.scenario-tabs .segment-btn');
+            
+            scenarioTabsBtns.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const targetScenario = tab.dataset.scenario;
+                    
+                    scenarioTabsBtns.forEach(t => {
+                        if(t.dataset.scenario === targetScenario) {
+                            t.classList.add('active');
+                        } else {
+                            t.classList.remove('active');
+                        }
+                    });
+                    
+                    currentScenario = targetScenario;
+                    
+                    document.querySelectorAll('.sim-badge').forEach(b => b.textContent = tab.textContent);
+                    
+                    renderHierarchy();
+                    
+                    document.querySelectorAll('.sim-text').forEach(st => {
+                        st.textContent = 'state: off';
+                        st.style.color = '#1d1d1f';
+                    });
+                    
+                    const hierarchyCurrentText = document.getElementById('hierarchyCurrentText');
+                    if (hierarchyCurrentText) {
+                        hierarchyCurrentText.textContent = '"state: off"';
+                    }
+                    
+                    isToggled = false;
+                    document.querySelectorAll('.sim-toggle').forEach(t => t.classList.remove('active'));
+
+                    const consoleOutputs = document.querySelectorAll('.console-output');
+                    consoleOutputs.forEach(out => {
+                        const entry = document.createElement('div');
+                        entry.className = 'mb-1 leading-snug break-all text-gray-300';
+                        entry.innerHTML = `<span class="text-blue-400 italic">➜ Switched architecture to: ${tab.textContent}</span>`;
+                        out.appendChild(entry);
+                        out.scrollTop = out.scrollHeight;
+                    });
+                });
+            });
+
+            renderHierarchy();
+
+            // Simulator
+            const toggles = document.querySelectorAll('.sim-toggle');
+            const clearConsoles = document.querySelectorAll('.clear-console');
+            let isToggled = false;
+
+            function appendLog(newVal) {
+                const scenario = scenarios[currentScenario];
+                const entry = document.createElement('div');
+                entry.className = 'mb-1 leading-snug break-all';
+
+                if (currentScenario === 'swiftui') {
+                    entry.innerHTML = `<span class="text-[#34C759]">[QM]</span> text=<span class="text-white">${newVal}</span>  source=<span class="text-white">accessibility</span>  element=<span class="text-blue-300">&lt;${scenario.targetClass}:${scenario.ptrs.elem}&gt;</span>  container=<span class="text-orange-300">&lt;${scenario.hostClass}:${scenario.ptrs.host}&gt;</span>`;
+                    entry.classList.add('text-gray-300');
+                } else if (scenario.captured) {
+                    let hostStr = '(nil)';
+                    if (scenario.hostClass !== '(nil)') {
+                        hostStr = `&lt;${scenario.hostClass}:${scenario.ptrs.host}&gt;`;
+                    }
+                    entry.innerHTML = `<span class="text-[#34C759]">[QM]</span> text=<span class="text-white">${newVal}</span>  object=<span class="text-blue-300">&lt;${scenario.targetClass}:${scenario.ptrs.elem}&gt;</span>  view=<span class="text-blue-300">&lt;${scenario.targetClass}:${scenario.ptrs.elem}&gt;</span>  layer=<span class="text-purple-300">&lt;${scenario.targetClass}Layer:${scenario.ptrs.layer}&gt;</span>  host=<span class="text-orange-300">${hostStr}</span>`;
+                    entry.classList.add('text-gray-300');
+                }
+                
+                document.querySelectorAll('.console-output').forEach(out => {
+                    out.appendChild(entry.cloneNode(true));
+                    out.scrollTop = out.scrollHeight;
+                });
+            }
+
+            toggles.forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    isToggled = !isToggled;
+                    const newState = isToggled ? 'state: on' : 'state: off';
+                    
+                    toggles.forEach(t => t.classList.toggle('active', isToggled));
+                    
+                    document.querySelectorAll('.sim-text').forEach(textDisplay => {
+                        textDisplay.textContent = newState;
+                        textDisplay.style.color = isToggled ? '#34C759' : '#1d1d1f';
+                        textDisplay.style.transform = 'scale(1.05)';
+                        setTimeout(() => textDisplay.style.transform = 'scale(1)', 150);
+                    });
+
+                    const hierarchyCurrentText = document.getElementById('hierarchyCurrentText');
+                    if (hierarchyCurrentText) hierarchyCurrentText.textContent = `"${newState}"`;
+
+                    setTimeout(() => {
+                        if (currentScenario === 'swiftui') {
+                            const interceptRay = document.getElementById('intercept-ray');
+                            if (interceptRay) {
+                                interceptRay.style.opacity = '1';
+                                setTimeout(() => interceptRay.style.opacity = '0', 500);
+                            }
+                        }
+                        appendLog(newState);
+                    }, 50);
+                });
+            });
+
+            clearConsoles.forEach(clear => {
+                clear.addEventListener('click', () => {
+                    document.querySelectorAll('.console-output').forEach(out => {
+                        out.innerHTML = `
+                            <div class="mb-4">
+                                <div class="text-gray-400"><span class="text-[#34C759]">[QM]</span> Installed UIKit text-setter hooks (24 selector(s)).</div>
+                                <div class="text-gray-400"><span class="text-[#34C759]">[QM]</span> Hooked SwiftUI hosting-view layout on 13 class(es) (pass 1; 13 total).</div>
+                                <div class="text-gray-500 mt-1">Waiting for text renders...</div>
+                            </div>
+                        `;
+                    });
+                });
+            });
+
+            // Reveal animation + architecture pulse
+            let animationInterval;
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('reveal-visible');
+                        
+                        if (entry.target.querySelector('#pipelineDemo')) {
+                            const nodes = ['node-swiftui', 'node-discovery', 'node-heuristic', 'node-hook'];
+                            let activeIdx = 0;
+                            
+                            if (animationInterval) clearInterval(animationInterval);
+                            
+                            animationInterval = setInterval(() => {
+                                nodes.forEach((id, idx) => {
+                                    const el = document.getElementById(id);
+                                    if (!el) return;
+                                    if (idx === activeIdx) el.classList.add('active');
+                                    else el.classList.remove('active');
+                                });
+                                
+                                activeIdx++;
+                                
+                                if (activeIdx >= nodes.length) {
+                                    clearInterval(animationInterval);
+                                    setTimeout(() => {
+                                        nodes.forEach(id => document.getElementById(id)?.classList.remove('active'));
+                                        document.getElementById('node-hook')?.classList.add('active');
+                                    }, 1000);
+                                }
+                            }, 800);
+                        }
+
+                        revealObserver.unobserve(entry.target); 
+                    }
+                });
+            }, { 
+                threshold: 0.1,
+                rootMargin: '0px 0px -10% 0px'
+            });
+
+            document.querySelectorAll('.reveal-hidden').forEach(el => revealObserver.observe(el));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QMTextLogger — Quantum Metric Mobile Challenge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-page: #f5f5f7;
+            --bg-surface: #ffffff;
+            --fg-main: #1d1d1f;
+            --fg-muted: #86868b;
+            --apple-blue: #007aff;
+            --apple-blue-dark: #0051a8;
+            --border-light: #e5e5ea;
+            --border-medium: #d1d1d6;
+
+            --xc-keyword: #9B2393;
+            --xc-string: #C41A16;
+            --xc-type: #0B4F79;
+            --xc-comment: #5D6C79;
+            --xc-function: #326D74;
+            --xc-property: #4B0E73;
+            --xc-number: #1C00CF;
+            --xc-macro: #78492A;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--fg-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .font-mono { font-family: Menlo, Monaco, Consolas, "Courier New", monospace; }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-apple {
+            background: linear-gradient(180deg, #42a1ec 0%, #0070c9 100%);
+            border: 1px solid #076bd2;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 1px 2px rgba(0, 0, 0, 0.1);
+            color: white;
+            font-weight: 500;
+            padding: 12px 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-apple:hover { background: linear-gradient(180deg, #51a9ee 0%, #147bcd 100%); }
+        .btn-apple:active { background: #0051a8; box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2); }
+
+        .btn-secondary {
+            background: linear-gradient(180deg, #ffffff 0%, #f0f0f0 100%);
+            border: 1px solid var(--border-medium);
+            color: var(--fg-main);
+            font-weight: 500;
+            padding: 12px 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-secondary:hover { background: linear-gradient(180deg, #f0f0f0 0%, #e5e5ea 100%); }
+
+        .mac-window {
+            background: var(--bg-surface);
+            border-radius: 8px;
+            border: 1px solid var(--border-medium);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .mac-titlebar {
+            background: linear-gradient(180deg, #e8e8e8 0%, #d1d1d1 100%);
+            border-bottom: 1px solid #b3b3b3;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .mac-title {
+            position: absolute;
+            left: 0; right: 0;
+            text-align: center;
+            font-size: 12px;
+            color: #4d4d4d;
+            font-weight: 500;
+            pointer-events: none;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+        }
+        .traffic-lights { display: flex; gap: 6px; z-index: 10; }
+        .traffic-light { width: 12px; height: 12px; border-radius: 50%; }
+        .tl-close { background: #ff5f56; border: 1px solid #e0443e; }
+        .tl-min   { background: #ffbd2e; border: 1px solid #dea123; }
+        .tl-max   { background: #27c93f; border: 1px solid #1aab29; }
+
+        .syntax-keyword  { color: var(--xc-keyword); font-weight: 500; }
+        .syntax-string   { color: var(--xc-string); }
+        .syntax-type     { color: var(--xc-type); }
+        .syntax-comment  { color: var(--xc-comment); font-style: italic; }
+        .syntax-function { color: var(--xc-function); }
+        .syntax-property { color: var(--xc-property); }
+        .syntax-number   { color: var(--xc-number); }
+        .syntax-macro    { color: var(--xc-macro); }
+
+        .segmented-control {
+            display: inline-flex;
+            background: #e5e5ea;
+            border-radius: 8px;
+            padding: 2px;
+        }
+        .segment-btn {
+            padding: 6px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--fg-main);
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .segment-btn.active {
+            background: white;
+            border-color: rgba(0,0,0,0.04);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12), 0 3px 1px rgba(0,0,0,0.04);
+        }
+
+        .ios-toggle {
+            width: 51px; height: 31px;
+            background: var(--border-medium);
+            border-radius: 31px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .ios-toggle.active { background: #34C759; }
+        .ios-toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px; left: 2px;
+            width: 27px; height: 27px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15), 0 3px 1px rgba(0,0,0,0.06);
+            transition: transform 0.3s cubic-bezier(0.2, 0.85, 0.32, 1.2);
+        }
+        .ios-toggle.active::after { transform: translateX(20px); }
+
+        .apple-card {
+            background: var(--bg-surface);
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .apple-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+
+        .diagram-node {
+            background: white;
+            border: 1px solid var(--border-medium);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+        .diagram-node.active {
+            border-color: var(--apple-blue);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+        }
+        .connector-down {
+            width: 2px; height: 24px;
+            background: var(--border-medium);
+            margin: 0 auto;
+            z-index: 1;
+        }
+
+        .flow-node {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-medium);
+            border-radius: 8px;
+            padding: 12px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            flex-shrink: 0;
+        }
+        .flow-node:hover { border-color: var(--apple-blue); }
+        .flow-node.active {
+            border-color: var(--apple-blue);
+            background: rgba(0, 122, 255, 0.05);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+        }
+
+        .terminal-bg { background: rgba(0, 0, 0, 0.9); color: #f1f1f1; }
+
+        .reveal-hidden {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-visible { opacity: 1; transform: translateY(0); }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #e8f5e9;
+            color: #1b5e20;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            border: 1px solid #c8e6c9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="fixed top-0 left-0 right-0 z-50 glass-nav">
+        <div class="max-w-5xl mx-auto px-6 py-3">
+            <div class="flex items-center justify-between">
+                <a href="#" class="flex items-center gap-2 text-[var(--fg-main)] hover:text-[var(--apple-blue)] transition-colors">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
+                    </svg>
+                    <span class="font-semibold tracking-tight text-lg">QMTextLogger</span>
+                </a>
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#challenge" class="text-sm font-medium text-[var(--fg-muted)] hover:text-[var(--fg-main)] transition-colors">Overview</a>
+                    <a href="#architecture" class="text-sm font-medium text-[var(--fg-muted)] hover:text-[var(--fg-main)] transition-colors">Architecture</a>
+                    <a href="#implementation" class="text-sm font-medium text-[var(--fg-muted)] hover:text-[var(--fg-main)] transition-colors">Decisions</a>
+                    <a href="#playground" class="text-sm font-medium text-[var(--fg-muted)] hover:text-[var(--fg-main)] transition-colors">Playground</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="pt-32 pb-20 px-6 flex items-center justify-center text-center min-h-[80vh]">
+        <div class="max-w-4xl mx-auto reveal-hidden" data-reveal>
+            <div class="inline-block mb-4 px-3 py-1 rounded-full bg-[var(--border-light)] text-xs font-semibold text-[var(--fg-muted)] tracking-widest uppercase">
+                QM Mobile Tech Challenge
+            </div>
+            <h1 class="text-5xl md:text-6xl font-bold tracking-tight mb-4 text-[var(--fg-main)]">
+                Intercept SwiftUI.<br>
+                <span class="text-[var(--fg-muted)] font-light">Without writing a single line.</span>
+            </h1>
+            <p class="text-xl text-[var(--fg-muted)] mb-10 max-w-2xl mx-auto font-light">
+                A robust observer for text rendered by SwiftUI views. Powered by Objective-C runtime introspection, mangled-name discovery, and dynamic swizzling. Drop it in, and it works.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="#playground" class="btn-apple text-lg">Try Interactive Demo</a>
+                <a href="https://github.com/johnnyclem/QMTextLogger" target="_blank" rel="noopener" class="btn-secondary text-lg">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+                    View Source
+                </a>
+            </div>
+
+            <div class="mt-20 text-sm text-[var(--fg-muted)] font-medium tracking-wide uppercase">
+                The Rendering Pipeline
+            </div>
+
+            <div class="relative max-w-lg mx-auto mt-6">
+                <div class="absolute -top-10 left-0 right-0 flex flex-col items-center z-20">
+                    <div class="bg-[var(--bg-page)] px-4 py-1 text-[var(--apple-blue)] flex items-center gap-1 mb-1">
+                        <span class="text-[10px] font-bold uppercase tracking-widest">Introspected via ObjC Runtime</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    </div>
+                    <div class="w-px h-6 bg-[var(--apple-blue)]"></div>
+                </div>
+
+                <div class="flex justify-between items-center bg-white rounded-xl border border-[var(--border-light)] p-4 shadow-sm relative z-10">
+                    <div class="flex flex-col items-center flex-1">
+                        <svg class="w-6 h-6 mb-1 text-[var(--fg-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                        <span class="text-[11px] font-semibold text-[var(--fg-main)]">SwiftUI</span>
+                    </div>
+                    <svg class="w-4 h-4 text-[var(--border-medium)] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    <div class="flex flex-col items-center flex-1">
+                        <svg class="w-6 h-6 mb-1 text-[var(--fg-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z"/></svg>
+                        <span class="text-[11px] font-semibold text-[var(--fg-main)]">UIKit Substrate</span>
+                    </div>
+                    <svg class="w-4 h-4 text-[var(--border-medium)] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    <div class="flex flex-col items-center flex-1">
+                        <svg class="w-6 h-6 mb-1 text-[var(--fg-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span class="text-[11px] font-semibold text-[var(--fg-main)]">CoreText</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="challenge" class="py-20 px-6 bg-white border-y border-[var(--border-light)]">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-16 reveal-hidden" data-reveal>
+                <h2 class="text-3xl font-bold tracking-tight mb-4">The Challenge & The Trap</h2>
+                <p class="text-[var(--fg-muted)] max-w-2xl mx-auto">
+                    The prompt looks straightforward. A button toggles a <code>@State</code>; a <code>Text</code> reflects it; log the change. The obvious path fails. Understanding <em>why</em> is the entire point.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-12 items-center reveal-hidden" data-reveal>
+                <div>
+                    <h3 class="text-xl font-semibold mb-6">The Requirements</h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start gap-3">
+                            <div class="mt-1 bg-red-100 p-1 rounded-full"><svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></div>
+                            <div>
+                                <strong class="block text-sm">Do not touch the View</strong>
+                                <span class="text-sm text-[var(--fg-muted)]"><code>ContentView.swift</code> must remain untouched. No view modifiers allowed.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="mt-1 bg-blue-100 p-1 rounded-full"><svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
+                            <div>
+                                <strong class="block text-sm">Bonus: Zero-Line Setup</strong>
+                                <span class="text-sm text-[var(--fg-muted)]">The prompt allowed one initialization line. We eliminate it entirely via <code>+load</code> — activating purely by being linked to the target.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="mt-1 bg-orange-100 p-1 rounded-full"><svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg></div>
+                            <div>
+                                <strong class="block text-sm">The Stack Overflow Trap</strong>
+                                <span class="text-sm text-[var(--fg-muted)]">Standard answers say to swizzle <code class="bg-gray-100 px-1 rounded">UILabel.setText:</code>. <strong>This will fail.</strong> SwiftUI doesn't use <code>UILabel</code>; it uses private CoreText-backed views in the SwiftUI namespace. The prompt author explicitly warns against this — solving it requires reaching the substrate the declarative API sits on.</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="mac-window">
+                    <div class="mac-titlebar">
+                        <div class="traffic-lights">
+                            <div class="traffic-light tl-close"></div>
+                            <div class="traffic-light tl-min"></div>
+                            <div class="traffic-light tl-max"></div>
+                        </div>
+                        <div class="mac-title">ContentView.swift</div>
+                    </div>
+                    <div class="p-5 font-mono text-sm overflow-x-auto bg-[#FFFFFF] h-full">
+<pre><code><span class="syntax-keyword">import</span> SwiftUI
+
+<span class="syntax-keyword">struct</span> <span class="syntax-type">ContentView</span>: <span class="syntax-type">View</span> {
+    <span class="syntax-keyword">@State var</span> toggleOn = <span class="syntax-keyword">false</span>
+
+    <span class="syntax-keyword">var</span> body: <span class="syntax-keyword">some</span> <span class="syntax-type">View</span> {
+        <span class="syntax-type">Button</span>(action: {
+            <span class="syntax-keyword">self</span>.toggleOn.<span class="syntax-function">toggle</span>()
+        }) {
+            <span class="syntax-type">Text</span>(<span class="syntax-string">"Show details"</span>)
+        }
+
+        <span class="syntax-type">Text</span>(<span class="syntax-string">"state: \(self.toggleOn ? "</span><span class="syntax-string">on</span><span class="syntax-string">" : "</span><span class="syntax-string">off</span><span class="syntax-string">")"</span>)
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="architecture" class="py-20 px-6">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-12 reveal-hidden" data-reveal>
+                <h2 class="text-3xl font-bold tracking-tight mb-4">How it actually works</h2>
+                <p class="text-[var(--fg-muted)] max-w-2xl mx-auto">
+                    SwiftUI is a declarative layer built on top of an imperative runtime. The declarative surface churns between iOS releases; the <code>UIView</code> substrate does not. We instrument the substrate.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-[var(--border-light)] p-10 max-w-3xl mx-auto shadow-sm reveal-hidden" data-reveal>
+                <div class="flex flex-col items-center" id="pipelineDemo">
+
+                    <div class="diagram-node w-64" id="node-swiftui">
+                        <div class="font-semibold text-sm mb-1 text-[var(--apple-blue)]">1. Link-Time Activation</div>
+                        <div class="font-mono text-xs text-[var(--fg-muted)]">+load runs before main()</div>
+                    </div>
+
+                    <div class="connector-down"></div>
+
+                    <div class="diagram-node w-64" id="node-discovery">
+                        <div class="font-semibold text-sm mb-1">2. Runtime Discovery</div>
+                        <div class="font-mono text-[10px] text-[var(--fg-muted)]">Enumerate all classes; filter by <code class="bg-gray-100 px-1 rounded text-[var(--fg-main)]">_TtC7SwiftUI</code> prefix</div>
+                    </div>
+
+                    <div class="connector-down"></div>
+
+                    <div class="diagram-node w-64" id="node-heuristic">
+                        <div class="font-semibold text-sm mb-1">3. Ivar Heuristic</div>
+                        <div class="font-mono text-xs text-[var(--fg-muted)]">Check for NSString / NSAttributedString / CTFrame ivars</div>
+                    </div>
+
+                    <div class="connector-down relative">
+                        <div class="absolute top-1/2 left-1/2 transform -translate-y-1/2 flex items-center gap-2 -translate-x-[160px] opacity-0 transition-opacity duration-500" id="intercept-ray">
+                            <div class="text-xs font-bold text-[var(--apple-blue)]">drawRect: SWIZZLED</div>
+                            <svg class="w-4 h-4 text-[var(--apple-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                        </div>
+                    </div>
+
+                    <div class="diagram-node w-64 border-[var(--apple-blue)] shadow-[0_0_0_2px_rgba(0,122,255,0.2)] relative" id="node-hook">
+                        <div class="absolute -right-3 -top-3 bg-[var(--apple-blue)] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shadow-md">★</div>
+                        <div class="font-semibold text-sm mb-1 text-[var(--apple-blue)]">4. Private Substrate Hooked</div>
+                        <div class="font-mono text-[10px] text-[var(--fg-muted)]">e.g. <code class="bg-blue-50 text-[var(--apple-blue)] px-1 rounded">_TtC7SwiftUI14CGDrawingView</code></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="implementation" class="py-20 px-6 bg-white border-t border-[var(--border-light)]">
+        <div class="max-w-5xl mx-auto">
+            <div class="mb-8 text-center reveal-hidden" data-reveal>
+                <h2 class="text-3xl font-bold tracking-tight mb-6">The Engineering Decisions</h2>
+
+                <div class="segmented-control mb-8" id="moduleTabs">
+                    <button class="segment-btn active" data-target="mod-api">Why +load?</button>
+                    <button class="segment-btn" data-target="mod-discovery">Why namespace discovery?</button>
+                    <button class="segment-btn" data-target="mod-dedup">Why associated objects?</button>
+                </div>
+            </div>
+
+            <div class="reveal-hidden" data-reveal>
+
+                <div id="mod-api" class="tab-pane">
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4">Deferred Discovery via <code class="text-lg">+load</code></h3>
+                            <p class="text-[var(--fg-muted)] text-sm mb-4">
+                                The library activates itself automatically before <code>main()</code> runs. No developer integration code is required — merely linking the library runs <code>+load</code>.
+                            </p>
+                            <p class="text-[var(--fg-muted)] text-sm">
+                                We defer the actual work to the next main-queue turn so UIKit is fully initialized, other libraries' <code>+load</code> methods have finished, and SwiftUI has registered its private classes with the ObjC runtime. The cost is a few milliseconds of launch latency; the benefit is that discovery runs in a settled runtime.
+                            </p>
+                        </div>
+                        <div class="mac-window">
+                            <div class="mac-titlebar">
+                                <div class="traffic-lights"><div class="traffic-light tl-close"></div><div class="traffic-light tl-min"></div><div class="traffic-light tl-max"></div></div>
+                                <div class="mac-title">QMTextLogger.m</div>
+                            </div>
+                            <div class="p-4 font-mono text-sm overflow-x-auto">
+<pre><code><span class="syntax-keyword">@implementation</span> <span class="syntax-type">QMTextLogger</span>
+
+<span class="syntax-macro">#pragma mark</span> + Load (zero-line integration)
+
++ (<span class="syntax-keyword">void</span>)load {
+    <span class="syntax-comment">// Defer to ensure UIKit and SwiftUI</span>
+    <span class="syntax-comment">// are fully registered with the runtime</span>
+    <span class="syntax-function">dispatch_async</span>(dispatch_get_main_queue(), ^{
+        [<span class="syntax-keyword">self</span> installHooks];
+    });
+}
+<span class="syntax-keyword">@end</span></code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="mod-discovery" class="tab-pane hidden">
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4">Mangled Name Discovery</h3>
+                            <p class="text-[var(--fg-muted)] text-sm mb-4">
+                                Hardcoding <code>_TtC7SwiftUI14CGDrawingView</code> breaks every iOS update. Instead, we enumerate all ObjC classes, filter for the SwiftUI namespace mangling prefix (<code>_TtC7SwiftUI</code> — that's <code>_TtC</code> for "class" plus length-prefixed module name <code>7SwiftUI</code>), and keep only <code>UIView</code> descendants.
+                            </p>
+                            <p class="text-[var(--fg-muted)] text-sm mb-4">
+                                We then inspect their <em>ivars</em>. If they carry <code>NSString</code>, <code>NSAttributedString</code>, or a CoreText primitive, we flag them as text-bearing and swizzle their <code>drawRect:</code> — but only if the class <em>directly</em> implements it, never an inherited method.
+                            </p>
+                            <p class="text-[var(--fg-muted)] text-xs italic">
+                                Swizzling an inherited <code>drawRect:</code> would mutate the superclass, affecting every <code>UIView</code> in the app. The <code>class_addMethod</code>-before-exchange pattern prevents that.
+                            </p>
+                        </div>
+                        <div class="mac-window">
+                            <div class="mac-titlebar">
+                                <div class="traffic-lights"><div class="traffic-light tl-close"></div><div class="traffic-light tl-min"></div><div class="traffic-light tl-max"></div></div>
+                                <div class="mac-title">QMTextLogger.m</div>
+                            </div>
+                            <div class="p-4 font-mono text-[13px] overflow-x-auto">
+<pre><code><span class="syntax-keyword">static const char</span> kSwiftUIPrefix[] = <span class="syntax-string">"_TtC7SwiftUI"</span>;
+<span class="syntax-keyword">static const size_t</span> kSwiftUIPrefixLen = <span class="syntax-function">sizeof</span>(kSwiftUIPrefix) - <span class="syntax-number">1</span>;
+
++ (<span class="syntax-keyword">void</span>)installHooks {
+    <span class="syntax-keyword">unsigned int</span> count = <span class="syntax-number">0</span>;
+    <span class="syntax-type">Class</span> *classes = <span class="syntax-function">objc_copyClassList</span>(&count);
+
+    <span class="syntax-keyword">for</span> (<span class="syntax-keyword">int</span> i = <span class="syntax-number">0</span>; i < count; i++) {
+        <span class="syntax-type">Class</span> cls = classes[i];
+        <span class="syntax-keyword">const char</span> *name = <span class="syntax-function">class_getName</span>(cls);
+
+        <span class="syntax-comment">// 1. Match SwiftUI namespace</span>
+        <span class="syntax-keyword">if</span> (<span class="syntax-function">strncmp</span>(name, kSwiftUIPrefix, kSwiftUIPrefixLen) != <span class="syntax-number">0</span>) <span class="syntax-keyword">continue</span>;
+
+        <span class="syntax-comment">// 2. Must be a view</span>
+        <span class="syntax-keyword">if</span> (![cls isSubclassOfClass:[<span class="syntax-type">UIView</span> <span class="syntax-keyword">class</span>]]) <span class="syntax-keyword">continue</span>;
+
+        <span class="syntax-comment">// 3. Ivar check &amp; direct-impl swizzle</span>
+        <span class="syntax-keyword">if</span> ([<span class="syntax-keyword">self</span> classAppearsToRenderText:cls]) {
+            [<span class="syntax-keyword">self</span> installDrawRectSwizzleOn:cls];
+        }
+    }
+    <span class="syntax-function">free</span>(classes);
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="mod-dedup" class="tab-pane hidden">
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4">Dedup via Associated Objects</h3>
+                            <p class="text-[var(--fg-muted)] text-sm mb-4">
+                                SwiftUI calls <code>drawRect:</code> on every render commit — not just when text changes. Without deduplication, we'd flood the notification stream on every animation tick and unrelated state update.
+                            </p>
+                            <p class="text-[var(--fg-muted)] text-sm">
+                                We extract the text (favoring <code>accessibilityLabel</code> for speed, falling back to ivar walks when it's been overridden). Then we store the last-logged string on the view itself, keyed by <code>kQMLastTextKey</code>. Associated objects give us a "free ivar" on classes we don't own; storage is released automatically when the view dies.
+                            </p>
+                        </div>
+                        <div class="mac-window">
+                            <div class="mac-titlebar">
+                                <div class="traffic-lights"><div class="traffic-light tl-close"></div><div class="traffic-light tl-min"></div><div class="traffic-light tl-max"></div></div>
+                                <div class="mac-title">QMTextLogger.m</div>
+                            </div>
+                            <div class="p-4 font-mono text-[13px] overflow-x-auto">
+<pre><code>+ (<span class="syntax-keyword">void</span>)handleRenderForView:(<span class="syntax-type">UIView</span> *)view {
+    <span class="syntax-type">NSString</span> *text = [<span class="syntax-keyword">self</span> extractTextFromView:view];
+    <span class="syntax-keyword">if</span> (text.length == <span class="syntax-number">0</span>) <span class="syntax-keyword">return</span>;
+
+    <span class="syntax-comment">// Per-view dedup guard</span>
+    <span class="syntax-type">NSString</span> *prev = <span class="syntax-function">objc_getAssociatedObject</span>(view, &kQMLastTextKey);
+    <span class="syntax-keyword">if</span> ([prev isEqualToString:text]) <span class="syntax-keyword">return</span>;
+
+    <span class="syntax-function">objc_setAssociatedObject</span>(view,
+                             &kQMLastTextKey,
+                             text,
+                             <span class="syntax-property">OBJC_ASSOCIATION_COPY_NONATOMIC</span>);
+
+    <span class="syntax-type">UIView</span> *host = [<span class="syntax-keyword">self</span> findHostingAncestorOf:view];
+    <span class="syntax-comment">// Post QMTextLoggerDidRenderNotification...</span>
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="playground" class="py-20 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-12 reveal-hidden" data-reveal>
+                <h2 class="text-3xl font-bold tracking-tight mb-4">Interactive Playground</h2>
+                <p class="text-[var(--fg-muted)]">Toggle the UI state below. The console shows what the library captures — and, importantly, what it doesn't.</p>
+            </div>
+
+            <div class="flex justify-center mb-10 reveal-hidden" data-reveal>
+                <div class="segmented-control" id="scenarioTabs">
+                    <button class="segment-btn active" data-scenario="swiftui">Pure SwiftUI</button>
+                    <button class="segment-btn" data-scenario="representable">UIKit in SwiftUI</button>
+                    <button class="segment-btn" data-scenario="uikit">Pure UIKit</button>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8 reveal-hidden" data-reveal>
+
+                <div class="bg-white rounded-[2.5rem] border-[8px] border-[#e5e5ea] shadow-xl overflow-hidden relative h-[450px] flex flex-col">
+                    <div class="h-6 w-32 bg-[#e5e5ea] absolute top-0 left-1/2 transform -translate-x-1/2 rounded-b-2xl z-20"></div>
+                    <div class="flex-1 flex flex-col items-center justify-center p-8 bg-gray-50 relative">
+                        <div class="absolute top-4 left-4">
+                            <div class="text-[10px] uppercase tracking-wider font-semibold text-gray-400" id="sim-badge">Pure SwiftUI</div>
+                        </div>
+                        <div class="text-2xl font-mono font-bold mb-8 text-gray-800 transition-colors" id="sim-text">state: off</div>
+                        <div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                            <span class="text-sm font-medium">Toggle UI State</span>
+                            <div class="ios-toggle" id="sim-toggle"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mac-window bg-black flex flex-col h-[450px]">
+                    <div class="mac-titlebar !bg-[#333] !border-black">
+                        <div class="traffic-lights"><div class="traffic-light tl-close"></div><div class="traffic-light tl-min"></div><div class="traffic-light tl-max"></div></div>
+                        <div class="mac-title !text-gray-300">Console Output</div>
+                        <button class="absolute right-3 text-xs text-gray-400 hover:text-white" id="clear-console">Clear</button>
+                    </div>
+                    <div class="bg-blue-900/40 border-b border-blue-800/50 py-2 px-4 flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <span class="text-[11px] font-mono text-blue-300 uppercase tracking-wide">Bonus Fulfilled: text + view + layer + host</span>
+                    </div>
+                    <div class="flex-1 p-4 font-mono text-[11px] md:text-xs overflow-y-auto terminal-bg leading-relaxed" id="console-output">
+                        <div class="mb-4">
+                            <div class="text-gray-400"><span class="text-[#34C759]">[QM]</span> Installed text-render hooks on 3 SwiftUI view class(es).</div>
+                            <div class="text-gray-500 mt-1">Waiting for text renders...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-16 reveal-hidden" data-reveal>
+                <h3 class="text-xl font-semibold mb-6">View Hierarchy Explorer</h3>
+                <div class="apple-card p-6 md:p-10">
+                    <div class="flex flex-col md:flex-row flex-wrap gap-4 items-center justify-center" id="hierarchyExplorer"></div>
+                    <div class="mt-8 p-6 bg-gray-50 border border-gray-200 rounded-xl transition-all" id="hierarchyDetail"></div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="risks" class="py-20 px-6 bg-[var(--bg-page)] border-t border-[var(--border-light)]">
+        <div class="max-w-5xl mx-auto reveal-hidden" data-reveal>
+            <h2 class="text-3xl font-bold tracking-tight mb-8 text-center">Trade-offs & Mitigations</h2>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="apple-card p-6">
+                    <h3 class="font-semibold mb-2 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-[var(--apple-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                        Heuristic vs. Surgical
+                    </h3>
+                    <p class="text-sm text-[var(--fg-muted)] mb-3">Why namespace prefixes and ivar heuristics instead of hardcoding <code>_TtC7SwiftUI14CGDrawingView</code>?</p>
+                    <div class="text-xs font-medium text-[var(--apple-blue)] bg-blue-50 inline-block px-3 py-2 rounded leading-relaxed">
+                        <strong>Mitigation:</strong> The hardcoded approach breaks every time Apple renames internal classes — which they've done every major iOS release since SwiftUI launched. The heuristic casts a wider net but survives rename churn. False positives are silent; false negatives are the cost of not hardcoding.
+                    </div>
+                </div>
+
+                <div class="apple-card p-6">
+                    <h3 class="font-semibold mb-2 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-[var(--apple-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        App Store Safety
+                    </h3>
+                    <p class="text-sm text-[var(--fg-muted)] mb-3">Does introspecting private SwiftUI classes risk App Store rejection?</p>
+                    <div class="text-xs font-medium text-[var(--apple-blue)] bg-blue-50 inline-block px-3 py-2 rounded leading-relaxed">
+                        <strong>Mitigation:</strong> Calling private SPIs gets rejected. This library only uses <strong>public runtime APIs</strong> — <code>objc_copyClassList</code>, <code>class_addMethod</code>, <code>method_exchangeImplementations</code>. The same toolkit Firebase, Sentry, and every major analytics SDK uses. No private symbols are referenced by name.
+                    </div>
+                </div>
+
+                <div class="apple-card p-6">
+                    <h3 class="font-semibold mb-2 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-[var(--apple-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Performance Overhead
+                    </h3>
+                    <p class="text-sm text-[var(--fg-muted)] mb-3">The <code>drawRect:</code> hook runs on the CoreAnimation commit path, which SwiftUI hits frequently.</p>
+                    <div class="text-xs font-medium text-[var(--apple-blue)] bg-blue-50 inline-block px-3 py-2 rounded leading-relaxed">
+                        <strong>Mitigation:</strong> Per-view string dedup via an associated object. The common path — same text as last render — is one pointer dereference and one string compare before early return. No allocation, no notification post.
+                    </div>
+                </div>
+
+                <div class="apple-card p-6">
+                    <h3 class="font-semibold mb-2 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-[var(--apple-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        Future Proofing
+                    </h3>
+                    <p class="text-sm text-[var(--fg-muted)] mb-3">What if SwiftUI moves off <code>drawRect:</code> to a pure <code>CALayer</code> rendering path in a future iOS release?</p>
+                    <div class="text-xs font-medium text-[var(--apple-blue)] bg-blue-50 inline-block px-3 py-2 rounded leading-relaxed">
+                        <strong>Mitigation:</strong> Known risk. If the substrate drops <code>drawRect:</code>, the library pivots to swizzling <code>-[CALayer display]</code> on the discovered layer classes — same namespace-discovery pattern, different hook point. The strategy is portable; only the hook selector changes.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="proof" class="py-20 px-6 bg-white border-t border-[var(--border-light)]">
+        <div class="max-w-4xl mx-auto text-center reveal-hidden" data-reveal>
+            <div class="inline-flex items-center justify-center gap-3 mb-6">
+                <h2 class="text-3xl font-bold tracking-tight text-[var(--fg-main)]">Verified in Context</h2>
+                <span class="badge">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                    Ready to Run
+                </span>
+            </div>
+
+            <p class="text-lg text-[var(--fg-muted)] mb-8 max-w-2xl mx-auto">
+                The repository contains the provided <code>SwiftUIQMTest.xcodeproj</code> with <code>QMTextLogger</code> integrated. Build, run, tap the button, watch the Xcode console. The library's decisions are also documented at the source.
+            </p>
+
+            <a href="https://github.com/johnnyclem/QMTextLogger" target="_blank" rel="noopener" class="btn-apple mb-12 text-sm px-6 py-3">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+                View on GitHub
+            </a>
+
+            <div class="grid md:grid-cols-2 gap-6 text-left">
+                <div class="apple-card p-6 border-l-4 border-l-[var(--apple-blue)]">
+                    <h4 class="font-semibold text-sm mb-2"><code>DECISIONS.md</code></h4>
+                    <p class="text-sm text-[var(--fg-muted)]">
+                        Every non-trivial design choice, with its alternative and the reason that alternative was rejected. Hook point, dedup strategy, deferred discovery, extraction fallback, static vs. dynamic, Objective-C vs. Swift. Reads as a design review, not a README.
+                    </p>
+                </div>
+                <div class="apple-card p-6 border-l-4 border-l-green-500">
+                    <h4 class="font-semibold text-sm mb-2"><code>INTEGRATION.md</code></h4>
+                    <p class="text-sm text-[var(--fg-muted)]">
+                        Two paths — Swift Package Manager or drop-in. Both are zero-line: no <code>import</code>, no initializer call, no variable. Step-by-step verification, including the exact console output to expect from the provided Xcode project.
+                    </p>
+                </div>
+            </div>
+
+            <p class="text-sm text-[var(--fg-muted)] mt-10">Built by Johnny Clem in response to Quantum Metric's mobile technical challenge.</p>
+        </div>
+    </section>
+
+    <footer class="py-10 text-center text-sm text-[var(--fg-muted)] bg-[var(--bg-page)] border-t border-[var(--border-light)]">
+        <p>QMTextLogger — Quantum Metric mobile technical challenge. <a href="https://github.com/johnnyclem/QMTextLogger" target="_blank" rel="noopener" class="text-[var(--apple-blue)] hover:underline">Source on GitHub</a>.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Decision tabs
+            const tabs = document.querySelectorAll('#moduleTabs .segment-btn');
+            const panes = document.querySelectorAll('.tab-pane');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    panes.forEach(p => p.classList.add('hidden'));
+                    const target = document.getElementById(tab.dataset.target);
+                    if (target) target.classList.remove('hidden');
+                });
+            });
+
+            // Stable per-scenario addresses, generated once per page load
+            const genAddr = (prefix) => `${prefix}${Math.floor(Math.random()*9000+1000).toString(16)}`;
+            const swiftuiPtrs = {
+                view:  '0x' + genAddr('107e0'),
+                layer: '0x' + genAddr('6000013e'),
+                host:  '0x' + genAddr('107d0'),
+                ctrl:  '0x' + genAddr('107a2'),
+                win:   '0x' + genAddr('107b3')
+            };
+
+            // Scenarios. Only SwiftUI is a capture target for this library.
+            // UIKit scenarios exist as teaching beats — showing what the
+            // namespace filter deliberately excludes.
+            const scenarios = {
+                swiftui: {
+                    title: "Pure SwiftUI",
+                    captured: true,
+                    targetClass: "_TtC7SwiftUI14CGDrawingView",
+                    hostClass:   "_TtGC7SwiftUI14_UIHostingView...",
+                    ptrs: swiftuiPtrs,
+                    nodes: [
+                        { name: 'UIWindow',              desc: "The root window containing the app's visual content.",                                                                    addr: swiftuiPtrs.win  },
+                        { name: 'UIHostingController',   desc: "SwiftUI's bridge to UIKit. Manages the SwiftUI view hierarchy within UIKit.",                                              addr: swiftuiPtrs.ctrl },
+                        { name: '_UIHostingView',        desc: 'The container view that hosts SwiftUI content. Handles layout and rendering coordination.',                                addr: swiftuiPtrs.host },
+                        { name: '_TtC7SwiftUI...',       desc: 'The interception target. A private, CoreText-backed view discovered via the runtime namespace scan. drawRect: swizzled.', addr: swiftuiPtrs.view }
+                    ]
+                },
+                representable: {
+                    title: "UIKit in SwiftUI",
+                    captured: false,
+                    ignoreReason: "UIViewRepresentable wraps a UILabel, which renders via drawTextInRect: — not drawRect:. Outside this library's scope.",
+                    nodes: [
+                        { name: 'UIWindow',             desc: 'The root window of the application.',                                                        addr: '0x107b3a100' },
+                        { name: 'UIHostingController',  desc: "SwiftUI's bridge to UIKit.",                                                                  addr: '0x107a2b200' },
+                        { name: '_UIHostingView',       desc: 'The root SwiftUI container view.',                                                           addr: '0x107d02800' },
+                        { name: 'PlatformViewHost',     desc: 'The internal SwiftUI wrapper bridging UIViewRepresentable to UIKit.',                        addr: '0x107c99f80' },
+                        { name: 'UILabel',              desc: 'A UIKit label wrapped inside the representable. Not a SwiftUI private view — not a target.', addr: '0x107e8123c' }
+                    ]
+                },
+                uikit: {
+                    title: "Pure UIKit",
+                    captured: false,
+                    ignoreReason: "UILabel lives outside the SwiftUI namespace. The prefix filter (_TtC7SwiftUI) excludes it by design.",
+                    nodes: [
+                        { name: 'UIWindow',         desc: 'The root window of the application.',                                                         addr: '0x107b3a100' },
+                        { name: 'UIViewController', desc: 'Standard UIKit view controller managing the screen.',                                         addr: '0x107e33a10' },
+                        { name: 'UIView',           desc: 'The root view of the view controller.',                                                       addr: '0x107e33b45' },
+                        { name: 'UILabel',          desc: 'Standard UIKit label. Not in the SwiftUI namespace, so the namespace filter excludes it.',    addr: '0x107e8123c' }
+                    ]
+                }
+            };
+
+            let currentScenario = 'swiftui';
+
+            const hierarchyExplorer = document.getElementById('hierarchyExplorer');
+            const hierarchyDetail   = document.getElementById('hierarchyDetail');
+
+            function renderHierarchy() {
+                const scenario = scenarios[currentScenario];
+                const data = scenario.nodes;
+                if (!hierarchyExplorer) return;
+                hierarchyExplorer.innerHTML = '';
+
+                data.forEach((info, index) => {
+                    const isTarget = scenario.captured && index === data.length - 1;
+                    const node = document.createElement('div');
+                    node.className = `flow-node ${isTarget ? 'active' : ''}`;
+                    node.dataset.level = index;
+                    node.innerHTML = `
+                        <div class="font-mono text-[10px] ${isTarget ? 'text-[var(--apple-blue)]' : 'text-[var(--fg-muted)]'} uppercase tracking-wider mb-1">Level ${index}</div>
+                        <div class="font-semibold text-sm ${isTarget ? 'text-[var(--apple-blue)]' : ''}">${info.name}</div>
+                    `;
+                    node.addEventListener('click', () => {
+                        hierarchyExplorer.querySelectorAll('.flow-node').forEach(n => n.classList.remove('active'));
+                        node.classList.add('active');
+                        updateHierarchyDetails(index);
+                    });
+                    hierarchyExplorer.appendChild(node);
+
+                    if (index < data.length - 1) {
+                        const arrow = document.createElement('div');
+                        arrow.innerHTML = `<svg class="w-5 h-5 text-[var(--border-medium)] hidden md:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>`;
+                        hierarchyExplorer.appendChild(arrow.firstChild);
+                    }
+                });
+
+                updateHierarchyDetails(data.length - 1);
+            }
+
+            function updateHierarchyDetails(level) {
+                const scenario = scenarios[currentScenario];
+                const info = scenario.nodes[level];
+                const isTarget = scenario.captured && level === scenario.nodes.length - 1;
+
+                const currentTextHtml = isTarget
+                    ? `<span class="text-[var(--apple-blue)] font-bold" id="hierarchyCurrentText">"${document.getElementById('sim-text').textContent}"</span>`
+                    : `<span class="text-gray-400 italic">Not applicable — scenario is outside the library's scope</span>`;
+
+                const header = isTarget
+                    ? `${info.name} (Level ${level}) — Interception Target`
+                    : `${info.name} (Level ${level})`;
+
+                if (hierarchyDetail) {
+                    hierarchyDetail.innerHTML = `
+                        <h4 class="font-mono text-sm font-semibold mb-4 ${isTarget ? 'text-[var(--apple-blue)]' : 'text-gray-800'}">${header}</h4>
+                        <p class="text-sm text-[var(--fg-muted)] mb-6">${info.desc}</p>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm font-mono text-gray-800">
+                            <div><span class="text-[var(--fg-muted)] w-32 inline-block">Memory Addr:</span> ${info.addr}</div>
+                            <div><span class="text-[var(--fg-muted)] w-32 inline-block">Current Text:</span> ${currentTextHtml}</div>
+                        </div>
+                    `;
+                }
+            }
+
+            // Scenario tabs
+            const scenarioTabsBtn = document.querySelectorAll('#scenarioTabs .segment-btn');
+            const simBadge = document.getElementById('sim-badge');
+            scenarioTabsBtn.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    scenarioTabsBtn.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentScenario = tab.dataset.scenario;
+
+                    simBadge.textContent = tab.textContent;
+                    renderHierarchy();
+
+                    const simText = document.getElementById('sim-text');
+                    simText.textContent = 'state: off';
+                    simText.style.color = '#1d1d1f';
+
+                    isToggled = false;
+                    document.getElementById('sim-toggle').classList.remove('active');
+
+                    const entry = document.createElement('div');
+                    entry.className = 'mb-1 leading-snug break-all text-gray-300';
+                    entry.innerHTML = `<span class="text-blue-400 italic">➜ Switched architecture to: ${tab.textContent}</span>`;
+                    consoleOutput.appendChild(entry);
+                    consoleOutput.scrollTop = consoleOutput.scrollHeight;
+                });
+            });
+
+            renderHierarchy();
+
+            // Simulator
+            const toggle = document.getElementById('sim-toggle');
+            const textDisplay = document.getElementById('sim-text');
+            const consoleOutput = document.getElementById('console-output');
+            const clearConsole = document.getElementById('clear-console');
+
+            let isToggled = false;
+
+            function appendLog(newVal) {
+                const scenario = scenarios[currentScenario];
+                const entry = document.createElement('div');
+                entry.className = 'mb-1 leading-snug break-all';
+
+                if (scenario.captured) {
+                    entry.innerHTML = `<span class="text-[#34C759]">[QM]</span> text=<span class="text-white">${newVal}</span>  view=<span class="text-blue-300">&lt;${scenario.targetClass}:${scenario.ptrs.view}&gt;</span>  layer=<span class="text-purple-300">&lt;CALayer:${scenario.ptrs.layer}&gt;</span>  host=<span class="text-orange-300">&lt;${scenario.hostClass}:${scenario.ptrs.host}&gt;</span>`;
+                    entry.classList.add('text-gray-300');
+                } else {
+                    entry.innerHTML = `<span class="text-gray-500 italic">— no capture — text changed on a UIKit element outside the namespace filter.</span><br><span class="text-gray-600 italic text-[10px]">${scenario.ignoreReason}</span>`;
+                }
+
+                consoleOutput.appendChild(entry);
+                consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            }
+
+            toggle.addEventListener('click', () => {
+                isToggled = !isToggled;
+                const newState = isToggled ? 'state: on' : 'state: off';
+
+                toggle.classList.toggle('active', isToggled);
+                textDisplay.textContent = newState;
+                textDisplay.style.color = isToggled ? '#34C759' : '#1d1d1f';
+                textDisplay.style.transform = 'scale(1.05)';
+                setTimeout(() => textDisplay.style.transform = 'scale(1)', 150);
+
+                const hierarchyCurrentText = document.getElementById('hierarchyCurrentText');
+                if (hierarchyCurrentText) hierarchyCurrentText.textContent = `"${newState}"`;
+
+                setTimeout(() => {
+                    if (currentScenario === 'swiftui') {
+                        const interceptRay = document.getElementById('intercept-ray');
+                        if (interceptRay) {
+                            interceptRay.style.opacity = '1';
+                            setTimeout(() => interceptRay.style.opacity = '0', 500);
+                        }
+                    }
+                    appendLog(newState);
+                }, 50);
+            });
+
+            clearConsole.addEventListener('click', () => {
+                consoleOutput.innerHTML = `
+                    <div class="mb-4">
+                        <div class="text-gray-400"><span class="text-[#34C759]">[QM]</span> Installed text-render hooks on 3 SwiftUI view class(es).</div>
+                        <div class="text-gray-500 mt-1">Waiting for text renders...</div>
+                    </div>
+                `;
+            });
+
+            // Reveal animation + single-cycle architecture pulse
+            let animationInterval;
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('reveal-visible');
+
+                        if (entry.target.querySelector('#pipelineDemo')) {
+                            const nodes = ['node-swiftui', 'node-discovery', 'node-heuristic', 'node-hook'];
+                            let activeIdx = 0;
+                            if (animationInterval) clearInterval(animationInterval);
+                            animationInterval = setInterval(() => {
+                                nodes.forEach((id, idx) => {
+                                    const el = document.getElementById(id);
+                                    if (!el) return;
+                                    if (idx === activeIdx) el.classList.add('active');
+                                    else el.classList.remove('active');
+                                });
+                                activeIdx++;
+                                if (activeIdx >= nodes.length) {
+                                    clearInterval(animationInterval);
+                                    setTimeout(() => {
+                                        nodes.forEach(id => document.getElementById(id)?.classList.remove('active'));
+                                        document.getElementById('node-hook')?.classList.add('active');
+                                    }, 1000);
+                                }
+                            }, 800);
+                        }
+
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+            document.querySelectorAll('.reveal-hidden').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

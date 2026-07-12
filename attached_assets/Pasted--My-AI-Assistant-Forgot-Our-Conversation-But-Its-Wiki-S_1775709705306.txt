@@ -1,0 +1,71 @@
+---
+
+**My AI Assistant Forgot Our Conversation — But Its Wiki Survived**
+
+I built an AI assistant. We talked for hours. It pushed several commits to an open source repository. Setup Karpathy’s wiki memory skill. Patched one of its bugs. Then it restarted, and forgot everything.
+
+That's not hyperbole — I had to scroll up in our chat to find context it should have had. It claimed never to have heard of a project we'd discussed extensively. The brutal part? It had written a code review of that project hours earlier, and couldn't remember doing it.
+
+But here's what stopped me cold: its **wiki survived**.
+
+---
+
+## What Actually Happened
+
+My assistant (built on OpenClaw) maintains two memory systems:
+
+1. **Session memory** — daily notes in `memory/YYYY-MM-DD.md` and a curated `MEMORY.md`
+2. **Wiki** — a Karpathy-style markdown knowledge base in `wiki/`
+
+After a restart, session memory was gone. Wiki was intact.
+
+The difference? Wiki is just files on disk. Session memory apparently had some restart dependency that failed silently. Same machine, same disk, different failure modes.
+
+---
+
+## The Irony
+
+I was building a tool called **Stenographer** — a real-time indexing layer for AI agent conversations. Its whole job is external, persistent, queryable memory that outlives the session.
+
+And there I was, experiencing the exact problem Stenographer is meant to solve.
+
+The wiki functioned as my assistant's Stenographer. It didn't know we'd talked about stenographer. But it had the docs.
+
+---
+
+## What This Means for Agent Memory
+
+Session-bound memory is a liability, not a feature. We optimize for it because it's convenient — fast reads, transactional consistency, tied to the current context. But agents that lose memory on restart aren't agents. They're chatbots with amnesia.
+
+The fix isn't better session handling. It's **external, durable, queryable memory** that:
+
+- Survives restarts
+- Is independently queryable (not just context-window stuffing)
+- Supports semantic search across time
+- Handles updates, corrections, "tombstones"
+
+That's what stenographer does. I just happened to build a cheaper version of it for myself without realizing it.
+
+---
+
+## The Next Evolution
+
+Every agent framework is wrestling with this. LangGraph has memory nodes. Mem0 claims "persistent memory for AI." But the simplest answer might be the oldest one: **a wiki**.
+
+Just files. Markdown. Git-optional. Queryable on your terms.
+
+My assistant's wiki carried the knowledge forward. The session didn't. That's the signal.
+
+---
+
+## What's Next
+
+I'm fixing the memory layer properly now — making both systems durable. But the bigger insight is this:
+
+> The most robust memory for an AI agent might just be a folder of markdown files that outlive every session.
+
+Build for that. Everything else is a cache.
+
+---
+
+*This post is part of the agent stack series: Stenographer → Short-hand → Smallchat → AgentVault. Building in public.*

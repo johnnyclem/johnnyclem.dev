@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Documentation: A Documentation | docs.docs</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Docusaurus-faithful palette */
+    --ds-green: #25c2a0;
+    --ds-green-dark: #21a38b;
+    --ds-green-light: #4fddbf;
+    --ds-purple: #6c5ce7;
+
+    --ds-bg: #ffffff;
+    --ds-sidebar-bg: #f8f8f8;
+    --ds-text: #1c1e21;
+    --ds-text-secondary: #606770;
+    --ds-text-muted: #999;
+    --ds-link: #2e8555;
+    --ds-border: #e3e3e3;
+    --ds-border-light: #ececec;
+
+    --ds-code-bg: #f6f7f8;
+    --ds-code-text: #393a34;
+    --ds-inline-code-bg: rgba(0,0,0,0.06);
+
+    --ds-navbar-height: 60px;
+    --ds-sidebar-width: 300px;
+
+    --ds-admonition-note: #54c7ec;
+    --ds-admonition-tip: #25c2a0;
+    --ds-admonition-info: #54c7ec;
+    --ds-admonition-caution: #ffba00;
+    --ds-admonition-danger: #fa383e;
+
+    --ds-toc-width: 200px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Ubuntu, Cantarell, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+    color: var(--ds-text);
+    background: var(--ds-bg);
+    font-size: 16px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Navbar ── */
+  .navbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: var(--ds-navbar-height);
+    background: var(--ds-bg);
+    border-bottom: 1px solid var(--ds-border);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+  }
+  .navbar-brand {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--ds-text);
+    margin-right: 32px;
+  }
+  .navbar-logo {
+    width: 32px; height: 32px;
+    background: var(--ds-green);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    color: #fff;
+  }
+  .navbar-items {
+    display: flex; align-items: center; gap: 24px;
+    font-size: 14px; font-weight: 500;
+  }
+  .navbar-items a {
+    color: var(--ds-text-secondary);
+    text-decoration: none;
+    padding: 4px 0;
+    transition: color 0.15s;
+  }
+  .navbar-items a:hover { color: var(--ds-text); }
+  .navbar-items a.active {
+    color: var(--ds-green);
+    border-bottom: 2px solid var(--ds-green);
+  }
+  .navbar-right {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .navbar-search {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 14px;
+    border: 1px solid var(--ds-border);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--ds-text-muted);
+    cursor: pointer;
+    transition: border-color 0.15s;
+    background: var(--ds-sidebar-bg);
+  }
+  .navbar-search:hover { border-color: #ccc; }
+  .navbar-search kbd {
+    font-family: inherit;
+    font-size: 11px;
+    background: var(--ds-bg);
+    border: 1px solid var(--ds-border);
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: var(--ds-text-muted);
+  }
+  .navbar-github {
+    font-size: 20px;
+    color: var(--ds-text-secondary);
+    text-decoration: none;
+    line-height: 1;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    position: fixed;
+    top: var(--ds-navbar-height);
+    left: 0; bottom: 0;
+    width: var(--ds-sidebar-width);
+    background: var(--ds-bg);
+    border-right: 1px solid var(--ds-border);
+    overflow-y: auto;
+    padding: 16px 12px;
+    font-size: 14px;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+
+  .sidebar-category {
+    margin-bottom: 20px;
+  }
+  .sidebar-category-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ds-text);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 4px 12px;
+    margin-bottom: 2px;
+  }
+  .sidebar-item {
+    display: block;
+    padding: 5px 12px;
+    color: var(--ds-text-secondary);
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 400;
+    transition: all 0.12s;
+    line-height: 1.5;
+  }
+  .sidebar-item:hover {
+    background: rgba(0,0,0,0.04);
+    color: var(--ds-text);
+  }
+  .sidebar-item.active {
+    background: rgba(37,194,160,0.08);
+    color: var(--ds-green);
+    font-weight: 600;
+  }
+  .sidebar-item.nested {
+    padding-left: 28px;
+    font-size: 13px;
+  }
+  .sidebar-badge {
+    display: inline-block;
+    font-size: 10px; font-weight: 700;
+    background: var(--ds-green);
+    color: #fff;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ── Main Content ── */
+  .main {
+    margin-left: var(--ds-sidebar-width);
+    margin-top: var(--ds-navbar-height);
+    padding: 32px 64px 120px;
+    max-width: calc(var(--ds-sidebar-width) + 820px);
+  }
+
+  /* ── Breadcrumb ── */
+  .breadcrumb {
+    font-size: 13px;
+    color: var(--ds-text-muted);
+    margin-bottom: 12px;
+  }
+  .breadcrumb a {
+    color: var(--ds-text-muted);
+    text-decoration: none;
+  }
+  .breadcrumb a:hover { text-decoration: underline; }
+
+  /* ── Typography ── */
+  h1 {
+    font-size: 2.4em;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  h2 {
+    font-size: 1.6em;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--ds-border-light);
+    letter-spacing: -0.2px;
+  }
+  h3 {
+    font-size: 1.25em;
+    font-weight: 600;
+    margin-top: 32px;
+    margin-bottom: 12px;
+  }
+  h4 {
+    font-size: 1.05em;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 8px;
+  }
+  p { margin-bottom: 16px; }
+  p + p { margin-top: 0; }
+  strong { font-weight: 700; }
+  em { color: inherit; }
+
+  a { color: var(--ds-link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  code {
+    font-family: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.85em;
+    background: var(--ds-inline-code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  ul, ol {
+    margin-bottom: 16px;
+    padding-left: 28px;
+  }
+  li { margin-bottom: 6px; }
+  li::marker { color: var(--ds-text-muted); }
+
+  blockquote {
+    border-left: 3px solid var(--ds-border);
+    padding: 4px 0 4px 20px;
+    margin: 20px 0;
+    color: var(--ds-text-secondary);
+    font-style: italic;
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--ds-border);
+    margin: 40px 0;
+  }
+
+  /* ── Code blocks ── */
+  .code-block {
+    background: var(--ds-code-bg);
+    border: 1px solid var(--ds-border-light);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 16px 0 24px;
+  }
+  .code-header {
+    display: flex; align-items: center;
+    padding: 8px 16px;
+    background: rgba(0,0,0,0.02);
+    border-bottom: 1px solid var(--ds-border-light);
+    font-size: 13px; font-weight: 600;
+    color: var(--ds-text-secondary);
+  }
+  .code-header .lang-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--ds-text-muted);
+    margin-left: auto;
+  }
+  .code-body {
+    padding: 16px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    line-height: 1.6;
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--ds-code-text);
+  }
+
+  /* ── Admonitions ── */
+  .admonition {
+    margin: 24px 0;
+    padding: 16px 20px;
+    border-radius: 8px;
+    border-left: 5px solid;
+    font-size: 15px;
+  }
+  .admonition p { margin-bottom: 0; }
+  .admonition p + p { margin-top: 10px; }
+  .admonition-heading {
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .admonition-note {
+    background: #eef9fd;
+    border-color: var(--ds-admonition-note);
+  }
+  .admonition-note .admonition-heading { color: #1a8aaa; }
+  .admonition-tip {
+    background: #eefbf5;
+    border-color: var(--ds-admonition-tip);
+  }
+  .admonition-tip .admonition-heading { color: #1a8a6e; }
+  .admonition-caution {
+    background: #fffaeb;
+    border-color: var(--ds-admonition-caution);
+  }
+  .admonition-caution .admonition-heading { color: #b58105; }
+  .admonition-danger {
+    background: #fff1f1;
+    border-color: var(--ds-admonition-danger);
+  }
+  .admonition-danger .admonition-heading { color: #d63939; }
+
+  /* ── Tables ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 15px;
+  }
+  th {
+    text-align: left;
+    font-weight: 600;
+    padding: 10px 14px;
+    border-bottom: 2px solid var(--ds-border);
+    background: var(--ds-sidebar-bg);
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--ds-border-light);
+    vertical-align: top;
+  }
+
+  /* ── Flowchart ── */
+  .flowchart {
+    margin: 24px 0;
+    padding: 28px 24px;
+    background: var(--ds-sidebar-bg);
+    border: 1px solid var(--ds-border-light);
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ds-text-secondary);
+    text-align: center;
+    line-height: 2.4;
+    overflow-x: auto;
+  }
+  .flow-node {
+    display: inline-block;
+    padding: 6px 16px;
+    background: #fff;
+    border: 1px solid var(--ds-border);
+    border-radius: 6px;
+    font-weight: 500;
+    color: var(--ds-text);
+  }
+  .flow-node.decision {
+    background: #fff8e1;
+    border-color: #ffe082;
+    transform: rotate(0deg);
+  }
+  .flow-node.terminal {
+    background: var(--ds-green);
+    color: #fff;
+    border-color: var(--ds-green);
+    font-weight: 700;
+  }
+  .flow-node.result {
+    background: #fff1f1;
+    border-color: #f5c6c6;
+    color: #c0392b;
+  }
+  .flow-arrow {
+    color: var(--ds-text-muted);
+    margin: 0 6px;
+  }
+
+  /* ── Prev/Next nav ── */
+  .doc-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--ds-border);
+    gap: 16px;
+  }
+  .doc-nav-link {
+    flex: 1;
+    padding: 16px 20px;
+    border: 1px solid var(--ds-border);
+    border-radius: 8px;
+    text-decoration: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .doc-nav-link:hover {
+    border-color: var(--ds-green);
+    box-shadow: 0 2px 12px rgba(37,194,160,0.08);
+    text-decoration: none;
+  }
+  .doc-nav-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ds-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .doc-nav-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ds-green);
+    margin-top: 4px;
+  }
+  .doc-nav-link.next { text-align: right; }
+
+  /* ── Subtitle ── */
+  .doc-subtitle {
+    font-size: 1.15em;
+    color: var(--ds-text-secondary);
+    margin-bottom: 32px;
+    line-height: 1.6;
+  }
+
+  /* ── Last updated ── */
+  .last-updated {
+    font-size: 13px;
+    color: var(--ds-text-muted);
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid var(--ds-border-light);
+  }
+
+  /* ── Comparison table ── */
+  .comparison-winner td:nth-child(3) {
+    font-weight: 700;
+    color: var(--ds-green);
+  }
+
+  /* ── Blank page joke ── */
+  .blank-section {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: var(--ds-text-muted);
+    font-style: italic;
+    border: 2px dashed var(--ds-border-light);
+    border-radius: 12px;
+    margin: 24px 0;
+    padding: 40px;
+    gap: 12px;
+  }
+  .blank-cursor {
+    font-size: 24px;
+    animation: blink 1s step-end infinite;
+    color: var(--ds-text-muted);
+  }
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 996px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 24px 20px 80px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Navbar ── -->
+<nav class="navbar">
+  <a href="#" class="navbar-brand">
+    <span class="navbar-logo">📄</span>
+    docs.docs
+  </a>
+  <div class="navbar-items">
+    <a href="#" class="active">Docs</a>
+    <a href="#">Blog</a>
+    <a href="#">Community</a>
+    <a href="#">Therapy</a>
+  </div>
+  <div class="navbar-right">
+    <div class="navbar-search">
+      🔍 Search docs about docs...
+      <kbd>⌘</kbd><kbd>K</kbd>
+    </div>
+    <a href="#" class="navbar-github" title="GitHub">⬡</a>
+  </div>
+</nav>
+
+<!-- ── Sidebar ── -->
+<aside class="sidebar">
+  <div class="sidebar-category">
+    <div class="sidebar-category-label">Introduction</div>
+    <a href="#" class="sidebar-item active">Why Documentation Matters</a>
+    <a href="#kevin" class="sidebar-item">Documentation vs. Telling Kevin</a>
+    <a href="#audience" class="sidebar-item">Knowing Your Audience</a>
+  </div>
+  <div class="sidebar-category">
+    <div class="sidebar-category-label">Getting Started</div>
+    <a href="#tooling" class="sidebar-item">Choosing a Docs Framework</a>
+    <a href="#tooling" class="sidebar-item nested">Setup & Configuration</a>
+    <a href="#tooling" class="sidebar-item nested">Migrating Between Frameworks</a>
+    <a href="#tooling" class="sidebar-item nested">Migrating Back</a>
+    <a href="#first-page" class="sidebar-item">Writing Your First Page</a>
+    <a href="#first-page" class="sidebar-item nested">Staring at the Blank Page</a>
+    <a href="#first-page" class="sidebar-item nested">Writing the First Sentence</a>
+    <a href="#first-page" class="sidebar-item nested">Deleting the First Sentence</a>
+  </div>
+  <div class="sidebar-category">
+    <div class="sidebar-category-label">Core Concepts</div>
+    <a href="#five-stages" class="sidebar-item">The Five Stages</a>
+    <a href="#when" class="sidebar-item">When to Write Docs</a>
+    <a href="#types" class="sidebar-item">Types of Documentation</a>
+  </div>
+  <div class="sidebar-category">
+    <div class="sidebar-category-label">Advanced Guides</div>
+    <a href="#excuses" class="sidebar-item">Making Excuses <span class="sidebar-badge">Popular</span></a>
+    <a href="#maintenance" class="sidebar-item">Keeping Docs Updated</a>
+    <a href="#screenshots" class="sidebar-item">Screenshots (& Why They're Immediately Wrong)</a>
+  </div>
+  <div class="sidebar-category">
+    <div class="sidebar-category-label">Reference</div>
+    <a href="#glossary" class="sidebar-item">Glossary</a>
+    <a href="#faq" class="sidebar-item">FAQ</a>
+  </div>
+</aside>
+
+<!-- ── Main Content ── -->
+<main class="main">
+
+  <div class="breadcrumb">
+    <a href="#">Docs</a> / <a href="#">Introduction</a> / Why Documentation Matters
+  </div>
+
+  <h1>Why Documentation Matters</h1>
+  <p class="doc-subtitle">
+    A comprehensive guide to understanding why you should write documentation, written instead of writing documentation.
+  </p>
+
+  <!-- ══════════════════════════════════ -->
+  <h2 id="kevin">Documentation vs. Just Telling Kevin on Slack</h2>
+
+  <p>
+    Before we begin, let's address the question that every developer asks before writing a single word of documentation: <strong>"Can't I just tell Kevin?"</strong>
+  </p>
+  <p>
+    Kevin is the senior engineer on your team who has been at the company for four years. Kevin knows where the config files live. Kevin knows why the database schema looks like that. Kevin knows the deploy process, the naming conventions, the reason behind that one weird if-statement on line 847 of <code>legacy_handler.py</code>, and who to email when Datadog goes red on a Thursday.
+  </p>
+  <p>
+    Kevin is your documentation. Kevin is a living, breathing, Slack-responsive knowledge base with a mass in Cambridge and a mass in the codebase. And if Kevin gets hit by a bus — or, more realistically, <em>accepts an offer from a company that pays 40% more</em> — every undocumented decision he's ever made leaves with him.
+  </p>
+  <p>
+    This is known as the <strong>Kevin Problem</strong>.
+  </p>
+
+  <div class="admonition admonition-caution">
+    <div class="admonition-heading">⚠️ caution</div>
+    <p>The Kevin Problem scales linearly with Kevin's tenure. A Kevin who has been at the company for six years is not 50% more valuable than a four-year Kevin — he is <em>existentially</em> more valuable, because at six years, Kevin has begun to <em>embody</em> institutional knowledge that predates every system currently in use.</p>
+  </div>
+
+  <p>
+    Let us now consider, quantitatively, the relative merits of documentation versus Kevin.
+  </p>
+
+  <table>
+    <tr>
+      <th>Criterion</th>
+      <th>Documentation</th>
+      <th>Kevin</th>
+    </tr>
+    <tr>
+      <td>Availability</td>
+      <td>24/7, all time zones</td>
+      <td>9:15 AM–4:47 PM EST, except Wednesdays (Kevin has therapy)</td>
+    </tr>
+    <tr>
+      <td>Response time</td>
+      <td>Instant (Ctrl+F)</td>
+      <td>Instant to 3 days (depends on sprint load, mood, and whether you asked in the right channel)</td>
+    </tr>
+    <tr>
+      <td>Accuracy</td>
+      <td>Frozen at time of writing (possibly wrong now)</td>
+      <td>Up-to-date but filtered through Kevin's current emotional state</td>
+    </tr>
+    <tr>
+      <td>Searchable</td>
+      <td>Yes</td>
+      <td>Only if you know the exact Slack DM phrase Kevin will respond to</td>
+    </tr>
+    <tr>
+      <td>Bus factor</td>
+      <td>Survives all buses</td>
+      <td>Does not survive buses (literal or metaphorical)</td>
+    </tr>
+    <tr class="comparison-winner">
+      <td>Enjoyment of writing</td>
+      <td>None</td>
+      <td>Kevin actually likes explaining things and you should let him have this</td>
+    </tr>
+    <tr>
+      <td>Cost</td>
+      <td>Free (after 3 days of yak-shaving your docs framework)</td>
+      <td>$187,000/yr (but he also writes code, allegedly)</td>
+    </tr>
+  </table>
+
+  <p>
+    The conclusion is clear: documentation is objectively superior in every category except the one that matters, which is that Kevin is already right there and will just <em>tell you</em> without you having to open a Markdown file.
+  </p>
+  <p>
+    This is why Kevin always wins. This is also why you need to write documentation.
+  </p>
+
+  <div class="admonition admonition-tip">
+    <div class="admonition-heading">💡 tip</div>
+    <p>An underappreciated benefit of documentation: once it exists, Kevin can reply to Slack questions with <em>"it's in the docs"</em> — the four most satisfying words in software engineering. You are not just writing docs. You are giving Kevin a gift.</p>
+  </div>
+
+  <!-- ══════════════════════════════════ -->
+  <h2 id="audience">Knowing Your Audience</h2>
+
+  <p>
+    Good documentation begins with understanding who will read it. In practice, your documentation will be read by the following audiences, in order of likelihood:
+  </p>
+
+  <ol>
+    <li><strong>You, in six months</strong>, having completely forgotten how any of this works</li>
+    <li><strong>A new hire</strong>, three days into onboarding, with 47 open browser tabs and a growing sense of dread</li>
+    <li><strong>Someone from another team</strong>, who will read the first two sentences, not find what they need, and Slack Kevin</li>
+    <li><strong>An LLM</strong>, who will ingest the entire page and produce a confident summary that is subtly wrong</li>
+    <li><strong>Nobody</strong> (most common)</li>
+  </ol>
+
+  <p>
+    Write for audience #1. Future-you is the only reader who is both guaranteed and sympathetic. Future-you will not judge your prose. Future-you will not leave a pedantic review comment. Future-you will simply be <em>grateful</em> — and that gratitude is the only reward documentation will ever provide.
+  </p>
+
+  <!-- ══════════════════════════════════ -->
+  <h2 id="tooling">Choosing a Documentation Framework</h2>
+
+  <p>
+    Before you can write documentation, you must first spend between one and three weeks selecting, configuring, theming, deploying, and then reconsidering your documentation toolchain. This is not procrastination. This is <strong>infrastructure</strong>.
+  </p>
+
+  <table>
+    <tr>
+      <th>Framework</th>
+      <th>Time to Set Up</th>
+      <th>Time Writing Docs After Setup</th>
+    </tr>
+    <tr>
+      <td>Docusaurus</td>
+      <td>3 days</td>
+      <td>0 days</td>
+    </tr>
+    <tr>
+      <td>GitBook</td>
+      <td>1 day</td>
+      <td>0 days</td>
+    </tr>
+    <tr>
+      <td>MkDocs + Material</td>
+      <td>2 days</td>
+      <td>0 days</td>
+    </tr>
+    <tr>
+      <td>VitePress</td>
+      <td>2 days</td>
+      <td>0 days (but the dev server is fast, which is nice while you stare at the blank page)</td>
+    </tr>
+    <tr>
+      <td>Notion</td>
+      <td>20 minutes</td>
+      <td>0 days (but you did spend 4 hours organizing the sidebar into a nested taxonomy that no one will navigate)</td>
+    </tr>
+    <tr>
+      <td>README.md</td>
+      <td>0 days</td>
+      <td>Wrote "# Project Name" and "TODO: add docs" and merged to main. Technically, docs exist.</td>
+    </tr>
+    <tr>
+      <td>Custom Next.js site</td>
+      <td>2 weeks</td>
+      <td>You have built a beautiful documentation framework. It contains no documentation. It has 4 GitHub stars, all from bots.</td>
+    </tr>
+  </table>
+
+  <div class="admonition admonition-note">
+    <div class="admonition-heading">📝 note</div>
+    <p>The correlation between "time spent choosing a docs framework" and "amount of documentation actually written" is not just zero — it is <em>slightly negative</em>. The more sophisticated your toolchain, the higher the activation energy to open a Markdown file and type words. This is called the <strong>Documentation Tooling Paradox</strong>, and it is the reason this very site exists instead of actual documentation for anything.</p>
+  </div>
+
+  <h3>The Migration Cycle</h3>
+
+  <p>
+    It is also important to be aware of the <strong>Documentation Framework Migration Cycle</strong>, which every engineering team completes approximately once per fiscal year:
+  </p>
+
+  <div class="flowchart">
+    <span class="flow-node">Choose framework</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-node">Configure it perfectly</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-node">Write 2 pages</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-node decision">Discover minor limitation</span>
+    <br>
+    <span class="flow-arrow" style="visibility:hidden">→</span>
+    <span class="flow-arrow" style="visibility:hidden">→</span>
+    <span class="flow-arrow" style="visibility:hidden">→</span>
+    <span class="flow-arrow">↓</span>
+    <br>
+    <span class="flow-node result">"Let's evaluate alternatives"</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-node">Choose new framework</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-node">Migrate 2 pages</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-node terminal">Repeat forever</span>
+  </div>
+
+  <p>
+    At no point in this cycle does the total number of documented pages exceed four.
+  </p>
+
+  <!-- ══════════════════════════════════ -->
+  <h2 id="first-page">Writing Your First Page</h2>
+
+  <p>
+    You have selected your framework. You have configured the sidebar. You have spent a non-trivial amount of time choosing between the default theme and a slightly different default theme. The deployment pipeline is running. The custom domain is pointing. Everything is ready.
+  </p>
+  <p>
+    Now you have to write something.
+  </p>
+
+  <div class="blank-section">
+    <span class="blank-cursor">▊</span>
+    <span style="font-size: 14px;">[This space intentionally left blank, which is also what your documentation page looks like right now]</span>
+  </div>
+
+  <p>
+    This is the moment — the <strong>Documentation Void</strong> — where most documentation initiatives die. The cursor blinks. Your coffee cools. You open a new tab. You check Slack. Kevin has answered someone's question. The question was about the thing you were about to document. Kevin was faster. Kevin is always faster.
+  </p>
+  <p>
+    You close the tab. You'll write docs tomorrow.
+  </p>
+
+  <h3>The First Sentence Problem</h3>
+
+  <p>
+    If you do manage to stay in the file, you will encounter the First Sentence Problem: the paralyzing inability to decide how to begin. Common false starts include:
+  </p>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>drafts.md</span>
+      <span class="lang-tag">md</span>
+    </div>
+    <div class="code-body"># Getting Started
+
+This document describes how to...
+<em style="color: var(--ds-text-muted);">[deleted — too formal]</em>
+
+# Getting Started
+
+Welcome to the getting started guide...
+<em style="color: var(--ds-text-muted);">[deleted — "welcome to the getting started guide" is the "hello my name is my name" of documentation]</em>
+
+# Getting Started
+
+Before you begin, make sure you have...
+<em style="color: var(--ds-text-muted);">[deleted — you don't know what they need yet because you haven't written the rest]</em>
+
+# Getting Started
+
+## Prerequisites
+
+- Node.js 18+
+<em style="color: var(--ds-text-muted);">[you have now committed to a prerequisites section and will spend 30 minutes listing things that may or may not be required]</em>
+
+# Getting Started
+
+So you want to use [Project Name].
+<em style="color: var(--ds-text-muted);">[deleted — too casual? too presumptuous? do they want to use it? maybe they were told to]</em>
+
+# Getting Started
+
+TODO: write getting started guide
+<em style="color: var(--ds-text-muted);">[shipped to main]</em></div>
+  </div>
+
+  <!-- ══════════════════════════════════ -->
+  <h2 id="five-stages">The Five Stages of Documentation</h2>
+
+  <p>
+    Decades of empirical observation across thousands of engineering teams have revealed that every documentation effort follows the same emotional trajectory. These are the <strong>Five Stages of Documentation</strong>:
+  </p>
+
+  <h3>Stage 1: Denial</h3>
+  <p>
+    "The code is self-documenting." This is the opening position. The engineer believes — sincerely, passionately — that well-named variables and clean architecture eliminate the need for external documentation. The code <em>speaks for itself</em>. The function is called <code>processUserData()</code>. What more is there to say?
+  </p>
+  <p>
+    What more is there to say: which users, what data, what "process" means, what happens when it fails, why it's called three times in succession in production, and who decided it should also send an email.
+  </p>
+
+  <h3>Stage 2: Anger</h3>
+  <p>
+    "Why doesn't anyone else write docs?" The engineer has been asked to explain the same thing for the fifth time. They are angry — not at the asker, but at the <em>absence of a system</em>. They vow to create that system. They open a Notion page. They type a title. The title is "Documentation Standards." They bold it. They feel better. They close the tab.
+  </p>
+
+  <h3>Stage 3: Bargaining</h3>
+  <p>
+    "What if I just add really good code comments?" This is the compromise stage. The engineer will not write separate documentation, but they will <em>annotate the code so thoroughly</em> that documentation becomes unnecessary. The comments will be comprehensive, contextual, and maintained.
+  </p>
+  <p>
+    The comments will be comprehensive for approximately two pull requests, after which they will begin to drift, fossilize, and eventually contradict the code they describe. Six months later, a comment reading <code>// this should never happen</code> will sit directly above a code path that handles 40% of production traffic.
+  </p>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span>The bargaining phase, visualized</span>
+      <span class="lang-tag">python</span>
+    </div>
+    <div class="code-body"><span style="color:#6a9955"># TODO: document this function</span>
+<span style="color:#6a9955"># NOTE: this is temporary (added 2019-03-14)</span>
+<span style="color:#6a9955"># HACK: don't ask</span>
+<span style="color:#6a9955"># FIXME: Kevin knows why this is here</span>
+<span style="color:#569cd6">def</span> <span style="color:#dcdcaa">process_user_data</span>(data, legacy=<span style="color:#569cd6">True</span>, kevin_mode=<span style="color:#569cd6">False</span>):
+    ...</div>
+  </div>
+
+  <h3>Stage 4: Depression</h3>
+  <p>
+    The engineer opens the docs site. The sidebar has four pages, two of which are the auto-generated "Introduction" and "Installation" that came with the framework. The "Architecture Overview" page contains a single Mermaid diagram from eight months ago that no longer reflects reality. The "API Reference" links to a Swagger page that 502s.
+  </p>
+  <p>
+    The engineer closes the docs site.
+  </p>
+
+  <h3>Stage 5: A README That Says "TODO"</h3>
+  <p>
+    Acceptance. The engineer creates a <code>README.md</code> with the project name, a one-line description, and the words "More documentation coming soon." The PR is merged. The README is never updated. The words "coming soon" will remain in the repository for the lifetime of the project, a permanent monument to good intentions and finite energy.
+  </p>
+
+  <div class="admonition admonition-danger">
+    <div class="admonition-heading">🚨 danger</div>
+    <p>If your project's README still says "coming soon" and the last commit to it was more than 18 months ago, you have not reached Stage 5. You have transcended it. The documentation is not coming. Make peace with this.</p>
+  </div>
+
+  <!-- ══════════════════════════════════ -->
+  <h2 id="when">When to Write Documentation</h2>
+
+  <p>
+    Timing is critical. Write documentation too early and it will be invalidated by the next sprint. Write it too late and no one will remember what the code does, including the person who wrote it. The optimal time to write documentation is always <strong>two weeks ago</strong>.
+  </p>
+  <p>
+    Since time travel is not yet available (and is not on the roadmap), the following flowchart can help determine when to write documentation in practice:
+  </p>
+
+  <div class="flowchart">
+    <span class="flow-node decision">Should I write docs now?</span>
+    <br>
+    <span class="flow-arrow">↓ yes</span>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <span class="flow-arrow">↓ no</span>
+    <br>
+    <span class="flow-node decision">Do I have time?</span>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <span class="flow-node terminal">Later</span>
+    <br>
+    <span class="flow-arrow">↓ yes</span>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <span class="flow-arrow">↓ no</span>
+    <br>
+    <span class="flow-node decision">Do I want to?</span>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <span class="flow-node terminal">Later</span>
+    <br>
+    <span class="flow-arrow">↓ yes (lying)</span>
+    &nbsp;&nbsp;&nbsp;
+    <span class="flow-arrow">↓ no</span>
+    <br>
+    <span class="flow-node terminal">Later</span>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <span class="flow-node terminal">Later</span>
+  </div>
+
+  <p>
+    As the flowchart demonstrates, all paths lead to <strong>Later</strong>. Later is not a time. Later is a place — specifically, the place where documentation goes to not be written. Later is the /dev/null of good intentions.
+  </p>
+
+  <!-- ══════════════════════════════════ -->
+  <h2 id="types">Types of Documentation</h2>
+
+  <p>
+    Software documentation exists in several forms, each serving a unique purpose and a unique form of neglect:
+  </p>
+
+  <table>
+    <tr>
+      <th>Type</th>
+      <th>Purpose</th>
+      <th>Typical Lifespan</th>
+    </tr>
+    <tr>
+      <td><strong>README</strong></td>
+      <td>First impression of the project</td>
+      <td>Written once during initial commit. "Coming soon" section ages like milk.</td>
+    </tr>
+    <tr>
+      <td><strong>API Reference</strong></td>
+      <td>Describe endpoints, parameters, responses</td>
+      <td>Accurate for approximately one sprint after auto-generation. Then the schema changes and the docs don't.</td>
+    </tr>
+    <tr>
+      <td><strong>Architecture Decision Records</strong></td>
+      <td>Explain <em>why</em> decisions were made</td>
+      <td>3 are created with great enthusiasm. Then the team forgets ADRs exist. Decision #4 onward is made in a Slack thread that is subsequently deleted.</td>
+    </tr>
+    <tr>
+      <td><strong>Runbooks</strong></td>
+      <td>Step-by-step guides for operational tasks</td>
+      <td>Accurate until the first step that says "click the blue button," which is now green, in a different location, behind a feature flag.</td>
+    </tr>
+    <tr>
+      <td><strong>Onboarding Guide</strong></td>
+      <td>Help new hires get productive</td>
+      <td>Written by the second employee. Never updated. The tenth employee's onboarding consists of Kevin saying "ignore the doc, I'll walk you through it."</td>
+    </tr>
+    <tr>
+      <td><strong>Confluence Pages</strong></td>
+      <td>Nobody knows</td>
+      <td>Eternal. Confluence pages never die. They just accumulate, forming geological strata of institutional memory, each layer contradicting the one below it. Archaeologists will study them.</td>
+    </tr>
+    <tr>
+      <td><strong>Inline Comments</strong></td>
+      <td>Explain tricky code</td>
+      <td>See: <a href="#five-stages">Stage 3 (Bargaining)</a></td>
+    </tr>
+  </table>
+
+  <!-- ══════════════════════════════════ -->
+  <h2 id="excuses">Making Excuses: A Field Guide</h2>
+
+  <p>
+    Over the years, the software engineering community has developed a rich and nuanced vocabulary for not writing documentation. The following phrases have been rigorously field-tested across thousands of standup meetings:
+  </p>
+
+  <h4>"The code is self-documenting"</h4>
+  <p>Translation: the code is not documented and I have decided this is a philosophy rather than a shortcoming.</p>
+
+  <h4>"We're moving too fast to write docs"</h4>
+  <p>Translation: we are moving too fast to write docs. We are also moving too fast to onboard new people, explain our decisions, or remember why we did things. We are very fast. We are lost.</p>
+
+  <h4>"Nobody reads the docs anyway"</h4>
+  <p>Translation: the docs are so out of date that reading them is actively harmful. This is presented as evidence against documentation rather than evidence for maintaining it.</p>
+
+  <h4>"I'll add docs in a follow-up PR"</h4>
+  <p>Translation: I will not add docs in a follow-up PR. There is no follow-up PR. There has never been a follow-up PR. The follow-up PR is a social contract that both parties understand will not be honored, and yet it is invoked in every code review, a ritual of mutual self-deception that binds the team together.</p>
+
+  <h4>"We should use AI to generate the docs"</h4>
+  <p>Translation: we have transferred responsibility for documentation from a human who won't write it to a machine that will write it confidently and incorrectly. The docs now exist, technically. They describe a system that is adjacent to ours but not quite ours, like a parallel universe where the API almost makes sense.</p>
+
+  <div class="admonition admonition-tip">
+    <div class="admonition-heading">💡 tip</div>
+    <p>If your team uses all five of these excuses simultaneously, you have achieved what researchers call <strong>Documentation Nihilism</strong> — the philosophical position that documentation is both impossible and unnecessary. This is the final form. There is no Stage 6.</p>
+  </div>
+
+  <!-- ══════════════════════════════════ -->
+  <h2 id="maintenance">Keeping Documentation Updated</h2>
+
+  <p>
+    Writing documentation is hard. Keeping it updated is a Sisyphean endeavor that will consume what remains of your will to live.
+  </p>
+  <p>
+    The fundamental challenge is this: documentation is a <strong>snapshot</strong> of understanding at a point in time. Code is a <strong>living system</strong> that changes continuously. The moment you press "merge" on a documentation PR, the clock begins ticking toward the moment that doc becomes inaccurate. This interval is called the <strong>Documentation Half-Life</strong>, and for most teams it is approximately 6 weeks.
+  </p>
+
+  <h3>The Screenshot Problem</h3>
+  <p>
+    No artifact in documentation decays faster than a screenshot. A screenshot of your UI is accurate for the duration of the current sprint, after which the button moves, the color changes, the sidebar is reorganized, and the screenshot now depicts a product that no longer exists.
+  </p>
+  <p>
+    And yet the screenshot remains in the docs, a ghost of interfaces past, confusing every new reader who wonders: "Is my app broken, or is this doc broken?" The answer is always the doc. The answer is <em>always</em> the doc.
+  </p>
+
+  <div class="admonition admonition-caution">
+    <div class="admonition-heading">⚠️ caution</div>
+    <p>If your documentation contains screenshots that include a macOS menu bar showing a date, and that date is more than one year ago, the documentation is not a guide — it is a historical document. Treat it accordingly. Consider adding a sepia filter.</p>
+  </div>
+
+  <!-- ══════════════════════════════════ -->
+  <h2 id="glossary">Glossary</h2>
+
+  <table>
+    <tr><th>Term</th><th>Definition</th></tr>
+    <tr>
+      <td><strong>Bus Factor</strong></td>
+      <td>The number of team members who can be hit by a bus before the project becomes unmaintainable. For most undocumented projects, this number is 1. That person is Kevin.</td>
+    </tr>
+    <tr>
+      <td><strong>Code Comment</strong></td>
+      <td>A note left in source code explaining what the code does, what it should do, or — most commonly — what the author was feeling at the time. e.g., <code>// I'm sorry</code></td>
+    </tr>
+    <tr>
+      <td><strong>Coming Soon</strong></td>
+      <td>A documentation placeholder indicating that content is not coming and was never coming, but the author needed to merge the PR and this was less embarrassing than an empty page.</td>
+    </tr>
+    <tr>
+      <td><strong>Documentation Debt</strong></td>
+      <td>The accumulated cost of not documenting things. Unlike technical debt, documentation debt is never tracked, never prioritized, and never repaid. It simply grows until Kevin leaves.</td>
+    </tr>
+    <tr>
+      <td><strong>Documentation Half-Life</strong></td>
+      <td>The time between a doc being written and a doc being wrong. Industry average: 6 weeks. For docs containing screenshots: 11 days.</td>
+    </tr>
+    <tr>
+      <td><strong>Follow-Up PR</strong></td>
+      <td>A fictional artifact referenced during code review to defer documentation to a future that will never arrive. See also: "tech debt ticket," "parking lot," "backlog."</td>
+    </tr>
+    <tr>
+      <td><strong>Kevin</strong></td>
+      <td>A load-bearing team member who serves as the primary knowledge store for all undocumented institutional knowledge. Every team has one. If you don't know who yours is, it might be you.</td>
+    </tr>
+    <tr>
+      <td><strong>Later</strong></td>
+      <td>The temporal destination of all documentation commitments. Not a time, but a state of being. The /dev/null of intention.</td>
+    </tr>
+    <tr>
+      <td><strong>Self-Documenting Code</strong></td>
+      <td>Code that is documented by virtue of being readable, well-structured, and thoroughly understood by its author. Understood by <em>no one else</em>, but the author doesn't know that yet.</td>
+    </tr>
+    <tr>
+      <td><strong>TODO</strong></td>
+      <td>A promise made to a codebase that will not be kept. The most common word in documentation, and the least honest.</td>
+    </tr>
+  </table>
+
+  <!-- ══════════════════════════════════ -->
+  <h2 id="faq">Frequently Asked Questions</h2>
+
+  <h4>Q: How long should documentation be?</h4>
+  <p>Long enough to be useful. Short enough that someone will read it. This Goldilocks zone does not exist, which is why no one is satisfied with any documentation ever.</p>
+
+  <h4>Q: Should I write docs before or after writing code?</h4>
+  <p>Before, according to every methodology. After, according to every developer. Never, according to what actually happens.</p>
+
+  <h4>Q: How do I convince my team to write documentation?</h4>
+  <p>You don't. You write it yourself, once, resentfully, on a Friday afternoon. Then you send a link in Slack with a message that reads "FYI — wrote some docs." No one will acknowledge the message. Two months later, someone will ask a question that is answered on page one, and you will experience an emotion that has no name but is adjacent to vindication.</p>
+
+  <h4>Q: Is this documentation site itself a form of procrastination?</h4>
+  <p>Yes. This site was built instead of writing the actual documentation for three separate internal projects, all of which remain undocumented. The sidebar navigation alone took four hours. We regret nothing. We regret everything.</p>
+
+  <h4>Q: Who is Kevin?</h4>
+  <p>You know who Kevin is.</p>
+
+  <!-- ══════════════════════════════════ -->
+
+  <div class="doc-nav">
+    <a href="#" class="doc-nav-link">
+      <div class="doc-nav-label">« Previous</div>
+      <div class="doc-nav-title">Installing a Docs Framework Instead of Writing Docs</div>
+    </a>
+    <a href="#" class="doc-nav-link next">
+      <div class="doc-nav-label">Next »</div>
+      <div class="doc-nav-title">Staring at the Blank Page: Advanced Techniques</div>
+    </a>
+  </div>
+
+  <div class="last-updated">
+    Last updated on <strong>March 22, 2026</strong> by <strong>Not Kevin</strong> · <a href="#">Edit this page</a>
+    <br>
+    <span style="font-size: 12px; color: #bbb; margin-top: 4px; display: block;">
+      This documentation was written instead of documenting three internal services, two API integrations, and a deploy process that only Kevin understands. Time spent: 6 hours. Documentation produced for actual projects: 0 pages.
+    </span>
+  </div>
+
+</main>
+
+</body>
+</html>
