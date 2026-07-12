@@ -1,0 +1,48 @@
+# Dependencies & local installs
+node_modules
+**/node_modules
+
+# Replit / local tooling
+.local
+.cache
+.agents
+.config
+.claude
+.replit
+.replitignore
+
+# Git metadata only at repo root (do NOT match app src/hooks)
+.git
+/objects
+/refs
+/logs
+/hooks
+/info
+/lfs
+/COMMIT_EDITMSG
+/FETCH_HEAD
+/ORIG_HEAD
+/HEAD
+/description
+/config
+/index
+
+# Build outputs (rebuilt on Vercel)
+**/dist
+**/*.tsbuildinfo
+tmp
+out-tsc
+.expo
+.expo-shared
+
+# Large local-only assets not needed for the static site
+attached_assets
+
+# IDE / OS
+.DS_Store
+.idea
+.vscode
+*.log
+
+# Mock sandbox (not the production site)
+artifacts/mockup-sandbox

@@ -60,7 +60,11 @@ router.post("/blog-posts", adminAuth, async (req, res) => {
 
 router.put("/blog-posts/:id", adminAuth, async (req, res) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(String(req.params.id), 10);
+    if (Number.isNaN(id)) {
+      res.status(400).json({ error: "Invalid blog post id" });
+      return;
+    }
     const [post] = await db
       .update(blogPostsTable)
       .set({ ...req.body, updatedAt: new Date() })
@@ -78,7 +82,11 @@ router.put("/blog-posts/:id", adminAuth, async (req, res) => {
 
 router.delete("/blog-posts/:id", adminAuth, async (req, res) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(String(req.params.id), 10);
+    if (Number.isNaN(id)) {
+      res.status(400).json({ error: "Invalid blog post id" });
+      return;
+    }
     const [post] = await db
       .delete(blogPostsTable)
       .where(eq(blogPostsTable.id, id))
