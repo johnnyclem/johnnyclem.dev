@@ -22,9 +22,13 @@ export default function PostPage() {
     if (!slug) return;
     const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     fetch(`${base}/api/page-item-overrides?registryType=posts`)
-      .then((res) => res.json())
-      .then((data: Array<PageItemOverride & { slug: string }>) => {
-        const match = data.find((o) => o.slug === slug);
+      .then(async (res) => {
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!Array.isArray(data)) return;
+        const match = data.find(
+          (o: PageItemOverride & { slug: string }) => o.slug === slug,
+        );
         if (match) setOverride(match);
       })
       .catch(() => {});

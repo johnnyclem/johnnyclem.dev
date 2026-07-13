@@ -34,8 +34,12 @@ export default function BlogPage() {
     document.title = "Blog — johnnyclem.dev";
     const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     fetch(`${base}/api/blog-posts`)
-      .then((res) => res.json())
-      .then((data) => setDbPosts(data.filter((p: DbBlogPost) => p.published)))
+      .then(async (res) => {
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!Array.isArray(data)) return;
+        setDbPosts(data.filter((p: DbBlogPost) => p.published));
+      })
       .catch(() => {});
   }, []);
 

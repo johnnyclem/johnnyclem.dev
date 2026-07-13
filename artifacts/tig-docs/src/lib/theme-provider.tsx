@@ -4,7 +4,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     fetch(`${base}/api/theme-settings`)
-      .then((res) => res.json())
+      .then(async (res) => {
+        if (!res.ok) return;
+        return res.json();
+      })
       .then((data) => {
         if (!data || !data.id) return;
 

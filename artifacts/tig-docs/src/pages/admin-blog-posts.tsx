@@ -53,8 +53,9 @@ export default function AdminBlogPosts() {
       const res = await fetch(`${base}/api/blog-posts`, {
         headers: getAuthHeaders(),
       });
+      if (!res.ok) return;
       const data = await res.json();
-      setPosts(data);
+      if (Array.isArray(data)) setPosts(data);
     } catch {
       console.error("Failed to fetch posts");
     } finally {

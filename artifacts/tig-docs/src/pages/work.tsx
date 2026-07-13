@@ -234,8 +234,12 @@ export default function WorkPage() {
     document.title = "Work — johnnyclem.dev";
     const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     fetch(`${base}/api/page-item-overrides?registryType=work`)
-      .then((res) => res.json())
-      .then((data) => setOverrides(data))
+      .then(async (res) => {
+        if (!res.ok) return;
+        const data = await res.json();
+        // API may be unconfigured (503) or return an error object — keep static data.
+        if (Array.isArray(data)) setOverrides(data);
+      })
       .catch(() => {});
   }, []);
 

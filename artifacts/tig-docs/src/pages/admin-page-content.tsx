@@ -47,8 +47,9 @@ export default function AdminPageContent() {
   const fetchOverrides = async () => {
     try {
       const res = await fetch(`${base}/api/page-item-overrides`);
+      if (!res.ok) return;
       const data = await res.json();
-      setOverrides(data);
+      if (Array.isArray(data)) setOverrides(data);
     } catch {
       console.error("Failed to fetch overrides");
     }
