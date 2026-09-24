@@ -12,6 +12,57 @@ export interface BlogPost {
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: "the-court-reporter",
+    title: "The Court Reporter",
+    description:
+      "The third post in the Concussion Protocol series. How 'touch something real' became stenographer's append-only truth ledger, what a tombstone actually is, and how the same word now shows up across stenographer, short-hand, smallchat, and polytician. Honest about what shipped and what didn't.",
+    date: "September 24, 2026",
+    readTime: "11 min read",
+    tags: ["AI", "Engineering", "Essay"],
+    fullPage: true,
+    component: () => import("./posts/the-court-reporter"),
+  },
+  {
+    slug: "press-stenographer",
+    title: "Stenographer adds an append-only truth ledger, human notarization, and real-time objections",
+    description:
+      "The MCP court reporter now records what is provably dead, who signed it, and objects when a model says it again.",
+    date: "September 24, 2026",
+    readTime: "3 min read",
+    tags: ["Press", "Open Source", "MCP"],
+    component: () => import("./posts/press-stenographer"),
+  },
+  {
+    slug: "press-short-hand",
+    title: "Short-hand turns corrections into tombstones that stale facts can't get past",
+    description:
+      "Progressive context compaction now keeps a record of what was superseded, prunes it from history, and hands it up the chain as a proposal.",
+    date: "September 24, 2026",
+    readTime: "3 min read",
+    tags: ["Press", "Open Source", "Memory"],
+    component: () => import("./posts/press-short-hand"),
+  },
+  {
+    slug: "press-smallchat",
+    title: "Smallchat now reads the truth ledger and keeps the literals intact",
+    description:
+      "The semantic tool-dispatch runtime consumes stenographer's tombstones, rebuilds asserted truth on every compaction, and takes objections on its channel bridge.",
+    date: "September 24, 2026",
+    readTime: "3 min read",
+    tags: ["Press", "Open Source", "MCP"],
+    component: () => import("./posts/press-smallchat"),
+  },
+  {
+    slug: "press-polytician",
+    title: "Polytician: where the tombstone stands, honestly",
+    description:
+      "The local-first semantic memory server has a tombstone. It is not yet the same tombstone as the other three, and this note says so.",
+    date: "September 24, 2026",
+    readTime: "3 min read",
+    tags: ["Press", "Open Source", "Memory"],
+    component: () => import("./posts/press-polytician"),
+  },
+  {
     slug: "git-for-a-mind",
     title: "Git for a Mind",
     description:
