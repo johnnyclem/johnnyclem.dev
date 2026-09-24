@@ -101,6 +101,41 @@ const posts = [
 
 const blogPosts = [
   {
+    slug: "the-court-reporter",
+    title: "The Court\nReporter",
+    category: "ESSAY · AI / ENGINEERING",
+    icon: "⚖",
+    gradient: ["#04070a", "#0a2620"],
+  },
+  {
+    slug: "press-stenographer",
+    title: "Stenographer:\nThe Truth Ledger",
+    category: "PRESS · OPEN SOURCE",
+    icon: "⎘",
+    gradient: ["#04070a", "#0a2b28"],
+  },
+  {
+    slug: "press-short-hand",
+    title: "Short-hand:\nCorrection Tombstones",
+    category: "PRESS · OPEN SOURCE",
+    icon: "≡",
+    gradient: ["#04070a", "#0a2b28"],
+  },
+  {
+    slug: "press-smallchat",
+    title: "Smallchat:\nReading the Ledger",
+    category: "PRESS · OPEN SOURCE",
+    icon: "◎",
+    gradient: ["#04070a", "#0a2b28"],
+  },
+  {
+    slug: "press-polytician",
+    title: "Polytician:\nWhere the Tombstone\nStands",
+    category: "PRESS · OPEN SOURCE",
+    icon: "◇",
+    gradient: ["#04070a", "#0a2b28"],
+  },
+  {
     slug: "git-for-a-mind",
     title: "Git for a Mind",
     category: "ESSAY · AI / ENGINEERING",
